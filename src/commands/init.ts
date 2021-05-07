@@ -2,13 +2,15 @@ import commander from "commander";
 import inquirer from 'inquirer'
 import fs from 'fs'
 
+import {hookTypes} from '../types/hook.types'
+
 export function addInit(program: commander.Command) {
     program.command('init')
         .action(async() => {
             const folderQuestion = {
                 type: 'input',
-                name: 'modulesPath',
-                message: `Please enter the path of the folder containing the packages or modules:\n`,
+                name: 'packagesPath',
+                message: `Please enter the path of the folder containing the packages:\n`,
                 validate: function (rpath: string) {
                     let pass
                     console.log({rpath})
@@ -25,38 +27,38 @@ export function addInit(program: commander.Command) {
                 transformer: (val: string) => `./${val}`,
             }
 
-            let {modulesPath} = await inquirer.prompt([folderQuestion]) as {modulesPath: string};
-            const moduleDirs = fs.readdirSync(`./${modulesPath}`, { withFileTypes: true })
+            let {packagesPath} = await inquirer.prompt([folderQuestion]) as {packagesPath: string};
+            const moduleDirs = fs.readdirSync(`./${packagesPath}`, { withFileTypes: true })
                 .filter(dirent => dirent.isDirectory() && !dirent.name.startsWith('.'))
                 .map(dirent => dirent.name)
 
-            const modulesQuestion = [{
+            const packagesQuestion = [{
                 type: 'checkbox',
-                name: 'modules',
+                name: 'packages',
                 message: 'Select folders to hook :',
                 choices: moduleDirs,
             }];
 
-            const {modules: selectedModules} = await inquirer.prompt(modulesQuestion)  as {modules: string[]};
+            const {packages: selectedPackages} = await inquirer.prompt(packagesQuestion)  as {packages: string[]};
 
             const packageJSON = JSON.parse(fs.readFileSync('package.json', 'utf8'));
             packageJSON.mookme = {
-                modulesPath,
-                modules: selectedModules
+                packagesPath,
+                packages: selectedPackages
             }
 
             const mookMeConfig = {
-                modulesPath: `.` + (modulesPath ? `/${modulesPath}`: ''),
-                modules: selectedModules
+                packagesPath: `.` + (packagesPath ? `/${packagesPath}`: ''),
+                packages: selectedPackages
             }
 
-            const modulesHooksDirPaths = selectedModules.map(mod => `${mookMeConfig.modulesPath}/${mod}/.hooks`)
+            const packagesHooksDirPaths = selectedPackages.map(mod => `${mookMeConfig.packagesPath}/${mod}/.hooks`)
 
             console.log("\nThe following configuration will be added into your package.json:")
             console.log("mookme: ", JSON.stringify(mookMeConfig, null, 2))
 
             console.log('\nThe following directories will also be created:')
-            modulesHooksDirPaths.forEach(hookDir => console.log(`- ${hookDir}`))
+            packagesHooksDirPaths.forEach(hookDir => console.log(`- ${hookDir}`))
 
             const {confirm} = await inquirer.prompt([{
                 type: 'confirm',
@@ -72,7 +74,8 @@ export function addInit(program: commander.Command) {
                 console.log('Done.')
                 
                 console.log('Initializing hooks folders...')
-                modulesHooksDirPaths.forEach(hookDir => {
+                fs.mkdirSync('.hooks');
+                packagesHooksDirPaths.forEach(hookDir => {
                     if (!fs.existsSync(hookDir)){
                         fs.mkdirSync(hookDir);
                     }
