@@ -46,12 +46,17 @@ export function addInit(program: commander.Command) {
             }
 
             const mookMeConfig = {
-                modulesPath: `./${modulesPath}`,
+                modulesPath: `.` + (modulesPath ? `/${modulesPath}`: ''),
                 modules: selectedModules
             }
 
-            console.log("The following configuration will be added into your package.json :")
+            const modulesHooksDirPaths = selectedModules.map(mod => `${mookMeConfig.modulesPath}/${mod}/.hooks`)
+
+            console.log("\nThe following configuration will be added into your package.json:")
             console.log("mookme: ", JSON.stringify(mookMeConfig, null, 2))
+
+            console.log('\nThe following directories will also be created:')
+            modulesHooksDirPaths.forEach(hookDir => console.log(`- ${hookDir}`))
 
             const {confirm} = await inquirer.prompt([{
                 type: 'confirm',
@@ -65,6 +70,13 @@ export function addInit(program: commander.Command) {
                 packageJSON.mookme = mookMeConfig
                 fs.writeFileSync('package.json', JSON.stringify(packageJSON, null, 2))
                 console.log('Done.')
+                
+                console.log('Initializing hooks folders...')
+                modulesHooksDirPaths.forEach(hookDir => {
+                    if (!fs.existsSync(hookDir)){
+                        fs.mkdirSync(hookDir);
+                    }
+                })
             }
         });
 }

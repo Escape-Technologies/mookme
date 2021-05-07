@@ -24,7 +24,7 @@
     "monorepos"
   ],
   "author": "lecanu.maxence@gmail.com",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/LMaxence/mook/issues"
   },
