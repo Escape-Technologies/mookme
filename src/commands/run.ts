@@ -1,16 +1,18 @@
-import commander from "commander";
+import commander, { args } from "commander";
 import fs from 'fs'
 import {exec, execSync} from 'child_process' 
 import draftlog from 'draftlog'
 import chalk from 'chalk'
 draftlog(console)
 
-import {hookTypes, HookType} from '../types/hook.types'
+import {hookTypes, HookType, PackageHook} from '../types/hook.types'
+import {StepCommand} from '../types/step.types'
 import {Config} from '../types/config.types'
+import { hookPackage } from "../utils/hook-package";
+import { getConfig } from "../utils/get-config";
+
 
 interface Options {type: HookType, args: string}
-interface StepCommand {name: string, command: string}
-interface HookStep {name: string, steps: StepCommand[], cwd: string} 
 
 export function addRun(program: commander.Command) {
     program.command('run')
@@ -18,7 +20,7 @@ export function addRun(program: commander.Command) {
         .option('-a, --args <args>[]', 'The arguments being passed to the hooks', '')
         .action(async(opts: Options) => {
 
-            const args = opts.args.split(' ').filter(arg => arg !== '')
+            process.env.MOOK_ME_ARGS = opts.args
 
             const {type} = opts
             if(!hookTypes.includes(type)) {
@@ -26,27 +28,9 @@ export function addRun(program: commander.Command) {
                 process.exit(1)
             }
 
-            let isRoot = false
-            let rootDir  = process.cwd()
-            while(!isRoot) {
-                isRoot = fs.existsSync(`${rootDir}/.git`)
-                if(!isRoot) {
-                    rootDir = `${rootDir}/..`
-                }
-            }
+            const {packages, packagesPath} = getConfig()
 
-            const packageJSON = JSON.parse(fs.readFileSync(`${rootDir}/package.json`, 'utf8'));
-            const config = packageJSON.mookme as Config
-
-            
-            if(!config) {
-                console.log('Please run `mookme --init` first')
-                process.exit(1)
-            }
-
-            const {packages, packagesPath} = config
-
-            const hooks: HookStep[] = []
+            const hooks: PackageHook[] = []
 
             const stagedFiles = execSync('echo $(git diff --cached --name-only)').toString()
             const packagesWithChanges = Array.from(new Set(stagedFiles.split(' ').map(path => path.split('/')[0]))).filter(name => packages.includes(name))
@@ -69,54 +53,21 @@ export function addRun(program: commander.Command) {
                 })
             }
 
-            const loggers: {[key: string]: any} = {}
-
-            hooks.filter(hook => hook.steps.length > 0).forEach(hook => {
-                loggers[hook.name] = console.draft(`${chalk.bold.inverse(` Hooks : ${hook.name} `)}${chalk.bgBlueBright.bold(' Running... ')}`)
-                const errors = []
-
-                Promise.all(hook.steps.map(step => new Promise((resolve, reject) => {
-                    const hookLoggers: {[key: string]: any} = {}
-                    const title: Function[] = []
-                    let currentStatus: string = 'Running.. '
-                    title.push(console.draft(`→ ${chalk.bold(step.name)} > ${step.command} `))
-                    title.push(console.draft('Running .'))
-                    const titleTO = setInterval(() => {
-                        switch(currentStatus) {
-                            case 'Running.. ':
-                                currentStatus = 'Running ..'
-                                break
-                            case 'Running ..':
-                                currentStatus = 'Running. .'
-                                break
-                            case 'Running. .':
-                                currentStatus = 'Running.. '
-                                break
+            Promise.all(hooks.filter(hook => hook.steps.length > 0).map(hook => hookPackage(hook)))
+                .then(packagesErrors => {
+                    packagesErrors.forEach(packageErrors => {
+                        packageErrors.forEach(err => {
+                            console.log(chalk.bgRed.white.bold(`Hook of package ${err.hook.name} failed at step ${err.step.name}`))
+                            console.log(chalk.red(err.msg))
+                        })
+                        if(packageErrors.length > 0) {
+                            process.exit(1)
                         }
-                        title[1](currentStatus)
-                    } , 100)
+                    })
+                }).catch(err => {
+                    console.log(chalk.bgRed('Unexpected error !'))
+                    console.error(err)
+                })
 
-                    const cp = exec(step.command.replace('{args}', `"${args.join(' ')}"`),  {cwd: hook.cwd})
-                    hookLoggers[step.name] = console.draft()
-                    
-                    cp.stderr?.on('data', (err) => {
-                        reject(err)
-                        errors.push({name: hook.name, step: step.name, err});
-                    });
-                
-                    cp.on('exit', (code) => {
-                        clearInterval(titleTO)
-                        if(code === 0) {
-                            title[1]('✅ Done.') 
-                        } else {
-                            title[1]('❌ Error.') 
-                        }
-                        resolve('ok')
-                    });
-
-                })))
-                    .then(() => loggers[hook.name](`${chalk.bold.inverse(` Hooks : ${hook.name} `)}${chalk.bgGreen.bold(' Done ✓ ')}`))
-                    .catch((err) => loggers[hook.name](`${chalk.bold.inverse(` Hooks : ${hook.name} `)}${chalk.bgRed.bold(' Error × ')}`))
-            })
         });
 }
