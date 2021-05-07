@@ -3,10 +3,20 @@ import inquirer from 'inquirer'
 import fs from 'fs'
 
 import {hookTypes} from '../types/hook.types'
+import { execSync } from "child_process";
+
+function createDirIfNeeded(path: string) {
+    if (!fs.existsSync(path)){
+        fs.mkdirSync(path);
+    }
+}
 
 export function addInit(program: commander.Command) {
     program.command('init')
         .action(async() => {
+
+            let selectedPackages: string[] = []
+
             const folderQuestion = {
                 type: 'input',
                 name: 'packagesPath',
@@ -39,8 +49,60 @@ export function addInit(program: commander.Command) {
                 choices: moduleDirs,
             }];
 
-            const {packages: selectedPackages} = await inquirer.prompt(packagesQuestion)  as {packages: string[]};
+            const {packages} = await inquirer.prompt(packagesQuestion)  as {packages: string[]};
+            selectedPackages = selectedPackages.concat(packages)
 
+            let {addSubFolder} = await inquirer.prompt([{
+                type: 'confirm',
+                name: 'addSubFolder',
+                message: 'Do you wanna add a subfolder for packages ?',
+                default: false
+            }])  as {addSubFolder: boolean};
+
+            while(addSubFolder) {
+                const folderQuestion = {
+                    type: 'input',
+                    name: 'subPath',
+                    message: `Please enter the path of the folder containing the packages:\n`,
+                    validate: function (rpath: string) {
+                        let pass
+                        try {
+                            pass = fs.lstatSync(packagesPath ? `./${packagesPath}/${rpath}` : `./${rpath}`).isDirectory() 
+                        } catch(err) {
+                            pass = false
+                        } 
+                        if (pass) {
+                            return true;
+                        }
+                        return `Path ./${rpath} is not a valid folder path`;
+                    },
+                    transformer: (val: string) => packagesPath ? `./${packagesPath}/${val}` : `./${val}`
+                }
+    
+                let {subPath} = await inquirer.prompt([folderQuestion]) as {subPath: string};
+                const fullSubFolderPath = packagesPath ? `./${packagesPath}/${subPath}` : `./${subPath}`
+                const moduleDirs = fs.readdirSync(`./${fullSubFolderPath}`, { withFileTypes: true })
+                    .filter(dirent => dirent.isDirectory() && !dirent.name.startsWith('.'))
+                    .map(dirent => dirent.name)
+    
+                const packagesQuestion = [{
+                    type: 'checkbox',
+                    name: 'packages',
+                    message: 'Select folders to hook :',
+                    choices: moduleDirs,
+                }];
+    
+                const {packages} = await inquirer.prompt(packagesQuestion)  as {packages: string[]};
+                selectedPackages = selectedPackages.concat(packages.map(subPackage => `${packagesPath ? `${packagesPath}/` : ''}${subPath}/${subPackage}`))
+
+                addSubFolder = (await inquirer.prompt([{
+                    type: 'confirm',
+                    name: 'addSubFolder',
+                    message: 'Do you wanna add a subfolder for packages ?',
+                    default: false
+                }])  as {addSubFolder: boolean}).addSubFolder;
+            }
+            
             const packageJSON = JSON.parse(fs.readFileSync('package.json', 'utf8'));
             packageJSON.mookme = {
                 packagesPath,
@@ -74,12 +136,14 @@ export function addInit(program: commander.Command) {
                 console.log('Done.')
                 
                 console.log('Initializing hooks folders...')
-                fs.mkdirSync('.hooks');
+                createDirIfNeeded('./hooks')
                 packagesHooksDirPaths.forEach(hookDir => {
-                    if (!fs.existsSync(hookDir)){
-                        fs.mkdirSync(hookDir);
-                    }
+                    createDirIfNeeded(hookDir)
                 })
+
+                createDirIfNeeded('./.git/hooks')
+                hookTypes.forEach(type => fs.appendFileSync(`./.git/hooks/${type}`, `mookme run --type ${type} -a "$1"`, {flag: 'a+'}))
+                hookTypes.forEach(type => execSync(`chmod +x ./.git/hooks/${type}`))
             }
         });
 }
