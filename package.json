@@ -1,0 +1,43 @@
+{
+  "name": "mookme",
+  "version": "0.0.1",
+  "description": "A pre-commit tool designed for monorepos",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "mookme": "bin/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LMaxence/mook.git"
+  },
+  "keywords": [
+    "pre",
+    "commit",
+    "pre-commit",
+    "hook",
+    "monorepos"
+  ],
+  "author": "lecanu.maxence@gmail.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LMaxence/mook/issues"
+  },
+  "homepage": "https://github.com/LMaxence/mook#readme",
+  "devDependencies": {
+    "@tsconfig/node10": "^1.0.7",
+    "@types/inquirer": "^7.3.1",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.4"
+  },
+  "dependencies": {
+    "@types/node": "^15.0.2",
+    "commander": "^7.2.0",
+    "inquirer": "^8.0.0"
+  }
+}
