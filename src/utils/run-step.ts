@@ -4,6 +4,7 @@ draftlog(console)
 
 import { StepCommand } from "../types/step.types"
 import { exec } from 'child_process'
+import { loader } from './loader'
 
 export interface RunStepOptions {
     name: string,
@@ -15,24 +16,8 @@ export function runStep(step: StepCommand, options: RunStepOptions): Promise<{st
 
     return new Promise((resolve, reject) => {
         const hookLoggers: {[key: string]: any} = {}
-        const title: Function[] = []
-        let currentStatus: string = 'Running.. '
-        title.push(console.draft(`→ ${chalk.bold(step.name)} > ${step.command} `))
-        title.push(console.draft('Running .'))
-        const titleTO = setInterval(() => {
-            switch(currentStatus) {
-                case 'Running.. ':
-                    currentStatus = 'Running ..'
-                    break
-                case 'Running ..':
-                    currentStatus = 'Running. .'
-                    break
-                case 'Running. .':
-                    currentStatus = 'Running.. '
-                    break
-            }
-            title[1](currentStatus)
-        } , 100)
+        console.log(`→ ${chalk.bold(step.name)} > ${step.command} `)
+        const {logger, titleTO} = loader()
 
         const cp = exec(step.command.replace('{args}', `"${args.join(' ')}"`),  {cwd: options.cwd})
         hookLoggers[step.name] = console.draft()
@@ -45,14 +30,14 @@ export function runStep(step: StepCommand, options: RunStepOptions): Promise<{st
         cp.on('exit', (code) => {
             clearInterval(titleTO)
             if(code === 0) {
-                title[1]('✅ Done.') 
+                logger('✅ Done.') 
                 resolve(null)
             } else {
                 resolve({
                     step: step,
                     msg: new Error(error)
                 })
-                title[1]('❌ Error.') 
+                logger('❌ Error.') 
             }
         });
 
