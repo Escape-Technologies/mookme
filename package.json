@@ -1,5 +1,5 @@
 {
-  "name": "mookme",
+  "name": "@escape.tech/mookme",
   "version": "0.0.1",
   "description": "A pre-commit tool designed for monorepos",
   "main": "dist/index.js",

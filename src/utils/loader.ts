@@ -1,7 +1,7 @@
 export function loader(initial: string =  'Running.. ') {
     let currentStatus = initial
     const logger = console.draft(currentStatus)
-    const titleTO: ReturnType<typeof setInterval> = setInterval(() => {
+    const interval: ReturnType<typeof setInterval> = setInterval(() => {
         switch(currentStatus) {
             case 'Running.. ':
                 currentStatus = 'Running ..'
@@ -15,5 +15,5 @@ export function loader(initial: string =  'Running.. ') {
         }
        logger(currentStatus)
     }, 100)
-    return {logger, titleTO}
+    return {logger, interval}
 }

@@ -9,4 +9,4 @@ export enum HookType {
 
 export const hookTypes = Object.values(HookType)
 
-export interface PackageHook {name: string, steps: StepCommand[], cwd: string} 
+export interface PackageHook {name: string, steps: StepCommand[], cwd: string,  type?: string, venvActivate?: string} 

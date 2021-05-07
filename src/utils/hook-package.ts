@@ -10,7 +10,14 @@ export function hookPackage(hook: PackageHook): Promise<{hook: PackageHook, step
     const loggers: {[key: string]: any} = {}
     loggers[hook.name] = console.draft(`${chalk.bold.inverse(` Hooks : ${hook.name} `)}${chalk.bgBlueBright.bold(' Running... ')}`)
 
-    return new Promise((resolve, reject) => Promise.all(hook.steps.map(step => runStep(step, {name: hook.name, cwd: hook.cwd})))
+    const options = {
+        name: hook.name, 
+        cwd: hook.cwd, type: 
+        hook.type, 
+        venvActivate: hook.venvActivate
+    }
+    
+    return new Promise((resolve, reject) => Promise.all(hook.steps.map(step => runStep(step, options)))
         .then((errors) => {
             const hasError = errors.find(err => err !== null)
             const result = hasError ? chalk.bgRed.bold(' Error × ') : chalk.bgGreen.bold(' Done ✓ ')

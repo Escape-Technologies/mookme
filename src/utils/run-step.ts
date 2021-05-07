@@ -3,21 +3,27 @@ import chalk from 'chalk'
 draftlog(console)
 
 import { StepCommand } from "../types/step.types"
-import { exec } from 'child_process'
+import { exec, execSync } from 'child_process'
 import { loader } from './loader'
 
 export interface RunStepOptions {
     name: string,
-    cwd: string
+    cwd: string,
+    type?: string,
+    venvActivate?: string
 }
 
 export function runStep(step: StepCommand, options: RunStepOptions): Promise<{step: StepCommand, msg: Error} | null> {
     const args = process.env.MOOK_ME_ARGS!.split(' ').filter(arg => arg !== '')
 
+    if(options.type === 'python' && options.venvActivate) {
+        step.command = `source ${options.venvActivate} && ` + step.command
+    }
+
     return new Promise((resolve, reject) => {
         const hookLoggers: {[key: string]: any} = {}
         console.log(`→ ${chalk.bold(step.name)} > ${step.command} `)
-        const {logger, titleTO} = loader()
+        const {logger, interval} = loader()
 
         const cp = exec(step.command.replace('{args}', `"${args.join(' ')}"`),  {cwd: options.cwd})
         hookLoggers[step.name] = console.draft()
@@ -28,7 +34,7 @@ export function runStep(step: StepCommand, options: RunStepOptions): Promise<{st
         });
     
         cp.on('exit', (code) => {
-            clearInterval(titleTO)
+            clearInterval(interval)
             if(code === 0) {
                 logger('✅ Done.') 
                 resolve(null)
