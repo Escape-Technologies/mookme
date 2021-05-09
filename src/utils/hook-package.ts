@@ -16,7 +16,7 @@ export function hookPackage(hook: PackageHook): Promise<{hook: PackageHook, step
         hook.type, 
         venvActivate: hook.venvActivate
     }
-    
+
     return new Promise((resolve, reject) => Promise.all(hook.steps.map(step => runStep(step, options)))
         .then((errors) => {
             const hasError = errors.find(err => err !== null)

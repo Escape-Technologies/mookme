@@ -33,15 +33,19 @@ export function addRun(program: commander.Command) {
             const stagedFiles = execSync('echo $(git diff --cached --name-only)').toString().split(' ')
             const packagesWithChanges = packages.filter(pkg => stagedFiles.find(file => file.includes(pkg)))
             
-            packages
-                .filter(name => packagesWithChanges.includes(name))
+            packagesWithChanges
                 .filter(name => fs.existsSync(`${packagesPath}/${name}/.hooks/${type}.json`))
                 .map(name => ({name, path: `${packagesPath}/${name}/.hooks/${type}.json`, cwd: `${packagesPath}/${name}`}))
-                .forEach(({name, path, cwd}) => hooks.push({
-                    name,
-                    cwd,
-                    steps: JSON.parse(fs.readFileSync(path, 'utf-8')).steps
-                }))
+                .forEach(({name, path, cwd}) => {
+                    const hook = JSON.parse(fs.readFileSync(path, 'utf-8'))
+                    hooks.push({
+                        name,
+                        cwd,
+                        type: hook.type,
+                        venvActivate: hook.venvActivate,
+                        steps: hook.steps
+                    })
+                })
 
             if(fs.existsSync(`${packagesPath}/.hooks/${type}.json`)) {
                 hooks.push({

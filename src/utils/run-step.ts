@@ -16,16 +16,18 @@ export interface RunStepOptions {
 export function runStep(step: StepCommand, options: RunStepOptions): Promise<{step: StepCommand, msg: Error} | null> {
     const args = process.env.MOOK_ME_ARGS!.split(' ').filter(arg => arg !== '')
 
-    if(options.type === 'python' && options.venvActivate) {
-        step.command = `source ${options.venvActivate} && ` + step.command
-    }
+    
 
     return new Promise((resolve, reject) => {
         const hookLoggers: {[key: string]: any} = {}
         console.log(`→ ${chalk.bold(step.name)} > ${step.command} `)
         const {logger, interval} = loader()
 
-        const cp = exec(step.command.replace('{args}', `"${args.join(' ')}"`),  {cwd: options.cwd})
+        const command = options.type === 'python' && options.venvActivate
+            ? `source ${options.venvActivate} && ` + step.command + '&& deactivate'
+            : step.command
+
+        const cp = exec(command.replace('{args}', `"${args.join(' ')}"`),  {cwd: options.cwd})
         hookLoggers[step.name] = console.draft()
 
         let out = ''
@@ -44,7 +46,6 @@ export function runStep(step: StepCommand, options: RunStepOptions): Promise<{st
                 logger('✅ Done.') 
                 resolve(null)
             } else {
-                console.log(error)
                 resolve({
                     step: step,
                     msg: new Error(error + chalk.bold('\nstdout :\n') + out)
