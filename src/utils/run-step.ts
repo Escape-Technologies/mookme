@@ -27,6 +27,11 @@ export function runStep(step: StepCommand, options: RunStepOptions): Promise<{st
 
         const cp = exec(step.command.replace('{args}', `"${args.join(' ')}"`),  {cwd: options.cwd})
         hookLoggers[step.name] = console.draft()
+
+        let out = ''
+        cp.stdout?.on('data', (chunk) => {
+            out += `\n${chunk}`
+        });
         
         let error = ''
         cp.stderr?.on('data', (chunk) => {
@@ -39,9 +44,10 @@ export function runStep(step: StepCommand, options: RunStepOptions): Promise<{st
                 logger('✅ Done.') 
                 resolve(null)
             } else {
+                console.log(error)
                 resolve({
                     step: step,
-                    msg: new Error(error)
+                    msg: new Error(error + chalk.bold('\nstdout :\n') + out)
                 })
                 logger('❌ Error.') 
             }

@@ -6,8 +6,6 @@ import chalk from 'chalk'
 draftlog(console)
 
 import {hookTypes, HookType, PackageHook} from '../types/hook.types'
-import {StepCommand} from '../types/step.types'
-import {Config} from '../types/config.types'
 import { hookPackage } from "../utils/hook-package";
 import { getConfig } from "../utils/get-config";
 
@@ -32,9 +30,9 @@ export function addRun(program: commander.Command) {
 
             const hooks: PackageHook[] = []
 
-            const stagedFiles = execSync('echo $(git diff --cached --name-only)').toString()
-            const packagesWithChanges = Array.from(new Set(stagedFiles.split(' ').map(path => path.split('/')[0]))).filter(name => packages.includes(name))
-
+            const stagedFiles = execSync('echo $(git diff --cached --name-only)').toString().split(' ')
+            const packagesWithChanges = packages.filter(pkg => stagedFiles.find(file => file.includes(pkg)))
+            
             packages
                 .filter(name => packagesWithChanges.includes(name))
                 .filter(name => fs.existsSync(`${packagesPath}/${name}/.hooks/${type}.json`))

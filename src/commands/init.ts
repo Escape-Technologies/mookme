@@ -4,6 +4,7 @@ import fs from 'fs'
 
 import {hookTypes} from '../types/hook.types'
 import { execSync } from "child_process";
+import chalk from "chalk";
 
 function createDirIfNeeded(path: string) {
     if (!fs.existsSync(path)){
@@ -11,9 +12,32 @@ function createDirIfNeeded(path: string) {
     }
 }
 
+function writeGitHooksFiles() {
+    createDirIfNeeded('./.git/hooks')
+    console.log(chalk.bold('Writing Git hooks files'))
+    hookTypes.forEach(type => {
+        console.log(chalk.bold(`- ./.git/hooks/${type}`))
+        if(fs.existsSync(`./.git/hooks/${type}`)) {
+            const hook = fs.readFileSync(`./.git/hooks/${type}`).toString()
+            if(!hook.includes(`mookme run --type ${type} -a "$1"`)) {
+                fs.appendFileSync(`./.git/hooks/${type}`, `mookme run --type ${type} -a "$1"`, {flag: 'a+'})
+                execSync(`chmod +x ./.git/hooks/${type}`)
+            } else {
+                console.log(`Hook ${type} is already declared, skipping...`)
+            }
+        }
+    })
+}
+
 export function addInit(program: commander.Command) {
     program.command('init')
-        .action(async() => {
+        .option('--only-hook', 'Skip packages definition and only write .git/hooks/${hook-type} files')
+        .action(async(opts) => {
+
+            if(opts.onlyHook) {
+                writeGitHooksFiles()
+                process.exit(0)
+            }
 
             let selectedPackages: string[] = []
 
@@ -141,9 +165,7 @@ export function addInit(program: commander.Command) {
                     createDirIfNeeded(hookDir)
                 })
 
-                createDirIfNeeded('./.git/hooks')
-                hookTypes.forEach(type => fs.appendFileSync(`./.git/hooks/${type}`, `mookme run --type ${type} -a "$1"`, {flag: 'a+'}))
-                hookTypes.forEach(type => execSync(`chmod +x ./.git/hooks/${type}`))
+                writeGitHooksFiles();
             }
         });
 }
