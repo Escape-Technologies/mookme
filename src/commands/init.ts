@@ -17,14 +17,18 @@ function writeGitHooksFiles() {
     console.log(chalk.bold('Writing Git hooks files'))
     hookTypes.forEach(type => {
         console.log(chalk.bold(`- ./.git/hooks/${type}`))
+        const mookmeCmd = `./node_modules/@escape.tech/mookme/bin/index.js run --type ${type} -a "$1"`
         if(fs.existsSync(`./.git/hooks/${type}`)) {
-            const hook = fs.readFileSync(`./.git/hooks/${type}`).toString()
-            if(!hook.includes(`mookme run --type ${type} -a "$1"`)) {
-                fs.appendFileSync(`./.git/hooks/${type}`, `mookme run --type ${type} -a "$1"`, {flag: 'a+'})
+            let hook = fs.readFileSync(`./.git/hooks/${type}`).toString()
+            if(!hook.includes(mookmeCmd)) {
+                fs.appendFileSync(`./.git/hooks/${type}`, `\n${mookmeCmd}`, {flag: 'a+'})
                 execSync(`chmod +x ./.git/hooks/${type}`)
             } else {
                 console.log(`Hook ${type} is already declared, skipping...`)
             }
+        } else {
+            console.log(`Hook ${type} does not exist, creating file...`)
+            fs.appendFileSync(`./.git/hooks/${type}`, `#!/bin/bash\n${mookmeCmd}`, {flag: 'a+'})
         }
     })
 }
