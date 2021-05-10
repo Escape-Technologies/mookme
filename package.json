@@ -1,7 +1,7 @@
 {
   "name": "@escape.tech/mookme",
   "version": "0.0.8",
-  "description": "A pre-commit tool designed for monorepos",
+  "description": "A git hook manager designed for monorepos",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
@@ -18,7 +18,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/LMaxence/mook.git"
+    "url": "git+https://github.com/Escape-Technologies/mookme"
   },
   "keywords": [
     "pre",
@@ -30,9 +30,9 @@
   "author": "lecanu.maxence@gmail.com",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/LMaxence/mook/issues"
+    "url": "https://github.com/Escape-Technologies/mookme/issues"
   },
-  "homepage": "https://github.com/LMaxence/mook#readme",
+  "homepage": "https://github.com/Escape-Technologies/mookme",
   "devDependencies": {
     "@tsconfig/node10": "^1.0.7",
     "@types/inquirer": "^7.3.1",
