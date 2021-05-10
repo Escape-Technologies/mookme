@@ -14,11 +14,11 @@ $ npm install @escape.tech/mookme
 $ mookme init
 ```
 
-Example of JSON `mookme` hook file installing `commitlint` :
+
 
 *`{args}` are replaced with the hook arguments when the command is executed. See [the  git documentation on hooks](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks)*
 
-```JSON
+```js
 # commit-msg.json
 {
     "steps": [{
@@ -28,7 +28,8 @@ Example of JSON `mookme` hook file installing `commitlint` :
 }
 ```
 
-More examples in the "**Writing hooks**" section !
+**More examples to [get you started !](./docs/hooks-examples/index.md)**
+
 
 ## Commands
 
@@ -66,7 +67,7 @@ The arguments that would be normally passed by git to the hook
 
 ### Writing hooks
 
-Hooks are stored in JSON files called `{hook-type}.json` where the hook type is one of the available git hooks, eg :
+With `mookme`, your hooks are stored in JSON files called `{hook-type}.json` where the hook type is one of the available git hooks, eg :
 
 - `pre-commit`
 - `prepare-commit-msg`
@@ -74,7 +75,6 @@ Hooks are stored in JSON files called `{hook-type}.json` where the hook type is 
 - `post-commit`
 
 A hook is nothing more than a list of steps, which are commands to execute.
-
 #### Available options
 
 - `steps`
