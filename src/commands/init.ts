@@ -29,6 +29,7 @@ function writeGitHooksFiles() {
         } else {
             console.log(`Hook ${type} does not exist, creating file...`)
             fs.appendFileSync(`./.git/hooks/${type}`, `#!/bin/bash\n${mookmeCmd}`, {flag: 'a+'})
+            execSync(`chmod +x ./.git/hooks/${type}`)
         }
     })
 }
