@@ -5,8 +5,7 @@
 Despite being a very young project, it is ready to use, even if it remains a beta under active development.
 
 You are welcome to use it and enjoy it's simplicity.
-
-**If you encounter any bug or weird behaviour, don't be afraid to open an issue :)**
+**If you encounter any bug or weird behavior, don't be afraid to open an issue :)**
 
 ## Get started
 

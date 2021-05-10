@@ -1,0 +1,9 @@
+{
+    "steps": [{
+        "name": "eslint",
+        "command": "npm run eslint"
+    }, {
+        "name": "prettier",
+        "command": "npm run prettier"
+    }]
+}

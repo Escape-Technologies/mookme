@@ -1,1 +1,4 @@
-export interface Config {packagesPath: string, packages: string[]}
+export interface Config {
+  packagesPath: string;
+  packages: string[];
+}
