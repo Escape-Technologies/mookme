@@ -80,6 +80,10 @@ The type of hook to run, has to be one of `pre-commit`, `prepare-commit-msg`, `c
 
 The arguments that would be normally passed by git to the hook
 
+- `-r --run-all` (optional)
+
+Skip the selection of hooks to run based on git-staged files, and run hooks of every package for this type
+
 ### Writing hooks
 
 With `mookme`, your hooks are stored in JSON files called `{hook-type}.json` where the hook type is one of the available git hooks, eg :
