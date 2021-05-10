@@ -1,6 +1,6 @@
 # A simple and easy-to-use, yet powerful and language agnostic git hook for monorepos.
 
-![demo](./demo.gif)
+![demo](../demo.gif)
 
 Despite being a very young project, it is ready to use, even if it remains a beta under active development.
 
