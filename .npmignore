@@ -7,3 +7,6 @@
 .prettierrc
 commitlint.config.js
 tsconfig.json
+docs
+demo.gif
+README.md
