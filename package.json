@@ -1,6 +1,6 @@
 {
   "name": "@escape.tech/mookme",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A pre-commit tool designed for monorepos",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
