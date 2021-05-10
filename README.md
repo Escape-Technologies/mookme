@@ -1,13 +1,28 @@
-# A simple and easy-to-use, yet powerful and language agnostic git hook for monorepos.
+# MookMe
 
-![demo](./demo.gif)
+*A simple and easy-to-use, yet powerful and language agnostic git hook for monorepos.*
 
+##  Table of contents
+
+1. [Get started](#get-started)
+2. [Examples](./docs/hooks-examples/index.md)
+3. [Commands](#commands)
+    1. [init](#commands-init)
+    2. [run](#commands-run)
+
+<br>
+
+---
+<img src="demo.gif" alt="demo" width="600"/>
+<br>
+
+---
 Despite being a very young project, it is ready to use, even if it remains a beta under active development.
 
 You are welcome to use it and enjoy it's simplicity.
 **If you encounter any bug or weird behavior, don't be afraid to open an issue :)**
 
-## Get started
+## Get started <a name="get-started"></a>
 
 ```bash
 $ npm install @escape.tech/mookme
@@ -31,9 +46,9 @@ $ mookme init
 **More examples to [get you started !](./docs/hooks-examples/index.md)**
 
 
-## Commands
+## Commands <a name="commands"></a>
 
-### `init`
+### `init` <a name="commands-init"></a>
 
 The main initialization command. It :
 
@@ -49,7 +64,7 @@ The main initialization command. It :
 
 Skip prompters and only write `.git/hooks` files. This is for installation in an already-configured project.
 
-### `run`
+### `run` <a name="commands-run"></a>
 
 Mainly used for debugging and dry run :
 
