@@ -27,7 +27,7 @@ export function runStep(step: StepCommand, options: RunStepOptions): Promise<{st
             ? `source ${options.venvActivate} && ` + step.command + '&& deactivate'
             : step.command
 
-        const cp = exec(command.replace('{args}', `"${args.join(' ')}"`),  {cwd: options.cwd})
+        const cp = exec(command.replace('{args}', `"${args.join(' ')}"`),  {cwd: options.cwd, shell: '/bin/bash'})
         hookLoggers[step.name] = console.draft()
 
         let out = ''
