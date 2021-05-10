@@ -18,6 +18,7 @@ export function addRun(program: commander.Command) {
         .option('-a, --args <args>[]', 'The arguments being passed to the hooks', '')
         .action(async(opts: Options) => {
 
+
             process.env.MOOK_ME_ARGS = opts.args
 
             const {type} = opts
@@ -55,21 +56,27 @@ export function addRun(program: commander.Command) {
                 })
             }
 
-            Promise.all(hooks.filter(hook => hook.steps.length > 0).map(hook => hookPackage(hook)))
-                .then(packagesErrors => {
-                    packagesErrors.forEach(packageErrors => {
-                        packageErrors.forEach(err => {
-                            console.log(chalk.bgRed.white.bold(`Hook of package ${err.hook.name} failed at step ${err.step.name}`))
-                            console.log(chalk.red(err.msg))
-                        })
-                        if(packageErrors.length > 0) {
-                            process.exit(1)
-                        }
-                    })
-                }).catch(err => {
-                    console.log(chalk.bgRed('Unexpected error !'))
-                    console.error(err)
-                })
+            const promisedHooks = []
 
+            for(let hook of hooks.filter(hook => hook.steps.length > 0)) {
+                promisedHooks.push(hookPackage(hook))
+                // await new Promise((resolve) => setTimeout(() => resolve(null), 50))
+            }
+
+            try {
+                const packagesErrors = await Promise.all(promisedHooks)
+                packagesErrors.forEach(packageErrors => {
+                    packageErrors.forEach(err => {
+                        console.log(chalk.bgRed.white.bold(`Hook of package ${err.hook.name} failed at step ${err.step.name}`))
+                        console.log(chalk.red(err.msg))
+                    })
+                    if(packageErrors.length > 0) {
+                        process.exit(1)
+                    }
+                })
+            } catch(err) {
+                console.log(chalk.bgRed('Unexpected error !'))
+                console.error(err)
+            }
         });
 }
