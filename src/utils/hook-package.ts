@@ -8,6 +8,8 @@ draftlog(console);
 
 export function hookPackage(hook: PackageHook): Promise<{ hook: PackageHook; step: StepCommand; msg: Error }[]> {
   const loggers: { [key: string]: (log: string) => void } = {};
+  console.log();
+
   loggers[hook.name] = console.draft(
     `${chalk.bold.inverse(` Hooks : ${hook.name} `)}${chalk.bgBlueBright.bold(' Running... ')}`,
   );

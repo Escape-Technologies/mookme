@@ -1,4 +1,5 @@
 import fs from 'fs';
+import path from 'path';
 import { Config } from '../types/config.types';
 
 export function getConfig(): Config {
@@ -18,6 +19,8 @@ export function getConfig(): Config {
     console.log('Please run `mookme --init` first');
     process.exit(1);
   }
+
+  config.packagesPath = path.resolve(`${rootDir}/${config.packagesPath}`);
 
   return config;
 }

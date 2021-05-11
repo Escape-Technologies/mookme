@@ -34,6 +34,13 @@ export function addRun(program: commander.Command): void {
         process.exit(1);
       }
 
+      const title = ` Running commit hook ${type} `;
+      console.log(
+        chalk.bold('-').repeat((process.stdout.columns - title.length - 2) / 2),
+        chalk.bold(title),
+        chalk.bold('-').repeat((process.stdout.columns - title.length - 2) / 2),
+      );
+
       const { packages, packagesPath } = getConfig();
 
       const hooks: PackageHook[] = [];
@@ -69,7 +76,6 @@ export function addRun(program: commander.Command): void {
 
       for (const hook of hooks.filter((hook) => hook.steps.length > 0)) {
         promisedHooks.push(hookPackage(hook));
-        // await new Promise((resolve) => setTimeout(() => resolve(null), 50))
       }
 
       try {

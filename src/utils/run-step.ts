@@ -19,7 +19,6 @@ export function runStep(step: StepCommand, options: RunStepOptions): Promise<{ s
   const args = process.env.MOOK_ME_ARGS!.split(' ').filter((arg) => arg !== '');
 
   return new Promise((resolve) => {
-    const hookLoggers: { [key: string]: (log: string) => void } = {};
     console.log(`→ ${chalk.bold(step.name)} > ${step.command} `);
     const { logger, interval } = loader();
 
@@ -29,7 +28,6 @@ export function runStep(step: StepCommand, options: RunStepOptions): Promise<{ s
         : step.command;
 
     const cp = exec(command.replace('{args}', `"${args.join(' ')}"`), { cwd: options.cwd, shell: '/bin/bash' });
-    hookLoggers[step.name] = console.draft();
 
     let out = '';
     cp.stdout?.on('data', (chunk) => {
