@@ -5,6 +5,7 @@ import fs from 'fs';
 import { execSync } from 'child_process';
 import chalk from 'chalk';
 import { hookTypes } from '../types/hook.types';
+import { ADDED_BEHAVIORS } from '../types/config.types';
 
 function createDirIfNeeded(path: string) {
   if (!fs.existsSync(path)) {
@@ -79,7 +80,7 @@ export function addInit(program: commander.Command): void {
         {
           type: 'checkbox',
           name: 'packages',
-          message: 'Select folders to hook :',
+          message: 'Select folders to hook :\n',
           choices: moduleDirs,
           pageSize: process.stdout.rows / 2,
         },
@@ -129,7 +130,7 @@ export function addInit(program: commander.Command): void {
           {
             type: 'checkbox',
             name: 'packages',
-            message: 'Select folders to hook :',
+            message: 'Select folders to hook :\n',
             choices: moduleDirs,
           },
         ];
@@ -143,24 +144,45 @@ export function addInit(program: commander.Command): void {
         addSubFolder = (
           (await inquirer.prompt([
             {
-              type: 'confirm',
+              type: 'checkbox',
               name: 'addSubFolder',
-              message: 'Do you wanna add a subfolder for packages ?',
+              message: 'Do you wanna add a subfolder for packages ?\n',
               default: false,
             },
           ])) as { addSubFolder: boolean }
         ).addSubFolder;
       }
 
+      clear();
+      const { addedBehavior } = (await inquirer.prompt([
+        {
+          type: 'list',
+          name: 'addedBehavior',
+          message: 'How should mookme behave when files are changed during hooks execution :\n',
+          choices: [
+            {
+              name: `${chalk.bold('Exit (recommended):')} fail and exit without performing the commit`,
+              value: ADDED_BEHAVIORS.EXIT,
+            },
+            {
+              name: `${chalk.bold('Add them and keep going: ')} run \`git add .\` and continue`,
+              value: ADDED_BEHAVIORS.ADD_AND_COMMIT,
+            },
+          ],
+        },
+      ])) as { addedBehavior: string };
+
       const packageJSON = JSON.parse(fs.readFileSync('package.json', 'utf8'));
       packageJSON.mookme = {
         packagesPath,
         packages: selectedPackages,
+        addedBehavior,
       };
 
       const mookMeConfig = {
         packagesPath: `.${packagesPath ? `/${packagesPath}` : ''}`,
         packages: selectedPackages,
+        addedBehavior,
       };
 
       const packagesHooksDirPaths = selectedPackages.map((mod) => `${mookMeConfig.packagesPath}/${mod}/.hooks`);

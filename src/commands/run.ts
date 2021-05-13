@@ -7,6 +7,7 @@ import chalk from 'chalk';
 import { hookTypes, HookType, PackageHook } from '../types/hook.types';
 import { hookPackage } from '../utils/hook-package';
 import { getConfig } from '../utils/get-config';
+import { ADDED_BEHAVIORS } from '../types/config.types';
 
 draftlog(console);
 
@@ -35,16 +36,21 @@ export function addRun(program: commander.Command): void {
       }
 
       const title = ` Running commit hook ${type} `;
+      console.log();
       console.log(
         chalk.bold('-').repeat((process.stdout.columns - title.length - 2) / 2),
         chalk.bold(title),
         chalk.bold('-').repeat((process.stdout.columns - title.length - 2) / 2),
       );
 
-      const { packages, packagesPath } = getConfig();
+      const { packages, packagesPath, addedBehavior } = getConfig();
 
       const hooks: PackageHook[] = [];
 
+      const initialNotStagedFiles = execSync('echo $(git diff --name-only)')
+        .toString()
+        .split(' ')
+        .map((file) => file.replace('\n', ''));
       const stagedFiles = execSync('echo $(git diff --cached --name-only)').toString().split(' ');
       const packagesWithChanges = packages.filter((pkg) => stagedFiles.find((file) => file.includes(pkg)));
 
@@ -82,7 +88,7 @@ export function addRun(program: commander.Command): void {
         const packagesErrors = await Promise.all(promisedHooks);
         packagesErrors.forEach((packageErrors) => {
           packageErrors.forEach((err) => {
-            console.log(chalk.bgRed.white.bold(`Hook of package ${err.hook.name} failed at step ${err.step.name}`));
+            console.log(chalk.bgRed.white.bold(`\n Hook of package ${err.hook.name} failed at step ${err.step.name} `));
             console.log(chalk.red(err.msg));
           });
           if (packageErrors.length > 0) {
@@ -92,6 +98,27 @@ export function addRun(program: commander.Command): void {
       } catch (err) {
         console.log(chalk.bgRed('Unexpected error !'));
         console.error(err);
+      }
+
+      const notStagedFiles = execSync('echo $(git diff --name-only)')
+        .toString()
+        .split(' ')
+        .map((file) => file.replace('\n', ''));
+      const changedFiles = notStagedFiles.filter((file) => !initialNotStagedFiles.includes(file));
+      if (changedFiles.length) {
+        console.log();
+        switch (addedBehavior) {
+          case ADDED_BEHAVIORS.ADD_AND_COMMIT:
+            console.log(chalk.bgYellow.black('Files were changed during hook execution !'));
+            console.log(chalk.yellow('Following the defined behavior : Add and continue.'));
+            execSync(`git add ${packagesPath}`);
+            break;
+          case ADDED_BEHAVIORS.EXIT:
+            console.log(chalk.bgYellow.black(' Files were changed during hook execution ! '));
+            console.log(chalk.yellow('Following the defined behavior : Exit.'));
+            process.exit(1);
+            break;
+        }
       }
     });
 }
