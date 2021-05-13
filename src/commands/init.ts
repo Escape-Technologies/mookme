@@ -34,6 +34,8 @@ function writeGitHooksFiles() {
   });
 }
 
+const clear = () => process.stdout.write('\x1Bc');
+
 export function addInit(program: commander.Command): void {
   program
     .command('init')
@@ -66,6 +68,7 @@ export function addInit(program: commander.Command): void {
         transformer: (val: string) => `./${val}`,
       };
 
+      clear();
       const { packagesPath } = (await inquirer.prompt([folderQuestion])) as { packagesPath: string };
       const moduleDirs = fs
         .readdirSync(`./${packagesPath}`, { withFileTypes: true })
@@ -78,9 +81,11 @@ export function addInit(program: commander.Command): void {
           name: 'packages',
           message: 'Select folders to hook :',
           choices: moduleDirs,
+          pageSize: process.stdout.rows / 2,
         },
       ];
 
+      clear();
       const { packages } = (await inquirer.prompt(packagesQuestion)) as { packages: string[] };
       selectedPackages = selectedPackages.concat(packages);
 
@@ -129,6 +134,7 @@ export function addInit(program: commander.Command): void {
           },
         ];
 
+        clear();
         const { packages } = (await inquirer.prompt(packagesQuestion)) as { packages: string[] };
         selectedPackages = selectedPackages.concat(
           packages.map((subPackage) => `${packagesPath ? `${packagesPath}/` : ''}${subPath}/${subPackage}`),
@@ -159,6 +165,7 @@ export function addInit(program: commander.Command): void {
 
       const packagesHooksDirPaths = selectedPackages.map((mod) => `${mookMeConfig.packagesPath}/${mod}/.hooks`);
 
+      clear();
       console.log('\nThe following configuration will be added into your package.json:');
       console.log('mookme: ', JSON.stringify(mookMeConfig, null, 2));
 
