@@ -8,6 +8,7 @@ import { hookTypes, HookType, PackageHook } from '../types/hook.types';
 import { hookPackage } from '../utils/hook-package';
 import { getConfig } from '../utils/get-config';
 import { ADDED_BEHAVIORS } from '../types/config.types';
+import { getRootDir } from '../utils/get-root-dir';
 
 draftlog(console);
 
@@ -52,7 +53,10 @@ export function addRun(program: commander.Command): void {
         .split(' ')
         .map((file) => file.replace('\n', ''));
       const stagedFiles = execSync('echo $(git diff --cached --name-only)').toString().split(' ');
-      const packagesWithChanges = packages.filter((pkg) => stagedFiles.find((file) => file.includes(pkg)));
+      const rootDir = getRootDir();
+      const packagesWithChanges = packages.filter((pkg) =>
+        stagedFiles.find((file) => `${rootDir}/${file}`.includes(`${packagesPath}/${pkg}`)),
+      );
 
       const packagesToCheck = opts.runAll ? packages : packagesWithChanges;
 
