@@ -82,6 +82,13 @@ export function addRun(program: commander.Command): void {
         });
       }
 
+      const stashMessage = 'stashing unstaged changes in order to run hooks properly';
+      const unstashMessage = 'un' + stashMessage;
+      if (type === 'pre-commit') {
+        console.log(chalk.bgCyan(stashMessage));
+        execSync(`git stash push --keep-index --include-untracked -m "MOOKME: ${stashMessage}"`);
+      }
+
       const promisedHooks = [];
 
       for (const hook of hooks.filter((hook) => hook.steps.length > 0)) {
@@ -102,6 +109,12 @@ export function addRun(program: commander.Command): void {
       } catch (err) {
         console.log(chalk.bgRed('Unexpected error !'));
         console.error(err);
+      }
+
+      if (type === 'pre-commit') {
+        console.log();
+        console.log(chalk.bgCyan(unstashMessage));
+        execSync('git stash pop');
       }
 
       const notStagedFiles = execSync('echo $(git diff --name-only)')
