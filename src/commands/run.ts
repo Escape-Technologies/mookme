@@ -83,9 +83,12 @@ export function addRun(program: commander.Command): void {
       }
 
       const stashMessage = 'stashing unstaged changes in order to run hooks properly';
-      const unstashMessage = 'un' + stashMessage;
-      if (type === 'pre-commit') {
-        console.log(chalk.bgCyan(stashMessage));
+      const unstashMessage = 'unstashing unstaged changes in order to run hooks properly';
+      const shouldStash =
+        execSync('git ls-files --others --exclude-standard --modified').toString().split('\n').length > 1;
+
+      if (type === HookType.preCommit && shouldStash) {
+        console.log(chalk.yellow.bold(stashMessage));
         execSync(`git stash push --keep-index --include-untracked -m "MOOKME: ${stashMessage}"`);
       }
 
@@ -111,9 +114,9 @@ export function addRun(program: commander.Command): void {
         console.error(err);
       }
 
-      if (type === 'pre-commit') {
+      if (type === HookType.preCommit && shouldStash) {
         console.log();
-        console.log(chalk.bgCyan(unstashMessage));
+        console.log(chalk.yellow.bold(unstashMessage));
         execSync('git stash pop');
       }
 
