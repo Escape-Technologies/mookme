@@ -48,12 +48,12 @@ Hook are written in a folder `.hooks` located at the root of your project and at
 |  |- commit-msg.json  # will be executed with the commit-msg git hook
 |  |- prepare-commit-msg.json
 |  |- post-commit.json
-|- pacakges
-|  |- pacakge A
+|- packages
+|  |- package A
 |  |  |- .hooks # will be executed if you commit changes on package A
 |  |  |  |- pre-commit.json 
 |  |  |  |- post-commit.json
-|  |- pacakge A
+|  |- package A
 |  |  |- .hooks # will be executed if you commit changes on package B
 |  |  |  |- pre-commit.json
 ```
