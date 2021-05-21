@@ -2,7 +2,7 @@
 
 *A simple and easy-to-use, yet powerful and language agnostic git hook for monorepos.*
 
-**[see the documentation](mookme.tech)**
+**[see the documentation](docs.mookme.org)**
 
 <img src="assets/banner.png" alt="demo" width="600"/>
 
