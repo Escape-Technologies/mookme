@@ -3,7 +3,8 @@
     "eslint.format.enable": true,
     "eslint.lintTask.enable": true,
     "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": true
+        "source.fixAll.eslint": true,
+        "source.fixAll.markdownlint": true
     },
     "spellright.language": [
         "en"

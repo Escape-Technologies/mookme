@@ -14,7 +14,9 @@
     "prettier": "prettier 'src/**/*.ts'",
     "prettier:fix": "prettier --write 'src/**/*.ts'",
     "eslint": "eslint 'src/**/*.ts'",
-    "eslint:fix": "eslint --fix 'src/**/*.ts'"
+    "eslint:fix": "eslint --fix 'src/**/*.ts'",
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs"
   },
   "repository": {
     "type": "git",
@@ -48,7 +50,8 @@
     "eslint-plugin-react-hooks": "^1.7.0",
     "prettier": "2.3.0",
     "ts-node": "^9.1.1",
-    "typescript": "^4.2.4"
+    "typescript": "^4.2.4",
+    "vuepress": "^1.8.2"
   },
   "dependencies": {
     "@commitlint/cli": "^12.1.1",
@@ -62,6 +65,8 @@
   },
   "mookme": {
     "packagesPath": ".",
-    "packages": []
+    "packages": [
+      "docs"
+    ]
   }
 }
