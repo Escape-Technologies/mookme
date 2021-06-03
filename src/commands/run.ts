@@ -15,7 +15,7 @@ draftlog(console);
 interface Options {
   type: HookType;
   args: string;
-  runAll: boolean;
+  all: boolean;
 }
 
 export function addRun(program: commander.Command): void {
@@ -25,8 +25,8 @@ export function addRun(program: commander.Command): void {
       '-t, --type <type>',
       'A valid git hook type ("pre-commit", "prepare-commit", "commit-msg", "post-commit")',
     )
-    .option('-r, --run-all', 'Run hooks for all packages', '')
-    .option('-a, --args <args>[]', 'The arguments being passed to the hooks', '')
+    .option('-a, --all', 'Run hooks for all packages', '')
+    .option('--args <args>[]', 'The arguments being passed to the hooks', '')
     .action(async (opts: Options) => {
       process.env.MOOK_ME_ARGS = opts.args;
 
@@ -58,7 +58,7 @@ export function addRun(program: commander.Command): void {
         stagedFiles.find((file) => `${rootDir}/${file}`.includes(`${packagesPath}/${pkg}`)),
       );
 
-      const packagesToCheck = opts.runAll ? packages : packagesWithChanges;
+      const packagesToCheck = opts.all ? packages : packagesWithChanges;
 
       packagesToCheck
         .filter((name) => fs.existsSync(`${packagesPath}/${name}/.hooks/${type}.json`))
