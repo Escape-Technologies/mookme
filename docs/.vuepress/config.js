@@ -8,6 +8,9 @@ module.exports = {
   themeConfig: {
     logo: "/logo.png",
     displayAllHeaders: true,
+    nav: [
+      { text: "GitHub", link: "https://github.com/Escape-Technologies/mookme"},
+    ],
     sidebar: [
       "",
       "get-started/",
