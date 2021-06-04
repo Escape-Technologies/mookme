@@ -16,7 +16,7 @@ export interface RunStepOptions {
 
 export function runStep(step: StepCommand, options: RunStepOptions): Promise<{ step: StepCommand; msg: Error } | null> {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const args = process.env.MOOK_ME_ARGS!.split(' ').filter((arg) => arg !== '');
+  const args = process.env.MOOKME_ARGS!.split(' ').filter((arg) => arg !== '');
 
   return new Promise((resolve) => {
     console.log(`→ ${chalk.bold(step.name)} > ${step.command} `);

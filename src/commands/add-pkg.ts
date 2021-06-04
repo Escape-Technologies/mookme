@@ -3,7 +3,7 @@ import commander from 'commander';
 import fs from 'fs';
 import path from 'path';
 
-import { getConfig, getPkgJSON, writePkgJSON } from '../utils/get-config';
+import { loadConfig, getPkgJSON, writePkgJSON } from '../utils/get-config';
 
 export function addAddPkg(program: commander.Command): void {
   program
@@ -12,7 +12,7 @@ export function addAddPkg(program: commander.Command): void {
     .description('Add a new package to an existing mookme configuration')
     .action(async ({ pkg }) => {
       const pkgJSON = getPkgJSON();
-      const { packagesPath, packages } = getConfig();
+      const { packagesPath, packages } = loadConfig();
 
       if (packages.includes(pkg)) {
         console.log(chalk.bold.yellow(`\nPackage ${pkg} is already registered, nothing will be done.\n`));

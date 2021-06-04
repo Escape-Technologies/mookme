@@ -21,7 +21,7 @@ export function writePkgJSON(data: any): void {
   fs.writeFileSync(`${rootDir}/package.json`, JSON.stringify(data, null, 2));
 }
 
-export function getConfig(): Config {
+export function loadConfig(): Config {
   const rootDir = getRootDir();
   const packageJSON = getPkgJSON();
   const config = packageJSON.mookme as Config;
@@ -32,6 +32,10 @@ export function getConfig(): Config {
   }
 
   config.packagesPath = path.resolve(`${rootDir}/${config.packagesPath}`);
-
+  process.env.MOOKME_CONFIG = JSON.stringify(config);
   return config;
+}
+
+export function getConfig(): Config {
+  return JSON.parse(process.env.MOOKME_CONFIG || '{}');
 }

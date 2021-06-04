@@ -2,7 +2,7 @@ import draftlog from 'draftlog';
 import chalk from 'chalk';
 import { PackageHook } from '../types/hook.types';
 import { runStep } from './run-step';
-import { StepCommand } from '../types/step.types';
+import { StepCommand, StepError } from '../types/step.types';
 
 draftlog(console);
 
@@ -44,4 +44,16 @@ export function hookPackage(hook: PackageHook): Promise<{ hook: PackageHook; ste
         reject(err);
       }),
   );
+}
+
+export function processResults(results: StepError[][]): void {
+  results.forEach((packageErrors) => {
+    packageErrors.forEach((err) => {
+      console.log(chalk.bgRed.white.bold(`\n Hook of package ${err.hook.name} failed at step ${err.step.name} `));
+      console.log(chalk.red(err.msg));
+    });
+    if (packageErrors.length > 0) {
+      process.exit(1);
+    }
+  });
 }

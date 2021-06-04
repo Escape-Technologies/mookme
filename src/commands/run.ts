@@ -1,15 +1,15 @@
 import commander from 'commander';
-import fs from 'fs';
 import path from 'path';
-import { execSync } from 'child_process';
 import draftlog from 'draftlog';
 import chalk from 'chalk';
 
-import { hookTypes, HookType, PackageHook } from '../types/hook.types';
-import { hookPackage } from '../utils/hook-package';
-import { getConfig } from '../utils/get-config';
-import { ADDED_BEHAVIORS } from '../types/config.types';
+import { hookTypes, HookType } from '../types/hook.types';
+import { hookPackage, processResults } from '../utils/hook-package';
+import { loadConfig } from '../utils/get-config';
 import { getRootDir } from '../utils/get-root-dir';
+import { center } from '../utils/ui';
+import { getStagedFiles, getNotStagedFiles, detectAndProcessModifiedFiles } from '../utils/git';
+import { loadHooks } from '../utils/packages';
 
 draftlog(console);
 
@@ -29,7 +29,8 @@ export function addRun(program: commander.Command): void {
     .option('-a, --all', 'Run hooks for all packages', '')
     .option('--args <args>[]', 'The arguments being passed to the hooks', '')
     .action(async (opts: Options) => {
-      process.env.MOOK_ME_ARGS = opts.args;
+      process.env.MOOKME_ARGS = opts.args;
+      process.env.MOOKME_HOOK_TYPE = opts.type;
 
       const { type } = opts;
       if (!hookTypes.includes(type)) {
@@ -39,80 +40,23 @@ export function addRun(program: commander.Command): void {
 
       const title = ` Running commit hook ${type} `;
       console.log();
-      console.log(
-        chalk.bold('-').repeat((process.stdout.columns - title.length - 2) / 2),
-        chalk.bold(title),
-        chalk.bold('-').repeat((process.stdout.columns - title.length - 2) / 2),
-      );
+      center(title);
 
-      const { packages, packagesPath, addedBehavior } = getConfig();
+      const { packages, packagesPath, addedBehavior } = loadConfig();
+      process.env.MOOKME_CONFIG = JSON.stringify({ packages, packagesPath, addedBehavior });
 
-      const hooks: PackageHook[] = [];
+      const initialNotStagedFiles = getNotStagedFiles();
+      const stagedFiles = getStagedFiles();
 
-      const initialNotStagedFiles = execSync('echo $(git diff --name-only)')
-        .toString()
-        .split(' ')
-        .map((file) => file.replace('\n', ''));
-
-      const stagedFiles = execSync('echo $(git diff --cached --name-only)')
-        .toString()
-        .split(' ')
-        .map((pth) => pth.replace('\n', ''));
-
-      const rootDir = getRootDir();
-      const packagesWithChanges = packages.filter((pkg) =>
-        stagedFiles.find((file) => `${rootDir}/${file}`.includes(`${packagesPath}/${pkg}`)),
-      );
+      process.env.ROOT_DIR = getRootDir();
+      const rootDir = process.env.ROOT_DIR;
 
       // Store staged files in environement for further easy retrieval
       process.env.MOOKME_STAGED_FILES = JSON.stringify(stagedFiles.map((fPath) => path.join(rootDir, fPath)));
 
-      const packagesToCheck = opts.all ? packages : packagesWithChanges;
+      const hooks = loadHooks(stagedFiles, type, { all: opts.all });
 
-      packagesToCheck
-        .filter((name) => fs.existsSync(`${packagesPath}/${name}/.hooks/${type}.json`))
-        .map((name) => ({ name, path: `${packagesPath}/${name}/.hooks/${type}.json`, cwd: `${packagesPath}/${name}` }))
-        .forEach(({ name, path, cwd }) => {
-          const hook = JSON.parse(fs.readFileSync(path, 'utf-8'));
-          hooks.push({
-            name,
-            cwd,
-            type: hook.type,
-            venvActivate: hook.venvActivate,
-            steps: hook.steps,
-          });
-        });
-
-      if (fs.existsSync(`${packagesPath}/.hooks/${type}.json`)) {
-        hooks.push({
-          name: '__global',
-          cwd: rootDir,
-          steps: JSON.parse(fs.readFileSync(`${packagesPath}/.hooks/${type}.json`, 'utf-8')).steps,
-        });
-      }
-
-      const stashMessage = 'Stashing unstaged changes in order to run hooks properly';
-      const unstashMessage = 'Unstashing unstaged changes in order to run hooks properly';
-      const shouldStash =
-        execSync('git ls-files --others --exclude-standard --modified').toString().split('\n').length > 1;
-
-      if (type === HookType.preCommit && shouldStash) {
-        console.log(chalk.yellow.bold(stashMessage));
-        console.log(chalk.bold(`> git stash push --keep-index --include-untracked`));
-        execSync(`git stash push --keep-index --include-untracked`).toString();
-
-        console.log(chalk.yellow.bold('\nList of stashed and modified files:'));
-        const stashedAndModified = execSync('git --no-pager stash show --name-only').toString();
-        console.log(stashedAndModified);
-
-        console.log(chalk.yellow.bold('List of stashed and untracked files:'));
-        const stashedAndUntracked = execSync('git --no-pager show stash@{0}^3:')
-          .toString()
-          .split('\n')
-          .slice(2)
-          .join('\n');
-        console.log(stashedAndUntracked);
-      }
+      // stashIfNeeded(type);
 
       const promisedHooks = [];
 
@@ -122,51 +66,13 @@ export function addRun(program: commander.Command): void {
 
       try {
         const packagesErrors = await Promise.all(promisedHooks);
-        packagesErrors.forEach((packageErrors) => {
-          packageErrors.forEach((err) => {
-            console.log(chalk.bgRed.white.bold(`\n Hook of package ${err.hook.name} failed at step ${err.step.name} `));
-            console.log(chalk.red(err.msg));
-          });
-          if (packageErrors.length > 0) {
-            process.exit(1);
-          }
-        });
+        processResults(packagesErrors);
       } catch (err) {
         console.log(chalk.bgRed.bold(' Unexpected error ! '));
         console.error(err);
       }
 
-      if (type === HookType.preCommit && shouldStash) {
-        console.log();
-        console.log(chalk.yellow.bold(unstashMessage));
-        try {
-          execSync('git stash pop');
-        } catch (err) {
-          console.log(
-            chalk.bgRed.white.bold('Could not unstash file ! You should run `git stash pop` and fix conflicts'),
-          );
-        }
-      }
-
-      const notStagedFiles = execSync('echo $(git diff --name-only)')
-        .toString()
-        .split(' ')
-        .map((file) => file.replace('\n', ''));
-      const changedFiles = notStagedFiles.filter((file) => !initialNotStagedFiles.includes(file));
-      if (changedFiles.length) {
-        console.log();
-        switch (addedBehavior) {
-          case ADDED_BEHAVIORS.ADD_AND_COMMIT:
-            console.log(chalk.bgYellow.black('Files were changed during hook execution !'));
-            console.log(chalk.yellow('Following the defined behavior : Add and continue.'));
-            execSync(`git add ${packagesPath}`);
-            break;
-          case ADDED_BEHAVIORS.EXIT:
-            console.log(chalk.bgYellow.black(' Files were changed during hook execution ! '));
-            console.log(chalk.yellow('Following the defined behavior : Exit.'));
-            process.exit(1);
-            break;
-        }
-      }
+      // unstashIfNeeded(type);
+      detectAndProcessModifiedFiles(initialNotStagedFiles, addedBehavior);
     });
 }
