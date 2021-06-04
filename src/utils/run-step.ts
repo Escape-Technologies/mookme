@@ -1,6 +1,6 @@
 import draftlog from 'draftlog';
 import chalk from 'chalk';
-
+import wcmatch from 'wildcard-match';
 import { exec } from 'child_process';
 import { StepCommand } from '../types/step.types';
 import { loader } from './loader';
@@ -20,7 +20,33 @@ export function runStep(step: StepCommand, options: RunStepOptions): Promise<{ s
 
   return new Promise((resolve) => {
     console.log(`→ ${chalk.bold(step.name)} > ${step.command} `);
+
     const { logger, interval } = loader();
+
+    if (step.onlyOn) {
+      try {
+        const matcher = wcmatch(step.onlyOn);
+
+        const matched = JSON.parse(process.env.MOOKME_STAGED_FILES || '[]')
+          .filter((fPath: string) => fPath.includes(options.cwd))
+          .map((fPath: string) => fPath.replace(`${options.cwd}/`, ''))
+          .filter((rPath: string) => matcher(rPath));
+
+        if (matched.length === 0) {
+          clearInterval(interval);
+          logger(`⏩ Skipped. (no match with "${step.onlyOn}")`);
+          return resolve(null);
+        }
+      } catch (err) {
+        logger(chalk.bgRed.white.bold(' Error '));
+        clearInterval(interval);
+        logger('❌ Error.');
+        resolve({
+          step,
+          msg: new Error(`Invalid \`onlyOn\` pattern: ${step.onlyOn}\n${err}`),
+        });
+      }
+    }
 
     const command =
       options.type === 'python' && options.venvActivate
