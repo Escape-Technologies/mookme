@@ -2,7 +2,7 @@
 
 ## `commitlint`
 
-*This guide will help you in the setup of a hook a hook for linting your commits with [commitlint](https://github.com/conventional-changelog/commitlint)*
+> This guide will help you in the setup of a hook a hook for linting your commits with [commitlint](https://github.com/conventional-changelog/commitlint)*
 
 ### Prerequisite
 
@@ -31,7 +31,7 @@
 
 ## `eslint`
 
-*This guide will help you in the setup of a hook for linting your code with [eslint](https://eslint.org/)*
+> This guide will help you in the setup of a hook for linting your code with [eslint](https://eslint.org/)*
 
 ### Prerequisite
 
@@ -41,7 +41,8 @@
 
 ### Hook
 
-- In the hooks folder of the package you want to lint with `eslint` `<project-root>/<package>/.hooks/commit-msg` add the following configuration :
+- In the hooks folder of the package you want to lint with `eslint` `<project-root>/<package>/.hooks/commit-msg` add
+the following configuration :
 
 ```js
 {
@@ -77,7 +78,7 @@
 
 ## `python`
 
-*This guide will help you in the setup of a python-based hook*
+> This guide will help you in the setup of a python-based hook*
 
 ### Prerequisite
 
@@ -87,7 +88,8 @@
 
 ### Hook
 
-- In the hooks folder of your package or in the global hooks folder `<project-root>/<package>/.hooks/pre-commit.json` or `<project-root>/<package>/.hooks/pre-commit.json`, add the following configuration :
+- In the hooks folder of your package or in the global hooks folder `<project-root>/<package>/.hooks/pre-commit.json`
+or `<project-root>/<package>/.hooks/pre-commit.json`, add the following configuration :
 
 ```js
 {

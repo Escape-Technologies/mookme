@@ -16,7 +16,9 @@ npm install @escape.tech/mookme
 mookme init
 ```
 
-This will display a prompter to let you define **where you packages are located**, how you want the hooks to behave when a file is changed during commit hooks, write the corresponding documentation in your `package.json`, and write your `.git/hooks` scripts.
+This will display a prompter to let you define **where you packages are located**, how you want the hooks to behave
+when a file is changed during commit hooks, write the corresponding documentation in your `package.json`, and write
+your `.git/hooks` scripts.
 
 Every step of this process is clearly shown and nothing will be written without asking you if you're okay with it :)
 
@@ -34,7 +36,8 @@ mookme init --only-hooks
 
 ### Global structure of your project hooks
 
-`Mookme` is designed for monorepos, hence it assumes your project has a root folder where global hooks can be defined, and multiple packages where you can define per-package hook.
+`Mookme` is designed for monorepos, hence it assumes your project has a root folder where global hooks can be defined,
+and multiple packages where you can define per-package hook.
 
 ::: tip
 Hook are written in a folder `.hooks` located at the root of your project and at the root of you packages' folders.
@@ -60,7 +63,8 @@ Hook are written in a folder `.hooks` located at the root of your project and at
 
 :::
 
-With `mookme`, your hooks are stored in JSON files called `{hook-type}.json` where the hook type is one of the available git hooks, eg :
+With `mookme`, your hooks are stored in JSON files called `{hook-type}.json` where the hook type is one of the
+available git hooks, eg :
 
 - `pre-commit`
 - `prepare-commit-msg`
@@ -74,7 +78,8 @@ Your hooks are defined in simple json files.
 - For complete reference, see the JSON hooks reference
 - For specific hook examples, see the recipes.
 
-A hook defines a list of `steps`, which are basically commands to run, with a name for proper display. A few configuration option are available, but the minimal requirement is `name` and `command`.
+A hook defines a list of `steps`, which are basically commands to run, with a name for proper display. A few
+configuration option are available, but the minimal requirement is `name` and `command`.
 
 Here is an example that will run your commit message using `commitlint`.
 
@@ -89,7 +94,8 @@ Here is an example that will run your commit message using `commitlint`.
 ```
 
 ::: tip
-When writing package-scoped hooks, the current working directory assumed by `Mookme` is the folder where this package's `.hooks'` folder is located
+When writing package-scoped hooks, the current working directory assumed by `Mookme` is the folder where this
+package's `.hooks'` folder is located
 :::
 
 ::: warning

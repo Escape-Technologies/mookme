@@ -1,6 +1,6 @@
 {
     "steps": [{
         "name": "markdownlint",
-        "command": "echo 'ok'"
+        "command": "../node_modules/markdownlint-cli/markdownlint.js ."
     }]
 }

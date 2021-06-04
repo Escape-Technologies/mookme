@@ -6,8 +6,10 @@ The main initialization command. It :
 
 - prompts for one or multiple packages folder path
 - asks you to select one or multiple package at each path
-- creates the `.hooks` folder in each package where you can write **dedicated hooks !** that will be triggered only when changes in this package occur
-- creates a `.hooks` folder at the root of your project where you can write **project-wide hooks** that will be triggered on every commit
+- creates the `.hooks` folder in each package where you can write **dedicated hooks !** that will be triggered only
+when changes in this package occur
+- creates a `.hooks` folder at the root of your project where you can write **project-wide hooks** that will be
+triggered on every commit
 - writes `.git/hooks` files
 
 ### Options
@@ -18,7 +20,8 @@ Skip prompters and only write `.git/hooks` files. This is for installation in an
 
 ## `mookme add-pkg`
 
-A helper for adding a new package to an existing configuration. It takes a required option `-p --pkg` which is the package to add.
+A helper for adding a new package to an existing configuration. It takes a required option `-p --pkg` which is the
+package to add.
 
 This will:
 
@@ -63,7 +66,8 @@ Skip the selection of hooks to run based on git-staged files, and run hooks of e
 
 ## Hook files
 
-With `mookme`, your hooks are stored in JSON files called `{hook-type}.json` where the hook type is one of the available git hooks, eg :
+With `mookme`, your hooks are stored in JSON files called `{hook-type}.json` where the hook type is one of the
+available git hooks, eg :
 
 - `pre-commit`
 - `prepare-commit-msg`
