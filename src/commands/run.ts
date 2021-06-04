@@ -90,6 +90,8 @@ export function addRun(program: commander.Command): void {
       if (type === HookType.preCommit && shouldStash) {
         console.log(chalk.yellow.bold(stashMessage));
         execSync(`git stash push --keep-index --include-untracked -m "MOOKME: ${stashMessage}"`);
+        console.log(chalk.yellow.bold('List of stashed files:\n'));
+        console.log(execSync('git --no-pager stash show --name-only').toString());
       }
 
       const promisedHooks = [];
