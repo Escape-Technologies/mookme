@@ -89,15 +89,20 @@ export function addRun(program: commander.Command): void {
 
       if (type === HookType.preCommit && shouldStash) {
         console.log(chalk.yellow.bold(stashMessage));
-        console.log(chalk.bold(`> git stash push --keep-index --include-untracked -m "MOOKME: ${stashMessage}"`));
-        console.log(
-          execSync(`git stash push --keep-index --include-untracked -m "MOOKME: ${stashMessage}"`).toString(),
-        );
-        console.log(chalk.yellow.bold('List of stashed and modified files:\n'));
-        console.log(execSync('git --no-pager stash show --name-only').toString());
+        console.log(chalk.bold(`> git stash push --keep-index --include-untracked`));
+        execSync(`git stash push --keep-index --include-untracked`).toString();
 
-        console.log(chalk.yellow.bold('List of stashed and untracked files:\n'));
-        console.log(execSync('git --no-pager show stash@{0}^3:').toString().split('\n').slice(2).join('\n'));
+        console.log(chalk.yellow.bold('\nList of stashed and modified files:'));
+        const stashedAndModified = execSync('git --no-pager stash show --name-only').toString();
+        console.log(stashedAndModified);
+
+        console.log(chalk.yellow.bold('List of stashed and untracked files:'));
+        const stashedAndUntracked = execSync('git --no-pager show stash@{0}^3:')
+          .toString()
+          .split('\n')
+          .slice(2)
+          .join('\n');
+        console.log(stashedAndUntracked);
       }
 
       const promisedHooks = [];
@@ -125,7 +130,13 @@ export function addRun(program: commander.Command): void {
       if (type === HookType.preCommit && shouldStash) {
         console.log();
         console.log(chalk.yellow.bold(unstashMessage));
-        execSync('git stash pop');
+        try {
+          execSync('git stash pop');
+        } catch (err) {
+          console.log(
+            chalk.bgRed.white.bold('Could not unstash file ! You should run `git stash pop` and fix conflicts'),
+          );
+        }
       }
 
       const notStagedFiles = execSync('echo $(git diff --name-only)')
