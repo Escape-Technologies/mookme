@@ -1,6 +1,7 @@
 {
     "steps": [{
         "name": "markdownlint",
-        "command": "../node_modules/markdownlint-cli/markdownlint.js ."
+        "command": "../node_modules/markdownlint-cli/markdownlint.js .",
+        "onlyOn": "*.md"
     }]
 }

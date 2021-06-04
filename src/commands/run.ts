@@ -1,5 +1,6 @@
 import commander from 'commander';
 import fs from 'fs';
+import path from 'path';
 import { execSync } from 'child_process';
 import draftlog from 'draftlog';
 import chalk from 'chalk';
@@ -52,11 +53,19 @@ export function addRun(program: commander.Command): void {
         .toString()
         .split(' ')
         .map((file) => file.replace('\n', ''));
-      const stagedFiles = execSync('echo $(git diff --cached --name-only)').toString().split(' ');
+
+      const stagedFiles = execSync('echo $(git diff --cached --name-only)')
+        .toString()
+        .split(' ')
+        .map((pth) => pth.replace('\n', ''));
+
       const rootDir = getRootDir();
       const packagesWithChanges = packages.filter((pkg) =>
         stagedFiles.find((file) => `${rootDir}/${file}`.includes(`${packagesPath}/${pkg}`)),
       );
+
+      // Store staged files in environement for further easy retrieval
+      process.env.MOOKME_STAGED_FILES = JSON.stringify(stagedFiles.map((fPath) => path.join(rootDir, fPath)));
 
       const packagesToCheck = opts.all ? packages : packagesWithChanges;
 
@@ -77,7 +86,7 @@ export function addRun(program: commander.Command): void {
       if (fs.existsSync(`${packagesPath}/.hooks/${type}.json`)) {
         hooks.push({
           name: '__global',
-          cwd: '.',
+          cwd: rootDir,
           steps: JSON.parse(fs.readFileSync(`${packagesPath}/.hooks/${type}.json`, 'utf-8')).steps,
         });
       }
@@ -123,7 +132,7 @@ export function addRun(program: commander.Command): void {
           }
         });
       } catch (err) {
-        console.log(chalk.bgRed('Unexpected error !'));
+        console.log(chalk.bgRed.bold(' Unexpected error ! '));
         console.error(err);
       }
 
