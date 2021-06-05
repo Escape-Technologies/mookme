@@ -78,7 +78,15 @@ available git hooks, eg :
 
 - `steps`
 
-The list of steps being executed by this hook
+The list of steps (commands) being executed by this hook. In a step you can define :
+
+#### Step options
+
+| Option        | Description           | Required  |
+| ------------- | ------------- | ------|
+| `name`      | The name that will be given to this step | yes |
+| `cmd`      | The command invoked at this step |   yes |
+| `onlyOn` | A shell wildcard conditioning the execution of the step based on modified files      |    no |
 
 - `type`
 
