@@ -1,0 +1,8 @@
+.hooks
+.tmp
+.vscode
+.eslintrc
+.gitignore
+.prettierrc
+tsconfig.json
+README.md
