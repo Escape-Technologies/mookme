@@ -53,7 +53,8 @@
     "packagesPath": "packages",
     "packages": [
       "docs",
-      "mookme"
+      "mookme",
+      "hub"
     ]
   }
 }
