@@ -1,0 +1,7 @@
+{
+    "steps": [{
+        "name": "markdownlint",
+        "command": "npm run lint",
+        "onlyOn": "*.md"
+    }]
+}

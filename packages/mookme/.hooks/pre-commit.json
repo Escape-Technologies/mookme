@@ -1,0 +1,10 @@
+{
+    "steps": [{
+        "name": "eslint",
+        "command": "npm run eslint",
+        "onlyOn": "src/**/*.ts"
+    }, {
+        "name": "prettier",
+        "command": "npm run prettier"
+    }]
+}

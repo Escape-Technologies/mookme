@@ -20,15 +20,19 @@ jobs:
             ${{ runner.OS }}-build-
             ${{ runner.OS }}-
       - name: Install
-        run: npm install
+        run: |
+          cd packages/docs
+          npm install
 
       - name: Build
-        run: npm run docs:build
+        run: |
+          cd packages/docs
+          npm run build
 
       - name: Deploy
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
-          aws s3 sync docs/.vuepress/dist s3://mookme-documentation --delete
+          aws s3 sync packages/docs/.vuepress/dist s3://mookme-documentation --delete
           aws cloudfront create-invalidation --distribution-id ${{ secrets.DOCS_CLOUDFRONT_ID }} --paths "/*"
