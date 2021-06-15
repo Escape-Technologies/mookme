@@ -16,11 +16,12 @@ jobs:
     - uses: actions/checkout@v2
     - name: Use Node.js
       uses: actions/setup-node@v2
-    - run |
-      cd packages/mookme
-      npm install      
-      npm run eslint
-      npm run prettier
+    - name: lint
+      run: |
+        cd packages/mookme
+        npm install      
+        npm run eslint
+        npm run prettier
   
   lint-docs:
     runs-on: ubuntu-latest
@@ -28,7 +29,8 @@ jobs:
     - uses: actions/checkout@v2
     - name: Use Node.js
       uses: actions/setup-node@v2
-    - run |
-      cd packages/docs
-      npm install      
-      npm run docs:lint
+    - name: lint
+      run: |
+        cd packages/docs
+        npm install      
+        npm run lint

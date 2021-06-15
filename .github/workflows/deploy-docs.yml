@@ -20,14 +20,10 @@ jobs:
             ${{ runner.OS }}-build-
             ${{ runner.OS }}-
       - name: Install
-        run: |
-          cd packages/docs
-          npm install
+        run: cd packages/docs && npm install
 
       - name: Build
-        run: |
-          cd packages/docs
-          npm run build
+        run: cd packages/docs && npm run docs:build
 
       - name: Deploy
         env:
