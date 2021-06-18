@@ -8,7 +8,13 @@ import { hookPackage, processResults } from '../utils/hook-package';
 import { loadConfig } from '../utils/get-config';
 import { getRootDir } from '../utils/get-root-dir';
 import { center } from '../utils/ui';
-import { getStagedFiles, getNotStagedFiles, detectAndProcessModifiedFiles } from '../utils/git';
+import {
+  getStagedFiles,
+  getNotStagedFiles,
+  detectAndProcessModifiedFiles,
+  hideNotCachedIfNeeded,
+  unHideNotCached,
+} from '../utils/git';
 import { loadHooks } from '../utils/packages';
 
 draftlog(console);
@@ -60,7 +66,7 @@ export function addRun(program: commander.Command): void {
       console.log();
       center(title);
 
-      // stashIfNeeded(type);
+      const patch_filename = hideNotCachedIfNeeded(type);
 
       const promisedHooks = [];
 
@@ -76,7 +82,10 @@ export function addRun(program: commander.Command): void {
         console.error(err);
       }
 
-      // unstashIfNeeded(type);
+      if (patch_filename) {
+        unHideNotCached(type, patch_filename);
+      }
+
       detectAndProcessModifiedFiles(initialNotStagedFiles, addedBehavior);
     });
 }
