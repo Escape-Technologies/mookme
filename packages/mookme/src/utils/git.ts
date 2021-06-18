@@ -5,13 +5,13 @@ import { HookType } from '../types/hook.types';
 let hasStashed = false;
 
 export const getNotStagedFiles = (): string[] =>
-  execSync('echo $(git diff --name-only)')
+  execSync('git --no-pager diff --name-only')
     .toString()
     .split(' ')
     .map((pth) => pth.replace('\n', ''));
 
 export const getStagedFiles = (): string[] =>
-  execSync('echo $(git diff --cached --name-only)')
+  execSync('git --no-pager diff --cached --name-only')
     .toString()
     .split(' ')
     .map((pth) => pth.replace('\n', ''));
@@ -54,7 +54,7 @@ export const unstashIfNeeded = (hookType: HookType): void => {
 import { ADDED_BEHAVIORS } from '../types/config.types';
 
 export function detectAndProcessModifiedFiles(initialNotStagedFiles: string[], behavior: ADDED_BEHAVIORS): void {
-  const notStagedFiles = execSync('echo $(git diff --name-only)')
+  const notStagedFiles = execSync('git --no-pager diff --name-only')
     .toString()
     .split(' ')
     .map((file) => file.replace('\n', ''));
