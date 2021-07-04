@@ -38,10 +38,6 @@ export function addRun(program: commander.Command): void {
         process.exit(1);
       }
 
-      const title = ` Running commit hook ${type} `;
-      console.log();
-      center(title);
-
       const { packages, packagesPath, addedBehavior } = loadConfig();
       process.env.MOOKME_CONFIG = JSON.stringify({ packages, packagesPath, addedBehavior });
 
@@ -55,6 +51,14 @@ export function addRun(program: commander.Command): void {
       process.env.MOOKME_STAGED_FILES = JSON.stringify(stagedFiles.map((fPath) => path.join(rootDir, fPath)));
 
       const hooks = loadHooks(stagedFiles, type, { all: opts.all });
+
+      if (hooks.length === 0) {
+        return;
+      }
+
+      const title = ` Running commit hook ${type} `;
+      console.log();
+      center(title);
 
       // stashIfNeeded(type);
 
