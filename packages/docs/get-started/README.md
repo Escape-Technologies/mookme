@@ -29,7 +29,7 @@ Every step of this process is clearly shown and nothing will be written without 
 This will only write your `.git/hooks` scripts.
 
 ```bash
-mookme init --only-hooks
+mookme init --only-hook
 ```
 
 ## Writing your hooks
