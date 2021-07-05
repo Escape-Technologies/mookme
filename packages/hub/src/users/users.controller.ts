@@ -2,10 +2,12 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
+  Delete,
   Get,
   HttpException,
   HttpStatus,
   Param,
+  Patch,
   Post,
   Put,
   UseInterceptors,
@@ -17,6 +19,17 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
+  notFound(id: number) {
+    throw new HttpException(
+      {
+        status: HttpStatus.NOT_FOUND,
+        error: 'Not Found',
+        message: [`User ${id} not found`],
+      },
+      HttpStatus.NOT_FOUND,
+    );
+  }
+
   @Get()
   @UseInterceptors(ClassSerializerInterceptor)
   async list() {
@@ -26,7 +39,11 @@ export class UsersController {
   @Get(':id')
   @UseInterceptors(ClassSerializerInterceptor)
   async getOne(@Param('id') id: number) {
-    return await this.usersService.findOne(id);
+    const user = await this.usersService.findOne(id);
+    if (!user) {
+      return this.notFound(id);
+    }
+    return user;
   }
 
   @Post()
@@ -42,7 +59,21 @@ export class UsersController {
         HttpStatus.BAD_REQUEST,
       );
     }
-    return await this.usersService.create(createUserDTO);
+    const potentialClash = await this.usersService.findByEmail(
+      createUserDTO.email,
+    );
+    if (!potentialClash) {
+      return await this.usersService.create(createUserDTO);
+    } else {
+      throw new HttpException(
+        {
+          status: HttpStatus.CONFLICT,
+          error: 'Conflict',
+          message: [`A user with email ${createUserDTO.email} already exists`],
+        },
+        HttpStatus.CONFLICT,
+      );
+    }
   }
 
   @Put(':id')
@@ -63,7 +94,22 @@ export class UsersController {
       }
     }
 
+    await this.usersService.checkExistence(id);
+
     const { email, password } = updateUserDTO;
     return await this.usersService.update(id, { email, password });
+  }
+
+  @Patch(':id/reset-key')
+  @UseInterceptors(ClassSerializerInterceptor)
+  async resetKey(@Param('id') id: number) {
+    await this.usersService.checkExistence(id);
+    return await this.usersService.resetKey(id);
+  }
+
+  @Delete(':id')
+  async deleteUser(@Param('id') id: number) {
+    await this.usersService.checkExistence(id);
+    return await this.usersService.remove(id);
   }
 }
