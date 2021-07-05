@@ -27,6 +27,10 @@ export class StepsService {
     return this.stepsRepository.findOne(id);
   }
 
+  findByName(name: string) {
+    return this.stepsRepository.findOne({ name });
+  }
+
   async remove(id: string): Promise<void> {
     await this.stepsRepository.delete(id);
   }
