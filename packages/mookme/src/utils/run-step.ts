@@ -3,7 +3,6 @@ import chalk from 'chalk';
 import wcmatch from 'wildcard-match';
 import { exec } from 'child_process';
 import { StepCommand } from '../types/step.types';
-import { loader } from './loader';
 
 draftlog(console);
 
@@ -14,15 +13,16 @@ export interface RunStepOptions {
   venvActivate?: string;
 }
 
-export function runStep(step: StepCommand, options: RunStepOptions): Promise<{ step: StepCommand; msg: Error } | null> {
+export function runStep(
+  step: StepCommand,
+  options: RunStepOptions,
+  logger: (log: string) => void,
+  interval: NodeJS.Timeout,
+): Promise<{ step: StepCommand; msg: Error } | null> {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const args = process.env.MOOKME_ARGS!.split(' ').filter((arg) => arg !== '');
 
   return new Promise((resolve) => {
-    console.log(`→ ${chalk.bold(step.name)} > ${step.command} `);
-
-    const { logger, interval } = loader();
-
     if (step.onlyOn) {
       try {
         const matcher = wcmatch(step.onlyOn);
