@@ -66,7 +66,9 @@ export function detectAndProcessModifiedFiles(initialNotStagedFiles: string[], b
       case ADDED_BEHAVIORS.ADD_AND_COMMIT:
         console.log(chalk.bgYellow.black('Files were changed during hook execution !'));
         console.log(chalk.yellow('Following the defined behavior : Add and continue.'));
-        execSync(`git add ${process.env.ROOT_DIR}`);
+        for (const file of changedFiles) {
+          execSync(`git add ${process.env.ROOT_DIR}/${file}`);
+        }
         break;
       case ADDED_BEHAVIORS.EXIT:
         console.log(chalk.bgYellow.black(' Files were changed during hook execution ! '));
