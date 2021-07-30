@@ -3,8 +3,6 @@ import { execSync } from 'child_process';
 import { HookType } from '../types/hook.types';
 import fs from 'fs';
 
-let hasStashed = false;
-
 export const getNotStagedFiles = (): string[] =>
   execSync('git --no-pager diff --name-only')
     .toString()
@@ -16,39 +14,6 @@ export const getStagedFiles = (): string[] =>
     .toString()
     .split(' ')
     .map((pth) => pth.replace('\n', ''));
-
-export const stashIfNeeded = (hookType: HookType): void => {
-  const shouldStash = execSync('git ls-files --others --exclude-standard --modified').toString().split('\n').length > 1;
-
-  if (hookType === HookType.preCommit && !!shouldStash) {
-    console.log(chalk.yellow.bold('Stashing unstaged changes in order to run hooks properly'));
-    console.log(chalk.bold(`> git stash push --keep-index --include-untracked`));
-    execSync(`git stash push --keep-index --include-untracked`).toString();
-
-    console.log(chalk.yellow.bold('\nList of stashed and modified files:'));
-    const stashedAndModified = execSync('git --no-pager stash show --name-only').toString();
-    console.log(stashedAndModified);
-
-    console.log(chalk.yellow.bold('List of stashed and untracked files:'));
-    const stashedAndUntracked = execSync('git --no-pager show stash@{0}^3:').toString().split('\n').slice(2).join('\n');
-    console.log(stashedAndUntracked);
-
-    hasStashed = true;
-  }
-};
-
-export const unstashIfNeeded = (hookType: HookType): void => {
-  if (hookType === HookType.preCommit && hasStashed) {
-    console.log();
-    console.log(chalk.yellow.bold('Unstashing unstaged changes in order to run hooks properly'));
-    try {
-      execSync('git stash pop');
-    } catch (err) {
-      console.log(err);
-      console.log(chalk.bgRed.white.bold('Could not unstash file ! You should run `git stash pop` and fix conflicts'));
-    }
-  }
-};
 
 export const hideNotCachedIfNeeded = (hookType: HookType): string | null => {
   const shouldHide = execSync('git ls-files --others --exclude-standard --modified').toString().split('\n').length > 1;
