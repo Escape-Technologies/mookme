@@ -3,14 +3,14 @@ import chalk from 'chalk';
 import { PackageHook } from '../types/hook.types';
 import { runStep } from './run-step';
 import { StepCommand, StepError } from '../types/step.types';
-import { loader } from './loader';
+import { loader, LoaderManager } from './loader';
 
 draftlog(console);
 
 type Logger = (log: string) => void;
 interface UI {
   packageLogger: Logger;
-  stepsLoggers: { [key: string]: { logger: Logger; interval: NodeJS.Timeout } };
+  stepsLoggers: { [key: string]: LoaderManager };
 }
 
 function init_ui(hook: PackageHook): UI {
@@ -24,7 +24,7 @@ function init_ui(hook: PackageHook): UI {
 
   for (const step of hook.steps) {
     console.log(`→ ${chalk.bold(step.name)} > ${step.command} `);
-    ui.stepsLoggers[step.name] = loader();
+    ui.stepsLoggers[step.name] = loader('Scheduled');
   }
 
   return ui;
@@ -45,8 +45,8 @@ export async function hookPackage(hook: PackageHook): Promise<{ hook: PackageHoo
 
   for (const step of hook.steps) {
     try {
-      const { logger, interval } = ui.stepsLoggers[step.name];
-      const stepPromise = runStep(step, options, logger, interval);
+      const loaderManager = ui.stepsLoggers[step.name];
+      const stepPromise = runStep(step, options, loaderManager);
       promises.push(stepPromise);
 
       if (step.serial) {

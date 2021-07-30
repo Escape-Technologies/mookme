@@ -1,22 +1,31 @@
-export function loader(initial = 'Running.. '): {
+export interface LoaderManager {
   logger: (log: string) => void;
+  updateMessage: (newMessage: string) => void;
   interval: ReturnType<typeof setInterval>;
-} {
-  let currentStatus = initial;
-  const logger = console.draft(currentStatus);
+}
+
+export function loader(initialMessage = 'Running'): LoaderManager {
+  let dotStatus = '.. ';
+  let message = initialMessage;
+  const logger = console.draft(message + dotStatus);
   const interval: ReturnType<typeof setInterval> = setInterval(() => {
-    switch (currentStatus) {
-      case 'Running.. ':
-        currentStatus = 'Running ..';
+    switch (dotStatus) {
+      case '.. ':
+        dotStatus = ' ..';
         break;
-      case 'Running ..':
-        currentStatus = 'Running. .';
+      case ' ..':
+        dotStatus = '. .';
         break;
-      case 'Running. .':
-        currentStatus = 'Running.. ';
+      case '. .':
+        dotStatus = '.. ';
         break;
     }
-    logger(currentStatus);
+    logger(message + dotStatus);
   }, 100);
-  return { logger, interval };
+
+  function updateMessage(newMessage: string): void {
+    message = newMessage;
+  }
+
+  return { logger, interval, updateMessage };
 }
