@@ -87,6 +87,10 @@ The list of steps (commands) being executed by this hook. In a step you can defi
 | `name`      | The name that will be given to this step | yes |
 | `cmd`      | The command invoked at this step |   yes |
 | `onlyOn` | A shell wildcard conditioning the execution of the step based on modified files      |    no |
+| `serial` | A boolean value describing if the package hook execution should await for the step to end |    no |
+
+::: warning
+A serial step that fails will not prevent the execution of the following steps
 
 - `type`
 
