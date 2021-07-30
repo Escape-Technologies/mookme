@@ -3,6 +3,7 @@ import chalk from 'chalk';
 import wcmatch from 'wildcard-match';
 import { exec } from 'child_process';
 import { StepCommand } from '../types/step.types';
+import { LoaderManager } from './loader';
 
 draftlog(console);
 
@@ -16,12 +17,11 @@ export interface RunStepOptions {
 export function runStep(
   step: StepCommand,
   options: RunStepOptions,
-  logger: (log: string) => void,
-  interval: NodeJS.Timeout,
+  loaderManager: LoaderManager,
 ): Promise<{ step: StepCommand; msg: Error } | null> {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const args = process.env.MOOKME_ARGS!.split(' ').filter((arg) => arg !== '');
-
+  loaderManager.updateMessage('Running');
   return new Promise((resolve) => {
     if (step.onlyOn) {
       try {
@@ -33,14 +33,14 @@ export function runStep(
           .filter((rPath: string) => matcher(rPath));
 
         if (matched.length === 0) {
-          clearInterval(interval);
-          logger(`⏩ Skipped. (no match with "${step.onlyOn}")`);
+          clearInterval(loaderManager.interval);
+          loaderManager.logger(`⏩ Skipped. (no match with "${step.onlyOn}")`);
           return resolve(null);
         }
       } catch (err) {
-        logger(chalk.bgRed.white.bold(' Error '));
-        clearInterval(interval);
-        logger('❌ Error.');
+        loaderManager.logger(chalk.bgRed.white.bold(' Error '));
+        clearInterval(loaderManager.interval);
+        loaderManager.logger('❌ Error.');
         resolve({
           step,
           msg: new Error(`Invalid \`onlyOn\` pattern: ${step.onlyOn}\n${err}`),
@@ -66,16 +66,16 @@ export function runStep(
     });
 
     cp.on('exit', (code) => {
-      clearInterval(interval);
+      clearInterval(loaderManager.interval);
       if (code === 0) {
-        logger('✅ Done.');
+        loaderManager.logger('✅ Done.');
         resolve(null);
       } else {
         resolve({
           step,
           msg: new Error(error + chalk.bold('\nstdout :\n') + out),
         });
-        logger('❌ Error.');
+        loaderManager.logger('❌ Error.');
       }
     });
   });
