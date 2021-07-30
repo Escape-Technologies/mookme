@@ -21,12 +21,14 @@ export const hideNotCachedIfNeeded = (hookType: HookType): string | null => {
     const tree = execSync('git write-tree').toString().trim();
     console.log(chalk.yellow.bold('Hiding unstaged changes in order to run hooks properly'));
     console.log(chalk.bold(`> git diff-index --ignore-submodules --binary --no-color --no-ext-diff ${tree}`));
+    console.log();
 
     const diffBinary = execSync(
       `git diff-index --ignore-submodules --binary --no-color --no-ext-diff ${tree}`,
     ).toString();
     const patchFilename = `patch_${Date.now()}_${process.pid}`;
     console.log(chalk.yellow.bold(`Writing patch file into ${patchFilename}`));
+    console.log();
     fs.writeFileSync(patchFilename, diffBinary);
 
     console.log(chalk.yellow.bold('Cleaning work tree'));
