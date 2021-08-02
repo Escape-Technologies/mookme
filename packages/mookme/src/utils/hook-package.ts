@@ -30,7 +30,23 @@ function init_ui(hook: PackageHook): UI {
   return ui;
 }
 
-export async function hookPackage(hook: PackageHook): Promise<{ hook: PackageHook; step: StepCommand; msg: Error }[]> {
+function handleStepError(
+  stepError: {
+    step: StepCommand;
+    msg: Error;
+  },
+  hook: PackageHook,
+): StepError {
+  return {
+    hook,
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    step: stepError!.step,
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    msg: stepError!.msg,
+  };
+}
+
+export async function hookPackage(hook: PackageHook): Promise<StepError[]> {
   const ui: UI = init_ui(hook);
 
   const options = {
@@ -51,30 +67,16 @@ export async function hookPackage(hook: PackageHook): Promise<{ hook: PackageHoo
 
       if (step.serial) {
         const stepError = await stepPromise;
-        let result: string = chalk.bgGreen.bold(' Done ✓ ');
+        const result: string = stepError !== null ? chalk.bgGreen.bold(' Done ✓ ') : chalk.bgRed.bold(' Error × ');
         if (stepError !== null) {
-          result = chalk.bgRed.bold(' Error × ');
-          errors.push({
-            hook,
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            step: stepError!.step,
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            msg: stepError!.msg,
-          });
+          errors.push(handleStepError(stepError, hook));
         }
         ui.packageLogger(`${chalk.bold.inverse(` Hooks : ${hook.name} `)}${result}`);
       } else {
         stepPromise.then((stepError) => {
-          let result: string = chalk.bgGreen.bold(' Done ✓ ');
+          const result: string = stepError !== null ? chalk.bgGreen.bold(' Done ✓ ') : chalk.bgRed.bold(' Error × ');
           if (stepError !== null) {
-            result = chalk.bgRed.bold(' Error × ');
-            errors.push({
-              hook,
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              step: stepError!.step,
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              msg: stepError!.msg,
-            });
+            errors.push(handleStepError(stepError, hook));
           }
           ui.packageLogger(`${chalk.bold.inverse(` Hooks : ${hook.name} `)}${result}`);
         });
@@ -88,30 +90,6 @@ export async function hookPackage(hook: PackageHook): Promise<{ hook: PackageHoo
   await Promise.all(promises);
 
   return errors;
-
-  // return await new Promise((resolve, reject) =>
-  //   Promise.all(hook.steps.map((step) => runStep(step, options)))
-  //     .then((errors) => {
-  //       const hasError = errors.find((err) => err !== null);
-  //       const result = hasError ? chalk.bgRed.bold(' Failed × ') : chalk.bgGreen.bold(' Success ✓ ');
-  //       loggers[hook.name](`${chalk.bold.inverse(` Hooks : ${hook.name} `)}${result}`);
-  //       resolve(
-  //         errors
-  //           .filter((err) => err !== null)
-  //           .map((err) => ({
-  //             hook,
-  //             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  //             step: err!.step,
-  //             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  //             msg: err!.msg,
-  //           })),
-  //       );
-  //     })
-  //     .catch((err) => {
-  //       loggers[hook.name](`${chalk.bold.inverse(` Hooks : ${hook.name} `)}${chalk.bgRed.bold(' Error × ')}`);
-  //       reject(err);
-  //     }),
-  // );
 }
 
 export function processResults(results: StepError[][]): void {
