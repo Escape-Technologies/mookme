@@ -4,5 +4,6 @@
 .eslintrc
 .gitignore
 .prettierrc
+assets
 tsconfig.json
 README.md
