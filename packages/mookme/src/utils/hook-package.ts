@@ -63,9 +63,12 @@ export async function hookPackage(hook: PackageHook): Promise<StepError[]> {
     try {
       const loaderManager = ui.stepsLoggers[step.name];
       const stepPromise = runStep(step, options, loaderManager);
+
+      // Regardless of whether the step is serial or not, it will be awaited at the end of this function
       promises.push(stepPromise);
 
       if (step.serial) {
+        // Serial steps are blocking
         const stepError = await stepPromise;
         const result: string = stepError !== null ? chalk.bgGreen.bold(' Done ✓ ') : chalk.bgRed.bold(' Error × ');
         if (stepError !== null) {
@@ -73,6 +76,7 @@ export async function hookPackage(hook: PackageHook): Promise<StepError[]> {
         }
         ui.packageLogger(`${chalk.bold.inverse(` Hooks : ${hook.name} `)}${result}`);
       } else {
+        // Non-serial steps are just launched and result is processed in a callback
         stepPromise.then((stepError) => {
           const result: string = stepError !== null ? chalk.bgGreen.bold(' Done ✓ ') : chalk.bgRed.bold(' Error × ');
           if (stepError !== null) {
@@ -87,6 +91,7 @@ export async function hookPackage(hook: PackageHook): Promise<StepError[]> {
     }
   }
 
+  // In every cases, we await for every step promises before processing hook results
   await Promise.all(promises);
 
   return errors;
