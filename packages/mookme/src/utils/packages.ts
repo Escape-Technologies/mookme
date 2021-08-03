@@ -7,9 +7,19 @@ export interface LoadHookOptions {
   all?: boolean;
 }
 
+function matchExactPath(filePath: string, to_match: string): boolean {
+  const position = filePath.indexOf(to_match);
+  if (position === -1) {
+    return false;
+  }
+  const remainingPath = filePath.slice(position + to_match.length);
+  return remainingPath.length > 0 ? remainingPath.startsWith('/') : true;
+}
+
 export const loadHooks = (stagedFiles: string[], hookType: string, opts: LoadHookOptions): PackageHook[] => {
   const hooks: PackageHook[] = [];
 
+  const rootDir: string = process.env.ROOT_DIR as string;
   const { packages, packagesPath } = getConfig();
 
   packages
@@ -17,9 +27,7 @@ export const loadHooks = (stagedFiles: string[], hookType: string, opts: LoadHoo
       if (opts.all) {
         return true;
       } else {
-        return !!stagedFiles.find((file) =>
-          `${process.env.ROOT_DIR}/${file}`.includes(path.join(packagesPath, pkgName)),
-        );
+        return !!stagedFiles.find((file) => matchExactPath(path.join(rootDir, file), path.join(packagesPath, pkgName)));
       }
     })
     .filter((pkgName) => fs.existsSync(`${packagesPath}/${pkgName}/.hooks/${hookType}.json`))
