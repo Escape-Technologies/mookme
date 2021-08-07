@@ -9,13 +9,16 @@ import {
 } from 'typeorm';
 
 @Entity()
-@Unique(['email'])
+@Unique(['email', 'username'])
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
   email: string;
+
+  @Column()
+  username: string;
 
   @Column()
   @Exclude({ toPlainOnly: true })

@@ -24,15 +24,22 @@ export class UsersService {
     }
   }
 
-  async checkConflict(email: string): Promise<void> {
-    const potentialClash = await this.findByEmail(email);
+  async checkConflict(value: string, field = 'email'): Promise<void> {
+    const potentialClash =
+      field == 'email'
+        ? await this.findByEmail(value)
+        : await this.findByUsername(value);
     if (potentialClash) {
-      throw new ConflictException(`A user with email ${email} already exists`);
+      throw new ConflictException(
+        `A user with ${field} ${value} already exists`,
+      );
     }
   }
 
   async create(createUserDTO: CreateUserDTO): Promise<User> {
     await this.checkConflict(createUserDTO.email);
+    await this.checkConflict(createUserDTO.username, 'username');
+
     const user = this.usersRepository.create(createUserDTO);
     user.key = uuid.v4();
     const salt = bcrypt.genSaltSync(10);
@@ -54,6 +61,10 @@ export class UsersService {
 
   async findByEmail(email: string): Promise<User> {
     return await this.usersRepository.findOne({ email });
+  }
+
+  async findByUsername(username: string): Promise<User> {
+    return await this.usersRepository.findOne({ username });
   }
 
   async update(
