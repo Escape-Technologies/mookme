@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsBoolean } from 'class-validator';
 import { User } from 'src/users/user.entity';
 import {
   Entity,
@@ -18,7 +18,12 @@ export class StepContent {
   command: string;
 
   @IsString()
+  @IsOptional()
   onlyOn?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  serial?: string;
 }
 
 @Entity()

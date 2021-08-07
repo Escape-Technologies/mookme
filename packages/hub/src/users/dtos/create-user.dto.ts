@@ -11,6 +11,10 @@ export class CreateUserDTO {
 
   @IsNotEmpty()
   @IsString()
+  username: string;
+
+  @IsNotEmpty()
+  @IsString()
   passwordConfirmation: string;
 
   get isValid() {

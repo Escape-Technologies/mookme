@@ -50,6 +50,7 @@ export class StepsService {
         'steps.name',
         'user.id',
         'user.email',
+        'user.username',
         'steps.rawContent',
       ])
       .leftJoin('steps.owner', 'user') // bar is the joined table
@@ -65,6 +66,7 @@ export class StepsService {
         'steps.name',
         'user.id',
         'user.email',
+        'user.username',
         'steps.rawContent',
       ])
       .leftJoin('steps.owner', 'user') // bar is the joined table
@@ -80,6 +82,7 @@ export class StepsService {
         'steps.name',
         'user.id',
         'user.email',
+        'user.username',
         'steps.rawContent',
       ])
       .leftJoin('steps.owner', 'user') // bar is the joined table
