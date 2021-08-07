@@ -1,11 +1,15 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { CreateUserDTO } from './dtos/create-user.dto';
 import { UserDTO } from './dtos/user-dto';
 import { User } from './user.entity';
-
+import * as bcrypt from 'bcrypt';
 import * as uuid from 'uuid';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class UsersService {
@@ -15,25 +19,24 @@ export class UsersService {
   ) {}
 
   async checkExistence(id: number): Promise<void> {
-    const count = await this.usersRepository.count({ id: id });
+    if ((await this.usersRepository.count({ id: id })) === 0) {
+      throw new NotFoundException(`User ${id} not found`);
+    }
+  }
 
-    console.log({ count });
-
-    if (count === 0) {
-      throw new HttpException(
-        {
-          status: HttpStatus.NOT_FOUND,
-          error: 'Not Found',
-          message: [`User ${id} not found`],
-        },
-        HttpStatus.NOT_FOUND,
-      );
+  async checkConflict(email: string): Promise<void> {
+    const potentialClash = await this.findByEmail(email);
+    if (potentialClash) {
+      throw new ConflictException(`A user with email ${email} already exists`);
     }
   }
 
   async create(createUserDTO: CreateUserDTO): Promise<User> {
+    await this.checkConflict(createUserDTO.email);
     const user = this.usersRepository.create(createUserDTO);
     user.key = uuid.v4();
+    const salt = bcrypt.genSaltSync(10);
+    user.password = bcrypt.hashSync(user.password, salt);
     return this.usersRepository.save(user);
   }
 
@@ -42,7 +45,11 @@ export class UsersService {
   }
 
   async findOne(id: number): Promise<User> {
-    return await this.usersRepository.findOne(id);
+    return await this.usersRepository.findOne(id, { relations: ['steps'] });
+  }
+
+  async findByAPIKey(key: string): Promise<User> {
+    return await this.usersRepository.findOne({ key });
   }
 
   async findByEmail(email: string): Promise<User> {
@@ -53,6 +60,9 @@ export class UsersService {
     id: number,
     update: Partial<CreateUserDTO>,
   ): Promise<{ updatedCount: number }> {
+    if (update.email) {
+      await this.checkConflict(update.email);
+    }
     await this.usersRepository.update(id, update);
     return { updatedCount: 1 };
   }

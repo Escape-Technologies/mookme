@@ -1,5 +1,12 @@
 import { Exclude } from 'class-transformer';
-import { Entity, Column, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { Step } from 'src/steps/step.entity';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  Unique,
+  OneToMany,
+} from 'typeorm';
 
 @Entity()
 @Unique(['email'])
@@ -16,4 +23,7 @@ export class User {
 
   @Column()
   key: string;
+
+  @OneToMany(() => Step, (step) => step.owner)
+  steps: Step[];
 }

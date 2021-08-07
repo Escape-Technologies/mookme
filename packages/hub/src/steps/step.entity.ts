@@ -1,5 +1,12 @@
 import { IsNotEmpty, IsString } from 'class-validator';
-import { Entity, Column, PrimaryGeneratedColumn, AfterLoad } from 'typeorm';
+import { User } from 'src/users/user.entity';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  AfterLoad,
+  ManyToOne,
+} from 'typeorm';
 
 export class StepContent {
   @IsString()
@@ -24,6 +31,9 @@ export class Step {
 
   @Column()
   rawContent: string;
+
+  @ManyToOne(() => User, (user) => user.steps)
+  owner: User;
 
   protected content: StepContent;
 

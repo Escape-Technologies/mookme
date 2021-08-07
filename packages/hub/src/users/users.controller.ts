@@ -1,79 +1,57 @@
 import {
+  BadRequestException,
   Body,
   ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
-  HttpException,
-  HttpStatus,
+  NotFoundException,
   Param,
   Patch,
   Post,
   Put,
+  Req,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { AuthenticatedRequest } from 'src/auth/authenticated-request.model';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { CreateUserDTO } from './dtos/create-user.dto';
 import { UsersService } from './users.service';
-
 @Controller('users')
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
   notFound(id: number) {
-    throw new HttpException(
-      {
-        status: HttpStatus.NOT_FOUND,
-        error: 'Not Found',
-        message: [`User ${id} not found`],
-      },
-      HttpStatus.NOT_FOUND,
-    );
+    throw new NotFoundException(`User ${id} not found`);
   }
 
-  @Get()
-  @UseInterceptors(ClassSerializerInterceptor)
-  async list() {
-    return await this.usersService.findAll();
-  }
+  // @Get()
+  // @UseInterceptors(ClassSerializerInterceptor)
+  // async list() {
+  //   return await this.usersService.findAll();
+  // }
 
   @Get(':id')
   @UseInterceptors(ClassSerializerInterceptor)
-  async getOne(@Param('id') id: number) {
-    const user = await this.usersService.findOne(id);
-    if (!user) {
-      return this.notFound(id);
-    }
-    return user;
+  async getOne(@Param() id: number) {
+    return await this.usersService.findOne(id);
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(ClassSerializerInterceptor)
+  async getMe(@Req() request: AuthenticatedRequest) {
+    return await this.usersService.findOne(request.user.id);
   }
 
   @Post()
   @UseInterceptors(ClassSerializerInterceptor)
   async create(@Body() createUserDTO: CreateUserDTO) {
     if (createUserDTO.password !== createUserDTO.passwordConfirmation) {
-      throw new HttpException(
-        {
-          status: HttpStatus.BAD_REQUEST,
-          error: 'Bad Request',
-          message: ['Passwords do not match'],
-        },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new BadRequestException('Passwords do not match');
     }
-    const potentialClash = await this.usersService.findByEmail(
-      createUserDTO.email,
-    );
-    if (!potentialClash) {
-      return await this.usersService.create(createUserDTO);
-    } else {
-      throw new HttpException(
-        {
-          status: HttpStatus.CONFLICT,
-          error: 'Conflict',
-          message: [`A user with email ${createUserDTO.email} already exists`],
-        },
-        HttpStatus.CONFLICT,
-      );
-    }
+    return await this.usersService.create(createUserDTO);
   }
 
   @Put(':id')
@@ -83,19 +61,9 @@ export class UsersController {
   ) {
     if (updateUserDTO.password) {
       if (updateUserDTO.password !== updateUserDTO.passwordConfirmation) {
-        throw new HttpException(
-          {
-            status: HttpStatus.BAD_REQUEST,
-            error: 'Bad Request',
-            message: ['Passwords do not match'],
-          },
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException('Passwords do not match');
       }
     }
-
-    await this.usersService.checkExistence(id);
-
     const { email, password } = updateUserDTO;
     return await this.usersService.update(id, { email, password });
   }
