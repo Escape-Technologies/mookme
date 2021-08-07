@@ -11,4 +11,8 @@ export class CreateStepDTO {
   @ValidateNested()
   @Type(() => StepContent)
   step: StepContent;
+
+  @IsNotEmpty()
+  @IsString()
+  apiKey: string;
 }
