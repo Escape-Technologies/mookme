@@ -22,6 +22,18 @@ jobs:
         npm install      
         npm run eslint
         npm run prettier
+
+  lint-hub:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js
+      uses: actions/setup-node@v2
+    - name: lint
+      run: |
+        cd packages/hub
+        npm install      
+        npm run lint
   
   lint-docs:
     runs-on: ubuntu-latest
