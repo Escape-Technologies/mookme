@@ -4,6 +4,7 @@ import wcmatch from 'wildcard-match';
 import { exec } from 'child_process';
 import { StepCommand } from '../types/step.types';
 import { LoaderManager } from './loader';
+import config from '../config';
 
 draftlog(console);
 
@@ -20,7 +21,7 @@ export function runStep(
   loaderManager: LoaderManager,
 ): Promise<{ step: StepCommand; msg: Error } | null> {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const args = process.env.MOOKME_ARGS!.split(' ').filter((arg) => arg !== '');
+  const args = config.executionContext.hookArgs!.split(' ').filter((arg) => arg !== '');
   loaderManager.updateMessage('Running');
   return new Promise((resolve) => {
     if (step.onlyOn) {

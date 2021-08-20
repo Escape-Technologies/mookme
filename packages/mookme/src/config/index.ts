@@ -1,10 +1,11 @@
 import { loadAuthConfig, loadCLIConfig, loadPackageJSONandProjectConfig } from './loaders';
-import { AuthConfig, CLIConfig, MookmeConfig, PkgJSON, ProjectConfig } from './types';
+import { AuthConfig, CLIConfig, ExecutionContext, MookmeConfig, PkgJSON, ProjectConfig } from './types';
 
 let CONFIG: MookmeConfig;
 
 export class Config {
   private config: MookmeConfig;
+  public executionContext: ExecutionContext = {};
 
   static loadConfig(): void {
     CONFIG = {
@@ -19,6 +20,13 @@ export class Config {
       Config.loadConfig();
     }
     this.config = CONFIG;
+  }
+
+  updateExecutionContext(newContext: ExecutionContext): void {
+    this.executionContext = {
+      ...this.executionContext,
+      ...newContext,
+    };
   }
 
   get project(): ProjectConfig {

@@ -21,11 +21,13 @@ export function addRun(program: commander.Command): void {
       '-t, --type <type>',
       'A valid git hook type ("pre-commit", "prepare-commit", "commit-msg", "post-commit")',
     )
-    .option('-a, --all', 'Run hooks for all packages', '')
-    .option('--args <args>[]', 'The arguments being passed to the hooks', '')
+    .option('-a, --all <all>', 'Run hooks for all packages', '')
+    .option('--args <args>', 'The arguments being passed to the hooks', '')
     .action(async (opts: Options) => {
-      process.env.MOOKME_ARGS = opts.args;
-      process.env.MOOKME_HOOK_TYPE = opts.type;
+      config.updateExecutionContext({
+        hookArgs: opts.args,
+        hookType: opts.type,
+      });
 
       const { type } = opts;
 
@@ -40,7 +42,9 @@ export function addRun(program: commander.Command): void {
       const stagedFiles = getStagedFiles();
 
       // Store staged files in environement for further easy retrieval
-      process.env.MOOKME_STAGED_FILES = JSON.stringify(stagedFiles.map((fPath) => path.join(rootDir || '', fPath)));
+      config.updateExecutionContext({
+        stagedFiles: stagedFiles.map((fPath) => path.join(rootDir || '', fPath)),
+      });
 
       const hooks = loadHooks(stagedFiles, type, { all: opts.all });
 

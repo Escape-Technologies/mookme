@@ -1,3 +1,5 @@
+import { HookType } from '../types/hook.types';
+
 export enum ADDED_BEHAVIORS {
   ADD_AND_COMMIT = 'addAndCommit',
   EXIT = 'exit',
@@ -26,4 +28,10 @@ export interface MookmeConfig {
   cli: CLIConfig;
   auth: AuthConfig;
   packageJSON: PkgJSON;
+}
+
+export interface ExecutionContext {
+  hookArgs?: string;
+  stagedFiles?: string[];
+  hookType?: HookType;
 }
