@@ -2,20 +2,24 @@ import chalk from 'chalk';
 import commander from 'commander';
 import fs from 'fs';
 import path from 'path';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
+import { parseAxiosError } from '../utils/client';
+import { loadAuthConfig } from '../config/loaders';
 
 export function addPublish(program: commander.Command): void {
   program
     .command('publish')
-    .requiredOption('-k, --key <key>', 'Your user api key on Mookme hub')
     .requiredOption('-n, --name <key>', 'The name of the step you are posting')
     .requiredOption(
       '-s, --step <step>',
       "The step that you want to publish. Can be a path to a json file, or it's stingified content",
     )
     .description('Publish step on Mookme hub')
-    .action(async ({ step, name, key }) => {
+    .action(async ({ step, name }) => {
+      const { key } = loadAuthConfig();
+
       const stepFilePath = path.join(process.cwd(), step);
+
       if (fs.existsSync(stepFilePath)) {
         let stepFileContent: string;
 
@@ -42,26 +46,14 @@ export function addPublish(program: commander.Command): void {
           console.log(chalk.bold(`\n${'='.repeat(25)}`));
         } catch (e) {
           if (e.isAxiosError) {
-            if (e.response) {
-              console.log(
-                chalk.bgRed.white.bold(
-                  `Publish failed : received response with status ${e.response.status} from the server.`,
-                ),
-              );
-              console.log(chalk.bold(`${'='.repeat(7)} Error content ${'='.repeat(7)}\n`));
-              console.log(e.response.data);
-              console.log(chalk.bold(`\n${'='.repeat(29)}`));
-            } else {
-              console.log(chalk.bgRed.white.bold(`Publish failed : received no response from the server.`));
-              console.log(chalk.bold(`${'='.repeat(7)} Error content ${'='.repeat(7)}\n`));
-              console.error(e);
-              console.log(chalk.bold(`\n${'='.repeat(29)}`));
-            }
+            parseAxiosError(e as AxiosError);
           } else {
             console.log(chalk.bgRed.white.bold(`An unknown error occured while publishing the step`));
             console.error(e);
           }
         }
+      } else {
+        console.log(chalk.red.bold(`No file found at path ${stepFilePath}`));
       }
     });
 }

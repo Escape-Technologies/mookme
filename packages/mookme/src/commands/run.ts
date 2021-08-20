@@ -5,8 +5,7 @@ import chalk from 'chalk';
 
 import { hookTypes, HookType } from '../types/hook.types';
 import { hookPackage, processResults } from '../utils/hook-package';
-import { loadConfig } from '../utils/get-config';
-import { getRootDir } from '../utils/get-root-dir';
+import { loadProjectConfig } from '../config/loaders';
 import { center } from '../utils/ui';
 import { getStagedFiles, getNotStagedFiles, detectAndProcessModifiedFiles } from '../utils/git';
 import { loadHooks } from '../utils/packages';
@@ -38,17 +37,16 @@ export function addRun(program: commander.Command): void {
         process.exit(1);
       }
 
-      const { packages, packagesPath, addedBehavior } = loadConfig();
-      process.env.MOOKME_CONFIG = JSON.stringify({ packages, packagesPath, addedBehavior });
+      const { packages, packagesPath, addedBehavior } = loadProjectConfig();
+      process.env.MOOKME_PROJECT_CONFIG = JSON.stringify({ packages, packagesPath, addedBehavior });
 
       const initialNotStagedFiles = getNotStagedFiles();
       const stagedFiles = getStagedFiles();
 
-      process.env.ROOT_DIR = getRootDir();
-      const rootDir = process.env.ROOT_DIR;
+      const rootDir = process.env.PROJECT_ROOT_DIR;
 
       // Store staged files in environement for further easy retrieval
-      process.env.MOOKME_STAGED_FILES = JSON.stringify(stagedFiles.map((fPath) => path.join(rootDir, fPath)));
+      process.env.MOOKME_STAGED_FILES = JSON.stringify(stagedFiles.map((fPath) => path.join(rootDir || '', fPath)));
 
       const hooks = loadHooks(stagedFiles, type, { all: opts.all });
 
