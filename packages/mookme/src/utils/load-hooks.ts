@@ -2,6 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import { PackageHook } from '../types/hook.types';
 import config from '../config';
+import { getStagedFiles } from './git';
 export interface LoadHookOptions {
   all?: boolean;
 }
@@ -15,12 +16,13 @@ function matchExactPath(filePath: string, to_match: string): boolean {
   return remainingPath.length > 0 ? remainingPath.startsWith('/') : true;
 }
 
-export const loadHooks = (stagedFiles: string[], hookType: string, opts: LoadHookOptions): PackageHook[] => {
-  const hooks: PackageHook[] = [];
+export const loadHooks = (hookType: string, opts: LoadHookOptions): PackageHook[] => {
+  const stagedFiles = getStagedFiles();
 
   const rootDir = config.project.rootDir;
   const { packages, packagesPath } = config.project;
 
+  const hooks: PackageHook[] = [];
   packages
     .filter((pkgName) => {
       if (opts.all) {
@@ -37,13 +39,15 @@ export const loadHooks = (stagedFiles: string[], hookType: string, opts: LoadHoo
     }))
     .forEach(({ name, path, cwd }) => {
       const hook = JSON.parse(fs.readFileSync(path, 'utf-8'));
-      hooks.push({
-        name,
-        cwd,
-        type: hook.type,
-        venvActivate: hook.venvActivate,
-        steps: hook.steps,
-      });
+      if (hook.steps.length > 0) {
+        hooks.push({
+          name,
+          cwd,
+          type: hook.type,
+          venvActivate: hook.venvActivate,
+          steps: hook.steps,
+        });
+      }
     });
 
   if (fs.existsSync(`${packagesPath}/.hooks/${hookType}.json`)) {

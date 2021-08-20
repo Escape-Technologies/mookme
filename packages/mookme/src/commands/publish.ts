@@ -40,7 +40,9 @@ export function addPublish(program: commander.Command): void {
         console.log(chalk.green.bold(`Succesfully registered step with id ${publishStepResponse.id}`));
         console.log(chalk.bold(`\nYou can distribute it with the following command :`));
         console.log(
-          chalk.bold(`mookme install --package <package> --hook <desired-step> @maxencel/${publishStepResponse.name}`),
+          chalk.bold(
+            `mookme install --package <package> --hook <desired-step> @<your-username>/${publishStepResponse.name}`,
+          ),
         );
         console.log(chalk.bold(`\n${'='.repeat(25)}`));
       } else {

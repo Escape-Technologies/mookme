@@ -32,6 +32,5 @@ export interface MookmeConfig {
 
 export interface ExecutionContext {
   hookArgs?: string;
-  stagedFiles?: string[];
   hookType?: HookType;
 }

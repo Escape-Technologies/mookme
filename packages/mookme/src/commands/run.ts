@@ -1,12 +1,11 @@
 import commander from 'commander';
-import path from 'path';
 import chalk from 'chalk';
 
 import { hookTypes, HookType } from '../types/hook.types';
 import { hookPackage, processResults } from '../utils/hook-package';
 import { center } from '../utils/ui';
-import { getStagedFiles, getNotStagedFiles, detectAndProcessModifiedFiles } from '../utils/git';
-import { loadHooks } from '../utils/packages';
+import { getNotStagedFiles, detectAndProcessModifiedFiles } from '../utils/git';
+import { loadHooks } from '../utils/load-hooks';
 import config from '../config';
 interface Options {
   type: HookType;
@@ -24,35 +23,26 @@ export function addRun(program: commander.Command): void {
     .option('-a, --all <all>', 'Run hooks for all packages', '')
     .option('--args <args>', 'The arguments being passed to the hooks', '')
     .action(async (opts: Options) => {
+      const initialNotStagedFiles = getNotStagedFiles();
+
+      const { type: hookType, args: hookArgs } = opts;
       config.updateExecutionContext({
-        hookArgs: opts.args,
-        hookType: opts.type,
+        hookArgs,
+        hookType,
       });
 
-      const { type } = opts;
-
-      if (!hookTypes.includes(type)) {
-        console.log(`Invalid hook type ${type}`);
+      if (!hookTypes.includes(hookType)) {
+        console.log(`Invalid hook type ${hookType}`);
         process.exit(1);
       }
 
-      const { rootDir, addedBehavior } = config.project;
-
-      const initialNotStagedFiles = getNotStagedFiles();
-      const stagedFiles = getStagedFiles();
-
-      // Store staged files in environement for further easy retrieval
-      config.updateExecutionContext({
-        stagedFiles: stagedFiles.map((fPath) => path.join(rootDir || '', fPath)),
-      });
-
-      const hooks = loadHooks(stagedFiles, type, { all: opts.all });
+      const hooks = loadHooks(hookType, { all: opts.all });
 
       if (hooks.length === 0) {
         return;
       }
 
-      const title = ` Running commit hook ${type} `;
+      const title = ` Running commit hook ${hookType} `;
       console.log();
       center(title);
 
@@ -60,7 +50,7 @@ export function addRun(program: commander.Command): void {
 
       const promisedHooks = [];
 
-      for (const hook of hooks.filter((hook) => hook.steps.length > 0)) {
+      for (const hook of hooks) {
         promisedHooks.push(hookPackage(hook));
       }
 
@@ -73,6 +63,6 @@ export function addRun(program: commander.Command): void {
       }
 
       // unstashIfNeeded(type);
-      detectAndProcessModifiedFiles(initialNotStagedFiles, addedBehavior);
+      detectAndProcessModifiedFiles(initialNotStagedFiles, config.project.addedBehavior);
     });
 }

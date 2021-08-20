@@ -2,12 +2,11 @@ import chalk from 'chalk';
 import { PackageHook } from '../types/hook.types';
 import { runStep } from './run-step';
 import { StepCommand, StepError } from '../types/step.types';
-import { loader, LoaderManager } from './loader';
+import { spin, SpinnerManager } from './spinner';
 
-type Logger = (log: string) => void;
 interface UI {
-  packageLogger: Logger;
-  stepsLoggers: { [key: string]: LoaderManager };
+  packageLogger: (log: string) => void;
+  stepsSpinners: { [key: string]: SpinnerManager };
 }
 
 function init_ui(hook: PackageHook): UI {
@@ -15,13 +14,13 @@ function init_ui(hook: PackageHook): UI {
     packageLogger: console.draft(
       `${chalk.bold.inverse(` Hooks : ${hook.name} `)}${chalk.bgBlueBright.bold(' Running... ')}`,
     ),
-    stepsLoggers: {},
+    stepsSpinners: {},
   };
   console.log();
 
   for (const step of hook.steps) {
     console.log(`→ ${chalk.bold(step.name)} > ${step.command} `);
-    ui.stepsLoggers[step.name] = loader('Scheduled');
+    ui.stepsSpinners[step.name] = spin('Scheduled');
   }
 
   return ui;
@@ -58,8 +57,8 @@ export async function hookPackage(hook: PackageHook): Promise<StepError[]> {
 
   for (const step of hook.steps) {
     try {
-      const loaderManager = ui.stepsLoggers[step.name];
-      const stepPromise: Promise<{ step: StepCommand; msg: Error } | null> = runStep(step, options, loaderManager);
+      const spinnerManager = ui.stepsSpinners[step.name];
+      const stepPromise: Promise<{ step: StepCommand; msg: Error } | null> = runStep(step, options, spinnerManager);
 
       // Regardless of whether the step is serial or not, it will be awaited at the end of this function
       promises.push(stepPromise);
