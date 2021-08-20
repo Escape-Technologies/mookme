@@ -32,17 +32,18 @@ export class UsersController {
   //   return await this.usersService.findAll();
   // }
 
-  @Get(':id')
-  @UseInterceptors(ClassSerializerInterceptor)
-  async getOne(@Param() id: number) {
-    return await this.usersService.findOne(id);
-  }
-
   @Get('me')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   async getMe(@Req() request: AuthenticatedRequest) {
+    console.log('here');
     return await this.usersService.findOne(request.user.id);
+  }
+
+  @Get(':id')
+  @UseInterceptors(ClassSerializerInterceptor)
+  async getOne(@Param() id: number) {
+    return await this.usersService.findOne(id);
   }
 
   @Post()

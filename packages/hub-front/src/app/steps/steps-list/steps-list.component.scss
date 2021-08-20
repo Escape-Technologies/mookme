@@ -1,0 +1,39 @@
+.steps-list {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+}
+
+.header {
+  width: 100%;
+  padding: 8px;
+  display: flex;
+  font-weight: bold;
+
+  .header-owner-username {
+    width: 20%;
+  }
+
+  .header-name {
+    width: 15%;
+  }
+
+  .header-displayed-name {
+    width: 15%;
+  }
+
+  .header-serial {
+    width: 10%;
+    text-align: center;
+  }
+
+  .header-only-on {
+    width: 10%;
+    text-align: center;
+  }
+
+  .header-command {
+    flex: 1;
+    text-align: right;
+  }
+}
