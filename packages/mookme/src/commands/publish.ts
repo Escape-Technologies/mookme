@@ -2,9 +2,9 @@ import chalk from 'chalk';
 import commander from 'commander';
 import fs from 'fs';
 import path from 'path';
-import axios, { AxiosError } from 'axios';
-import { parseAxiosError } from '../utils/client';
-import { loadAuthConfig } from '../config/loaders';
+import client from '../client';
+import { PublishStepBody } from '../client/types';
+import config from '../config';
 
 export function addPublish(program: commander.Command): void {
   program
@@ -16,8 +16,6 @@ export function addPublish(program: commander.Command): void {
     )
     .description('Publish step on Mookme hub')
     .action(async ({ step, name }) => {
-      const { key } = loadAuthConfig();
-
       const stepFilePath = path.join(process.cwd(), step);
 
       if (fs.existsSync(stepFilePath)) {
@@ -31,27 +29,20 @@ export function addPublish(program: commander.Command): void {
           process.exit(1);
         }
 
-        const createBody = {
+        const publishStepBody: PublishStepBody = {
           name,
-          apiKey: key,
+          apiKey: config.auth.key,
           step: stepFileContent,
         };
 
-        try {
-          const { data } = await axios.post('http://localhost:4000/steps', createBody);
-          console.log(chalk.bold(`${'='.repeat(7)} Success ${'='.repeat(7)}\n`));
-          console.log(chalk.green.bold(`Succesfully registered step with id ${data.id}`));
-          console.log(chalk.bold(`\nYou can distribute it with the following command :`));
-          console.log(chalk.bold(`mookme install --package <package> --hook <desired-step> @maxencel/${data.name}`));
-          console.log(chalk.bold(`\n${'='.repeat(25)}`));
-        } catch (e) {
-          if (e.isAxiosError) {
-            parseAxiosError(e as AxiosError);
-          } else {
-            console.log(chalk.bgRed.white.bold(`An unknown error occured while publishing the step`));
-            console.error(e);
-          }
-        }
+        const publishStepResponse = await client.publish(publishStepBody);
+        console.log(chalk.bold(`${'='.repeat(7)} Success ${'='.repeat(7)}\n`));
+        console.log(chalk.green.bold(`Succesfully registered step with id ${publishStepResponse.id}`));
+        console.log(chalk.bold(`\nYou can distribute it with the following command :`));
+        console.log(
+          chalk.bold(`mookme install --package <package> --hook <desired-step> @maxencel/${publishStepResponse.name}`),
+        );
+        console.log(chalk.bold(`\n${'='.repeat(25)}`));
       } else {
         console.log(chalk.red.bold(`No file found at path ${stepFilePath}`));
       }

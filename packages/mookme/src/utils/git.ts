@@ -1,6 +1,8 @@
 import chalk from 'chalk';
 import { execSync } from 'child_process';
 import { HookType } from '../types/hook.types';
+import { ADDED_BEHAVIORS } from '../config/types';
+import config from '../config';
 
 let hasStashed = false;
 
@@ -51,9 +53,8 @@ export const unstashIfNeeded = (hookType: HookType): void => {
   }
 };
 
-import { ADDED_BEHAVIORS } from '../config/types';
-
 export function detectAndProcessModifiedFiles(initialNotStagedFiles: string[], behavior: ADDED_BEHAVIORS): void {
+  const { rootDir } = config.project;
   const notStagedFiles = execSync('echo $(git diff --name-only)')
     .toString()
     .split(' ')
@@ -67,7 +68,7 @@ export function detectAndProcessModifiedFiles(initialNotStagedFiles: string[], b
         console.log(chalk.bgYellow.black('Files were changed during hook execution !'));
         console.log(chalk.yellow('Following the defined behavior : Add and continue.'));
         for (const file of changedFiles) {
-          execSync(`git add ${process.env.PROJECT_ROOT_DIR}/${file}`);
+          execSync(`git add ${rootDir}/${file}`);
         }
         break;
       case ADDED_BEHAVIORS.EXIT:

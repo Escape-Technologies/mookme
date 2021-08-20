@@ -7,6 +7,7 @@ export interface ProjectConfig {
   packagesPath: string;
   packages: string[];
   addedBehavior: ADDED_BEHAVIORS;
+  rootDir: string;
 }
 
 export interface CLIConfig {
@@ -15,4 +16,14 @@ export interface CLIConfig {
 
 export interface AuthConfig {
   key: string;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type PkgJSON = { [key: string]: any };
+
+export interface MookmeConfig {
+  project: ProjectConfig;
+  cli: CLIConfig;
+  auth: AuthConfig;
+  packageJSON: PkgJSON;
 }
