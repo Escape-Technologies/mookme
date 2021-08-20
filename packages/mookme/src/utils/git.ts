@@ -51,7 +51,7 @@ export const unstashIfNeeded = (hookType: HookType): void => {
   }
 };
 
-import { ADDED_BEHAVIORS } from '../types/config.types';
+import { ADDED_BEHAVIORS } from '../config/types';
 
 export function detectAndProcessModifiedFiles(initialNotStagedFiles: string[], behavior: ADDED_BEHAVIORS): void {
   const notStagedFiles = execSync('echo $(git diff --name-only)')
@@ -67,7 +67,7 @@ export function detectAndProcessModifiedFiles(initialNotStagedFiles: string[], b
         console.log(chalk.bgYellow.black('Files were changed during hook execution !'));
         console.log(chalk.yellow('Following the defined behavior : Add and continue.'));
         for (const file of changedFiles) {
-          execSync(`git add ${process.env.ROOT_DIR}/${file}`);
+          execSync(`git add ${process.env.PROJECT_ROOT_DIR}/${file}`);
         }
         break;
       case ADDED_BEHAVIORS.EXIT:

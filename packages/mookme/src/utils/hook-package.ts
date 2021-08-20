@@ -1,11 +1,8 @@
-import draftlog from 'draftlog';
 import chalk from 'chalk';
 import { PackageHook } from '../types/hook.types';
 import { runStep } from './run-step';
 import { StepCommand, StepError } from '../types/step.types';
 import { loader, LoaderManager } from './loader';
-
-draftlog(console);
 
 type Logger = (log: string) => void;
 interface UI {

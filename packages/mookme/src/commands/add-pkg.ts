@@ -2,8 +2,8 @@ import chalk from 'chalk';
 import commander from 'commander';
 import fs from 'fs';
 import path from 'path';
-
-import { loadConfig, getPkgJSON, writePkgJSON } from '../utils/get-config';
+import { loadProjectConfig } from '../config/loaders';
+import { getPkgJSON, writePkgJSON } from '../utils/config';
 
 export function addAddPkg(program: commander.Command): void {
   program
@@ -12,7 +12,7 @@ export function addAddPkg(program: commander.Command): void {
     .description('Add a new package to an existing mookme configuration')
     .action(async ({ pkg }) => {
       const pkgJSON = getPkgJSON();
-      const { packagesPath, packages } = loadConfig();
+      const { packagesPath, packages } = loadProjectConfig();
 
       if (packages.includes(pkg)) {
         console.log(chalk.bold.yellow(`\nPackage ${pkg} is already registered, nothing will be done.\n`));

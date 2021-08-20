@@ -3,8 +3,16 @@ export enum ADDED_BEHAVIORS {
   EXIT = 'exit',
 }
 
-export interface Config {
+export interface ProjectConfig {
   packagesPath: string;
   packages: string[];
   addedBehavior: ADDED_BEHAVIORS;
+}
+
+export interface CLIConfig {
+  backendUrl: string;
+}
+
+export interface AuthConfig {
+  key: string;
 }

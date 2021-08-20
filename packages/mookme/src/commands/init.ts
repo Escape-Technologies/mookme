@@ -5,7 +5,7 @@ import fs from 'fs';
 import { execSync } from 'child_process';
 import chalk from 'chalk';
 import { hookTypes } from '../types/hook.types';
-import { ADDED_BEHAVIORS } from '../types/config.types';
+import { ADDED_BEHAVIORS } from '../config/types';
 
 function createDirIfNeeded(path: string) {
   if (!fs.existsSync(path)) {
