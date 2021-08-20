@@ -43,16 +43,6 @@ export function loadAuthConfig(): AuthConfig {
   return credentials;
 }
 
-export function loadPkgJSON(): { [key: string]: unknown } {
-  const rootDir = getRootDir();
-  if (!fs.existsSync(`${rootDir}/package.json`)) {
-    console.log(chalk.red.bold(`package.json file not found at path ${rootDir}`));
-    process.exit(1);
-  }
-
-  return JSON.parse(fs.readFileSync(`${rootDir}/package.json`, 'utf8'));
-}
-
 export function loadPackageJSONandProjectConfig(): { project: ProjectConfig; packageJSON: PkgJSON } {
   const rootDir = getRootDir();
 
