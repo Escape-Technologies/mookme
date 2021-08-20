@@ -60,11 +60,17 @@ export class UsersService {
   }
 
   async findByEmail(email: string): Promise<User> {
-    return await this.usersRepository.findOne({ email });
+    return await this.usersRepository.findOne(
+      { email },
+      { relations: ['steps'] },
+    );
   }
 
   async findByUsername(username: string): Promise<User> {
-    return await this.usersRepository.findOne({ username });
+    return await this.usersRepository.findOne(
+      { username },
+      { relations: ['steps'] },
+    );
   }
 
   async update(

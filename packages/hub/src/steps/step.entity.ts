@@ -6,6 +6,8 @@ import {
   PrimaryGeneratedColumn,
   AfterLoad,
   ManyToOne,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 export class StepContent {
@@ -30,6 +32,12 @@ export class StepContent {
 export class Step {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
 
   @Column()
   name: string;

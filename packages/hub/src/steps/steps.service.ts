@@ -1,6 +1,7 @@
 import {
   ConflictException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -23,7 +24,7 @@ export class StepsService {
       throw new UnauthorizedException();
     }
 
-    const potentialClash = await this.findByNameAndAuthor(
+    const potentialClash = await this.findByNameAndAuthorId(
       createStepDTO.name,
       owner.id,
     );
@@ -40,6 +41,23 @@ export class StepsService {
         `A step with name ${createStepDTO.name} already exists`,
       );
     }
+  }
+
+  getLatest(): Promise<Step[]> {
+    return this.stepsRepository
+      .createQueryBuilder('steps')
+      .select([
+        'steps.id',
+        'steps.name',
+        'user.id',
+        'user.email',
+        'user.username',
+        'steps.rawContent',
+      ])
+      .orderBy('created_at', 'DESC')
+      .limit(10)
+      .leftJoin('steps.owner', 'user') // bar is the joined table
+      .getMany();
   }
 
   findAll(): Promise<Step[]> {
@@ -73,7 +91,19 @@ export class StepsService {
       .getOne();
   }
 
-  findByNameAndAuthor(name: string, ownerId: number) {
+  async findByNameAndAuthorUsername(name: string, username: string) {
+    const owner = await this.usersService.findByUsername(username);
+    if (!owner) {
+      throw new NotFoundException('Author does not exist');
+    }
+    const step = owner.steps.find((step) => step.name === name);
+    if (!step) {
+      throw new NotFoundException('Step does not exist');
+    }
+    return step;
+  }
+
+  findByNameAndAuthorId(name: string, ownerId: number) {
     return this.stepsRepository
       .createQueryBuilder('steps')
       .where({ name, owner: ownerId })

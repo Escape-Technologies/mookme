@@ -1,0 +1,12 @@
+@import "src/styles/variables";
+
+.home {
+  width: 100%;
+  padding: 2 * $space-unit;
+  display: flex;
+  flex-direction: column;
+}
+
+.latest-steps {
+  width: 100%;
+}
