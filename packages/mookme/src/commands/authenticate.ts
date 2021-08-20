@@ -2,12 +2,11 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 
-import axios from 'axios';
 import chalk from 'chalk';
 import commander from 'commander';
 import inquirer from 'inquirer';
 
-import { parseAxiosError } from '../utils/client';
+import client from '../client';
 
 const emailQuestion = {
   type: 'input',
@@ -50,29 +49,14 @@ export function addAuthenticate(program: commander.Command): void {
       email = email ? email : ((await inquirer.prompt([emailQuestion])) as { email: string }).email;
       password = password ? password : ((await inquirer.prompt([passwordQuestion])) as { password: string }).password;
 
-      try {
-        const { data: authData } = await axios.post('http://localhost:4000/auth/login', { email, password });
-        const accessToken: string = authData.access_token;
-        const { data: userData } = await axios.get('http://localhost:4000/users/me', {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
-        const api_key = userData.key;
-        if (api_key) {
-          const credentialsPath = path.join(os.homedir(), '.config', 'mookme', 'credentials.json');
-          console.log(
-            chalk.green.bold('Succesfully retrieved api key. Storing it under `~/.config/mookme/credentials.json`'),
-          );
-          createMookmeConfigFolderIfNeeded();
-          fs.writeFileSync(credentialsPath, JSON.stringify({ key: api_key }, null, 2));
-          console.log(chalk.green.bold(`Credentials have been stored at path \`${credentialsPath}\``));
-        }
-      } catch (e) {
-        if (e.isAxiosError) {
-          parseAxiosError(e);
-        } else {
-          console.log(chalk.bgRed.white.bold(`An unknown error occured while publishing the step`));
-          console.error(e);
-        }
-      }
+      await client.login(email, password);
+      const { key: apiKey } = await client.getMe();
+      const credentialsPath = path.join(os.homedir(), '.config', 'mookme', 'credentials.json');
+      console.log(
+        chalk.green.bold('Succesfully retrieved api key. Storing it under `~/.config/mookme/credentials.json`'),
+      );
+      createMookmeConfigFolderIfNeeded();
+      fs.writeFileSync(credentialsPath, JSON.stringify({ key: apiKey }, null, 2));
+      console.log(chalk.green.bold(`Credentials have been stored at path \`${credentialsPath}\``));
     });
 }

@@ -1,8 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import { PackageHook } from '../types/hook.types';
-import { getProjectConfig } from './config';
-
+import config from '../config';
 export interface LoadHookOptions {
   all?: boolean;
 }
@@ -19,8 +18,8 @@ function matchExactPath(filePath: string, to_match: string): boolean {
 export const loadHooks = (stagedFiles: string[], hookType: string, opts: LoadHookOptions): PackageHook[] => {
   const hooks: PackageHook[] = [];
 
-  const rootDir: string = process.env.PROJECT_ROOT_DIR as string;
-  const { packages, packagesPath } = getProjectConfig();
+  const rootDir = config.project.rootDir;
+  const { packages, packagesPath } = config.project;
 
   packages
     .filter((pkgName) => {
@@ -50,7 +49,7 @@ export const loadHooks = (stagedFiles: string[], hookType: string, opts: LoadHoo
   if (fs.existsSync(`${packagesPath}/.hooks/${hookType}.json`)) {
     hooks.push({
       name: '__global',
-      cwd: process.env.PROJECT_ROOT_DIR || process.cwd(),
+      cwd: rootDir || process.cwd(),
       steps: JSON.parse(fs.readFileSync(`${packagesPath}/.hooks/${hookType}.json`, 'utf-8')).steps,
     });
   }

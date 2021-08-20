@@ -1,17 +1,13 @@
 import commander from 'commander';
 import path from 'path';
-import draftlog from 'draftlog';
 import chalk from 'chalk';
 
 import { hookTypes, HookType } from '../types/hook.types';
 import { hookPackage, processResults } from '../utils/hook-package';
-import { loadProjectConfig } from '../config/loaders';
 import { center } from '../utils/ui';
 import { getStagedFiles, getNotStagedFiles, detectAndProcessModifiedFiles } from '../utils/git';
 import { loadHooks } from '../utils/packages';
-
-draftlog(console);
-
+import config from '../config';
 interface Options {
   type: HookType;
   args: string;
@@ -32,18 +28,16 @@ export function addRun(program: commander.Command): void {
       process.env.MOOKME_HOOK_TYPE = opts.type;
 
       const { type } = opts;
+
       if (!hookTypes.includes(type)) {
         console.log(`Invalid hook type ${type}`);
         process.exit(1);
       }
 
-      const { packages, packagesPath, addedBehavior } = loadProjectConfig();
-      process.env.MOOKME_PROJECT_CONFIG = JSON.stringify({ packages, packagesPath, addedBehavior });
+      const { rootDir, addedBehavior } = config.project;
 
       const initialNotStagedFiles = getNotStagedFiles();
       const stagedFiles = getStagedFiles();
-
-      const rootDir = process.env.PROJECT_ROOT_DIR;
 
       // Store staged files in environement for further easy retrieval
       process.env.MOOKME_STAGED_FILES = JSON.stringify(stagedFiles.map((fPath) => path.join(rootDir || '', fPath)));
