@@ -1,3 +1,4 @@
+import path from 'path';
 import draftlog from 'draftlog';
 import chalk from 'chalk';
 import wcmatch from 'wildcard-match';
@@ -9,8 +10,7 @@ import config from '../config';
 draftlog(console);
 
 export interface RunStepOptions {
-  name: string;
-  cwd: string;
+  packageName: string;
   type?: string;
   venvActivate?: string;
 }
@@ -24,13 +24,18 @@ export function runStep(
   const args = config.executionContext.hookArgs!.split(' ').filter((arg) => arg !== '');
   spinnerManager.updateMessage('Running');
   return new Promise((resolve) => {
+    const packagePath = path.join(config.project.packagesPath, options.packageName);
+
     if (step.onlyOn) {
       try {
         const matcher = wcmatch(step.onlyOn);
 
-        const matched = JSON.parse(process.env.MOOKME_STAGED_FILES || '[]')
-          .filter((fPath: string) => fPath.includes(options.cwd))
-          .map((fPath: string) => fPath.replace(`${options.cwd}/`, ''))
+        const matched = (config.executionContext.stagedFiles || [])
+          .map((fPath: string) => path.join(config.project.rootDir, fPath))
+          .filter((fPath: string) => {
+            return fPath.includes(packagePath);
+          })
+          .map((fPath: string) => fPath.replace(`${packagePath}/`, ''))
           .filter((rPath: string) => matcher(rPath));
 
         if (matched.length === 0) {
@@ -54,7 +59,7 @@ export function runStep(
         ? `source ${options.venvActivate} && ${step.command}&& deactivate`
         : step.command;
 
-    const cp = exec(command.replace('{args}', `"${args.join(' ')}"`), { cwd: options.cwd, shell: '/bin/bash' });
+    const cp = exec(command.replace('{args}', `"${args.join(' ')}"`), { cwd: packagePath, shell: '/bin/bash' });
 
     let out = '';
     cp.stdout?.on('data', (chunk) => {

@@ -10,5 +10,5 @@ export interface StepCommand {
 export interface StepError {
   hook: PackageHook;
   step: StepCommand;
-  msg: Error;
+  error: Error;
 }

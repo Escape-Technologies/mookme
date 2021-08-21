@@ -2,7 +2,8 @@ import chalk from 'chalk';
 import { PackageHook } from '../types/hook.types';
 import { runStep } from './run-step';
 import { StepCommand, StepError } from '../types/step.types';
-import { init_ui, UI } from './ui';
+import { init_ui, UI } from '../display/ui';
+import logger from '../display/logger';
 
 function handleStepError(
   stepError: {
@@ -16,7 +17,7 @@ function handleStepError(
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     step: stepError!.step,
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    msg: stepError!.msg,
+    error: stepError!.msg,
   };
 }
 
@@ -24,14 +25,13 @@ export async function hookPackage(hook: PackageHook): Promise<StepError[]> {
   const ui: UI = init_ui(hook);
 
   const options = {
-    name: hook.name,
-    cwd: hook.cwd,
+    packageName: hook.name,
     type: hook.type,
     venvActivate: hook.venvActivate,
   };
 
   const promises = [];
-  const errors: { hook: PackageHook; step: StepCommand; msg: Error }[] = [];
+  const errors: { hook: PackageHook; step: StepCommand; error: Error }[] = [];
 
   for (const step of hook.steps) {
     try {
@@ -74,8 +74,8 @@ export async function hookPackage(hook: PackageHook): Promise<StepError[]> {
 export function processResults(results: StepError[][]): void {
   results.forEach((packageErrors) => {
     packageErrors.forEach((err) => {
-      console.log(chalk.bgRed.white.bold(`\n Hook of package ${err.hook.name} failed at step ${err.step.name} `));
-      console.log(chalk.red(err.msg));
+      logger.failure(`\nHook of package ${err.hook.name} failed at step ${err.step.name} `);
+      logger.log(err.error.message);
     });
     if (packageErrors.length > 0) {
       process.exit(1);

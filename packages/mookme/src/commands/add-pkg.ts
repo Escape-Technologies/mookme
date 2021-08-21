@@ -1,8 +1,8 @@
-import chalk from 'chalk';
 import commander from 'commander';
 import fs from 'fs';
 import path from 'path';
 import config from '../config';
+import logger from '../display/logger';
 
 export function addAddPkg(program: commander.Command): void {
   program
@@ -14,30 +14,30 @@ export function addAddPkg(program: commander.Command): void {
       const { rootDir, packagesPath, packages } = config.project;
 
       if (packages.includes(pkg)) {
-        console.log(chalk.bold.yellow(`\nPackage ${pkg} is already registered, nothing will be done.\n`));
+        logger.warning(`\nPackage ${pkg} is already registered, nothing will be done.\n`);
         process.exit(1);
       }
 
       const pkgPath = path.join(packagesPath, pkg);
 
       if (!fs.existsSync(pkgPath)) {
-        console.log(chalk.bold.red(`Nothing found at path ${pkgPath}`));
+        logger.failure(`Nothing found at path ${pkgPath}. Exiting.`);
         process.exit(1);
       }
 
       packages.push(pkg);
       pkgJSON.mookme.packages = packages;
-      console.log(chalk.bold.green('\nThe following entry will be added to your package.json:'));
-      console.log(`-> package.json -> mookme -> packages -> ${pkg}`);
+      logger.success('\nThe following entry will be added to your package.json:');
+      logger.log(`-> package.json -> mookme -> packages -> ${pkg}`);
 
       fs.writeFileSync(`${rootDir}/package.json`, JSON.stringify(pkgJSON, null, 2));
 
       const pkgHooksPath = path.join(pkgPath, '.hooks');
       if (!fs.existsSync(pkgHooksPath)) {
-        console.log(chalk.bold(`\nInitializing .hooks dir at path ${pkgHooksPath}`));
+        logger.info(`\nInitializing .hooks dir at path ${pkgHooksPath}`);
         fs.mkdirSync(pkgHooksPath);
       }
 
-      console.log(chalk.bold.green('All done !'));
+      logger.success("You're all set !");
     });
 }

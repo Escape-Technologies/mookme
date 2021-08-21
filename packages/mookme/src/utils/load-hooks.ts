@@ -2,7 +2,6 @@ import path from 'path';
 import fs from 'fs';
 import { PackageHook } from '../types/hook.types';
 import config from '../config';
-import { getStagedFiles } from './git';
 export interface LoadHookOptions {
   all?: boolean;
 }
@@ -17,7 +16,7 @@ function matchExactPath(filePath: string, to_match: string): boolean {
 }
 
 export const loadHooks = (hookType: string, opts: LoadHookOptions): PackageHook[] => {
-  const stagedFiles = getStagedFiles();
+  const stagedFiles = config.executionContext.stagedFiles || [];
 
   const rootDir = config.project.rootDir;
   const { packages, packagesPath } = config.project;

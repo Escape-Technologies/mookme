@@ -1,12 +1,12 @@
 import commander from 'commander';
-import chalk from 'chalk';
 
 import { hookTypes, HookType } from '../types/hook.types';
 import { hookPackage, processResults } from '../utils/hook-package';
-import { center } from '../utils/ui';
-import { getNotStagedFiles, detectAndProcessModifiedFiles } from '../utils/git';
+import { center } from '../display/ui';
+import { getNotStagedFiles, detectAndProcessModifiedFiles, getStagedFiles } from '../utils/git';
 import { loadHooks } from '../utils/load-hooks';
 import config from '../config';
+import logger from '../display/logger';
 interface Options {
   type: HookType;
   args: string;
@@ -24,15 +24,17 @@ export function addRun(program: commander.Command): void {
     .option('--args <args>', 'The arguments being passed to the hooks', '')
     .action(async (opts: Options) => {
       const initialNotStagedFiles = getNotStagedFiles();
+      const stagedFiles = getStagedFiles();
 
       const { type: hookType, args: hookArgs } = opts;
       config.updateExecutionContext({
         hookArgs,
         hookType,
+        stagedFiles,
       });
 
       if (!hookTypes.includes(hookType)) {
-        console.log(`Invalid hook type ${hookType}`);
+        logger.failure(`Invalid hook type ${hookType}. Exiting`);
         process.exit(1);
       }
 
@@ -58,7 +60,7 @@ export function addRun(program: commander.Command): void {
         const packagesErrors = await Promise.all(promisedHooks);
         processResults(packagesErrors);
       } catch (err) {
-        console.log(chalk.bgRed.bold(' Unexpected error ! '));
+        logger.failure(' Unexpected error ! ');
         console.error(err);
       }
 

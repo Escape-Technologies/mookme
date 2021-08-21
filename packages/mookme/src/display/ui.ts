@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import { PackageHook } from '../types/hook.types';
-import { spin, SpinnerManager } from './spinner';
+import { spin, SpinnerManager } from '../utils/spinner';
 
 export interface UI {
   packageLogger: (log: string) => void;

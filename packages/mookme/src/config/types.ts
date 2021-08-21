@@ -24,7 +24,7 @@ export interface AuthConfig {
 export type PkgJSON = { [key: string]: any };
 
 export interface MookmeConfig {
-  project: ProjectConfig;
+  project?: ProjectConfig;
   cli: CLIConfig;
   auth: AuthConfig;
   packageJSON: PkgJSON;
@@ -33,4 +33,5 @@ export interface MookmeConfig {
 export interface ExecutionContext {
   hookArgs?: string;
   hookType?: HookType;
+  stagedFiles?: string[];
 }

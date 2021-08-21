@@ -1,8 +1,9 @@
-import chalk from 'chalk';
+import fs from 'fs';
 import { execSync } from 'child_process';
-import { HookType } from '../types/hook.types';
+import { HookType, hookTypes } from '../types/hook.types';
 import { ADDED_BEHAVIORS } from '../config/types';
 import config from '../config';
+import logger from '../display/logger';
 
 let hasStashed = false;
 
@@ -22,17 +23,17 @@ export const stashIfNeeded = (hookType: HookType): void => {
   const shouldStash = execSync('git ls-files --others --exclude-standard --modified').toString().split('\n').length > 1;
 
   if (hookType === HookType.preCommit && !!shouldStash) {
-    console.log(chalk.yellow.bold('Stashing unstaged changes in order to run hooks properly'));
-    console.log(chalk.bold(`> git stash push --keep-index --include-untracked`));
+    logger.warning('Stashing unstaged changes in order to run hooks properly');
+    logger.info(`> git stash push --keep-index --include-untracked`);
     execSync(`git stash push --keep-index --include-untracked`).toString();
 
-    console.log(chalk.yellow.bold('\nList of stashed and modified files:'));
+    logger.warning('\nList of stashed and modified files:');
     const stashedAndModified = execSync('git --no-pager stash show --name-only').toString();
-    console.log(stashedAndModified);
+    logger.log(stashedAndModified);
 
-    console.log(chalk.yellow.bold('List of stashed and untracked files:'));
+    logger.warning('List of stashed and untracked files:');
     const stashedAndUntracked = execSync('git --no-pager show stash@{0}^3:').toString().split('\n').slice(2).join('\n');
-    console.log(stashedAndUntracked);
+    logger.log(stashedAndUntracked);
 
     hasStashed = true;
   }
@@ -41,12 +42,12 @@ export const stashIfNeeded = (hookType: HookType): void => {
 export const unstashIfNeeded = (hookType: HookType): void => {
   if (hookType === HookType.preCommit && hasStashed) {
     console.log();
-    console.log(chalk.yellow.bold('Unstashing unstaged changes in order to run hooks properly'));
+    logger.warning('Unstashing unstaged changes in order to run hooks properly');
     try {
       execSync('git stash pop');
     } catch (err) {
-      console.log(err);
-      console.log(chalk.bgRed.white.bold('Could not unstash file ! You should run `git stash pop` and fix conflicts'));
+      logger.failure('Could not unstash file ! You should run `git stash pop` and fix conflicts');
+      console.error(err);
     }
   }
 };
@@ -63,17 +64,42 @@ export function detectAndProcessModifiedFiles(initialNotStagedFiles: string[], b
     console.log();
     switch (behavior) {
       case ADDED_BEHAVIORS.ADD_AND_COMMIT:
-        console.log(chalk.bgYellow.black('Files were changed during hook execution !'));
-        console.log(chalk.yellow('Following the defined behavior : Add and continue.'));
+        logger.warning('Files were changed during hook execution !');
+        logger.info('Following the defined behavior : Add and continue.');
         for (const file of changedFiles) {
           execSync(`git add ${rootDir}/${file}`);
         }
         break;
       case ADDED_BEHAVIORS.EXIT:
-        console.log(chalk.bgYellow.black(' Files were changed during hook execution ! '));
-        console.log(chalk.yellow('Following the defined behavior : Exit.'));
+        logger.warning(' Files were changed during hook execution ! ');
+        logger.info('Following the defined behavior : Exit.');
         process.exit(1);
-        break;
     }
   }
+}
+
+export function writeGitHooksFiles(): void {
+  if (!fs.existsSync('./.git/hooks')) {
+    fs.mkdirSync('./.git/hooks');
+  }
+
+  logger.info('Writing Git hooks files');
+
+  hookTypes.forEach((type) => {
+    logger.info(`- ./.git/hooks/${type}`);
+    const mookmeCmd = `./node_modules/@escape.tech/mookme/bin/index.js run --type ${type} --args "$1"`;
+    if (fs.existsSync(`./.git/hooks/${type}`)) {
+      const hook = fs.readFileSync(`./.git/hooks/${type}`).toString();
+      if (!hook.includes(mookmeCmd)) {
+        fs.appendFileSync(`./.git/hooks/${type}`, `\n${mookmeCmd}`, { flag: 'a+' });
+        execSync(`chmod +x ./.git/hooks/${type}`);
+      } else {
+        logger.log(`Hook ${type} is already declared, skipping...`);
+      }
+    } else {
+      logger.warning(`Hook ${type} does not exist, creating file...`);
+      fs.appendFileSync(`./.git/hooks/${type}`, `#!/bin/bash\n${mookmeCmd}`, { flag: 'a+' });
+      execSync(`chmod +x ./.git/hooks/${type}`);
+    }
+  });
 }

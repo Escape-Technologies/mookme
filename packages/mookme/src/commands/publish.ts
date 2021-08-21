@@ -1,10 +1,10 @@
-import chalk from 'chalk';
 import commander from 'commander';
 import fs from 'fs';
 import path from 'path';
 import client from '../client';
 import { PublishStepBody } from '../client/types';
 import config from '../config';
+import logger from '../display/logger';
 
 export function addPublish(program: commander.Command): void {
   program
@@ -24,7 +24,7 @@ export function addPublish(program: commander.Command): void {
         try {
           stepFileContent = JSON.parse(fs.readFileSync(stepFilePath).toString());
         } catch (e) {
-          console.log(chalk.bold.red(`Could not read the content of file at path ${stepFilePath}`));
+          console.log(logger.failure(`Could not read the content of file at path ${stepFilePath}. Exiting`));
           console.error(e);
           process.exit(1);
         }
@@ -35,18 +35,15 @@ export function addPublish(program: commander.Command): void {
           step: stepFileContent,
         };
 
-        const publishStepResponse = await client.publish(publishStepBody);
-        console.log(chalk.bold(`${'='.repeat(7)} Success ${'='.repeat(7)}\n`));
-        console.log(chalk.green.bold(`Succesfully registered step with id ${publishStepResponse.id}`));
-        console.log(chalk.bold(`\nYou can distribute it with the following command :`));
-        console.log(
-          chalk.bold(
-            `mookme install --package <package> --hook <desired-step> @<your-username>/${publishStepResponse.name}`,
-          ),
-        );
-        console.log(chalk.bold(`\n${'='.repeat(25)}`));
+        const { name: stepName, id } = await client.publish(publishStepBody);
+        logger.success(`${'='.repeat(7)} Success ${'='.repeat(7)}\n`);
+        logger.success(`Succesfully registered step with id ${id}`);
+        logger.info(`\nYou can distribute it with the following command :`);
+        logger.info(`mookme install --package <package> --hook <desired-step> @<your-username>/${stepName}`);
+        logger.success(`\n${'='.repeat(25)}`);
       } else {
-        console.log(chalk.red.bold(`No file found at path ${stepFilePath}`));
+        logger.failure(`No file found at path ${stepFilePath}. Exiting`);
+        process.exit(1);
       }
     });
 }

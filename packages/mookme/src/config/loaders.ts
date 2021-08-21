@@ -1,9 +1,9 @@
-import chalk from 'chalk';
 import path from 'path';
 import os from 'os';
 import fs from 'fs';
 
 import { AuthConfig, CLIConfig, PkgJSON, ProjectConfig } from './types';
+import logger from '../display/logger';
 
 export function getRootDir(): string {
   let isRoot = false;
@@ -35,7 +35,8 @@ export function loadAuthConfig(): AuthConfig {
   const credentialsPath = path.join(os.homedir(), '.config', 'mookme', 'credentials.json');
 
   if (!fs.existsSync(path.join(credentialsPath))) {
-    console.log(chalk.red.bold('No credentials found. Did you run `mookme authenticate` ?'));
+    logger.failure('No credentials found. Exiting.');
+    logger.info('Did you run `mookme authenticate` ?');
     process.exit(1);
   }
 
@@ -43,11 +44,11 @@ export function loadAuthConfig(): AuthConfig {
   return credentials;
 }
 
-export function loadPackageJSONandProjectConfig(): { project: ProjectConfig; packageJSON: PkgJSON } {
+export function loadPackageJSONandProjectConfig(): { project?: ProjectConfig; packageJSON: PkgJSON } {
   const rootDir = getRootDir();
 
   if (!fs.existsSync(`${rootDir}/package.json`)) {
-    console.log(chalk.red.bold(`package.json file not found at path ${rootDir}`));
+    logger.failure(`package.json file not found at path ${rootDir}. Exiting.`);
     process.exit(1);
   }
 
@@ -56,8 +57,10 @@ export function loadPackageJSONandProjectConfig(): { project: ProjectConfig; pac
   const projectConfig = rawPackageJSON.mookme as ProjectConfig;
 
   if (!projectConfig) {
-    console.log('Please run `mookme --init` first');
-    process.exit(1);
+    return {
+      project: undefined,
+      packageJSON: rawPackageJSON,
+    };
   }
 
   projectConfig.rootDir = rootDir;

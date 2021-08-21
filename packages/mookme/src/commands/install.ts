@@ -1,13 +1,13 @@
 import fs from 'fs';
 import path from 'path';
 
-import chalk from 'chalk';
 import commander from 'commander';
 import inquirer from 'inquirer';
 
 import { HookType } from '../types/hook.types';
 import config from '../config';
 import client from '../client';
+import logger from '../display/logger';
 
 const packageQuestion = (packages: string[]) => ({
   type: 'list',
@@ -37,7 +37,7 @@ export function addInstall(program: commander.Command): void {
     .description('Install a step retrieved from the store in the desired package')
     .action(async ({ stepIdentifier, packageName, hookType }: InstallArguments) => {
       if (!Object.values(HookType).includes(hookType)) {
-        console.log(chalk.red.bold(`Invalid hook type ${hookType}.`));
+        logger.failure(`Invalid hook type ${hookType}. Exiting.`);
         process.exit(1);
       }
 
@@ -47,7 +47,7 @@ export function addInstall(program: commander.Command): void {
         ).packageName;
       } else {
         if (!config.project.packages.includes(packageName)) {
-          console.log(chalk.red.bold(`Package ${packageName} is not registered.`));
+          logger.failure(`Package ${packageName} is not registered. Exiting`);
           process.exit(1);
         }
       }
@@ -57,13 +57,13 @@ export function addInstall(program: commander.Command): void {
 
       const packageHooksPath = path.join(config.project.packagesPath, packageName, '.hooks');
       if (!fs.existsSync(packageHooksPath)) {
-        console.log(chalk.yellow.bold(`Create hook folder at path \`${packageHooksPath}\``));
+        logger.warning(`Create hook folder at path \`${packageHooksPath}\``);
         fs.mkdirSync(packageHooksPath);
       }
 
       const hookTypeFilePath = path.join(packageHooksPath, `${hookType}.json`);
       if (!fs.existsSync(hookTypeFilePath)) {
-        console.log(chalk.yellow.bold(`Create hook type file at path \`${hookTypeFilePath}\``));
+        logger.warning(`Create hook type file at path \`${hookTypeFilePath}\``);
         fs.writeFileSync(hookTypeFilePath, JSON.stringify({ steps: [] }));
       }
 
