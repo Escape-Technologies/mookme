@@ -1,8 +1,7 @@
-import chalk from 'chalk';
 import { PackageHook } from '../types/hook.types';
 import { runStep } from './run-step';
 import { StepCommand, StepError } from '../types/step.types';
-import { init_ui, UI } from '../display/ui';
+import { HookUI, UIExecutionStatus } from '../display/ui';
 import logger from '../display/logger';
 
 function handleStepError(
@@ -22,7 +21,7 @@ function handleStepError(
 }
 
 export async function hookPackage(hook: PackageHook): Promise<StepError[]> {
-  const ui: UI = init_ui(hook);
+  const ui: HookUI = new HookUI(hook);
 
   const options = {
     packageName: hook.name,
@@ -35,8 +34,8 @@ export async function hookPackage(hook: PackageHook): Promise<StepError[]> {
 
   for (const step of hook.steps) {
     try {
-      const spinnerManager = ui.stepsSpinners[step.name];
-      const stepPromise: Promise<{ step: StepCommand; msg: Error } | null> = runStep(step, options, spinnerManager);
+      const stepUI = ui.stepsUI[step.name];
+      const stepPromise: Promise<{ step: StepCommand; msg: Error } | null> = runStep(step, options, stepUI);
 
       // Regardless of whether the step is serial or not, it will be awaited at the end of this function
       promises.push(stepPromise);
@@ -44,23 +43,23 @@ export async function hookPackage(hook: PackageHook): Promise<StepError[]> {
       if (step.serial) {
         // Serial steps are blocking
         const stepError = await stepPromise;
-        const result: string = stepError == null ? chalk.bgGreen.bold(' Done ✓ ') : chalk.bgRed.bold(' Test × ');
+        const newStatus: UIExecutionStatus = stepError == null ? UIExecutionStatus.DONE : UIExecutionStatus.ERROR;
+        ui.setHookStatus(newStatus);
         if (stepError !== null) {
           errors.push(handleStepError(stepError, hook));
         }
-        ui.packageLogger(`${chalk.bold.inverse(` Hooks : ${hook.name} `)}${result}`);
       } else {
         // Non-serial steps are just launched and result is processed in a callback
         stepPromise.then((stepError) => {
-          const result: string = stepError == null ? chalk.bgGreen.bold(' Done ✓ ') : chalk.bgRed.bold(' Error × ');
+          const newStatus: UIExecutionStatus = stepError == null ? UIExecutionStatus.DONE : UIExecutionStatus.ERROR;
+          ui.setHookStatus(newStatus);
           if (stepError !== null) {
             errors.push(handleStepError(stepError, hook));
           }
-          ui.packageLogger(`${chalk.bold.inverse(` Hooks : ${hook.name} `)}${result}`);
         });
       }
     } catch (err) {
-      ui.packageLogger(`${chalk.bold.inverse(` Hooks : ${hook.name} `)}${chalk.bgRed.bold(' Error × ')}`);
+      ui.setHookStatus(UIExecutionStatus.ERROR);
       throw err;
     }
   }

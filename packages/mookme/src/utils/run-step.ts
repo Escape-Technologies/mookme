@@ -4,8 +4,8 @@ import chalk from 'chalk';
 import wcmatch from 'wildcard-match';
 import { exec } from 'child_process';
 import { StepCommand } from '../types/step.types';
-import { SpinnerManager } from './spinner';
 import config from '../config';
+import { StepUI, UIExecutionStatus } from '../display/ui';
 
 draftlog(console);
 
@@ -18,11 +18,11 @@ export interface RunStepOptions {
 export function runStep(
   step: StepCommand,
   options: RunStepOptions,
-  spinnerManager: SpinnerManager,
+  stepUI: StepUI,
 ): Promise<{ step: StepCommand; msg: Error } | null> {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const args = config.executionContext.hookArgs!.split(' ').filter((arg) => arg !== '');
-  spinnerManager.updateMessage('Running');
+  stepUI.setStatus(UIExecutionStatus.RUNNING);
   return new Promise((resolve) => {
     const packagePath = path.join(config.project.packagesPath, options.packageName);
 
@@ -39,14 +39,11 @@ export function runStep(
           .filter((rPath: string) => matcher(rPath));
 
         if (matched.length === 0) {
-          clearInterval(spinnerManager.interval);
-          spinnerManager.display(`⏩ Skipped. (no match with "${step.onlyOn}")`);
+          stepUI.stop(`⏩ Skipped. (no match with "${step.onlyOn}")`);
           return resolve(null);
         }
       } catch (err) {
-        spinnerManager.display(chalk.bgRed.white.bold(' Error '));
-        clearInterval(spinnerManager.interval);
-        spinnerManager.display('❌ Error.');
+        stepUI.stop('❌ Error.');
         resolve({
           step,
           msg: new Error(`Invalid \`onlyOn\` pattern: ${step.onlyOn}\n${err}`),
@@ -56,7 +53,7 @@ export function runStep(
 
     const command =
       options.type === 'python' && options.venvActivate
-        ? `source ${options.venvActivate} && ${step.command}&& deactivate`
+        ? `source ${options.venvActivate} && ${step.command} && deactivate`
         : step.command;
 
     const cp = exec(command.replace('{args}', `"${args.join(' ')}"`), { cwd: packagePath, shell: '/bin/bash' });
@@ -72,16 +69,15 @@ export function runStep(
     });
 
     cp.on('exit', (code) => {
-      clearInterval(spinnerManager.interval);
       if (code === 0) {
-        spinnerManager.display('✅ Done.');
+        stepUI.stop('✅ Done.');
         resolve(null);
       } else {
         resolve({
           step,
           msg: new Error(error + chalk.bold('\nstdout :\n') + out),
         });
-        spinnerManager.display('❌ Error.');
+        stepUI.stop('❌ Error.');
       }
     });
   });

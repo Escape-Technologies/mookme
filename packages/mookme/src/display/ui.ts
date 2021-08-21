@@ -1,27 +1,94 @@
 import chalk from 'chalk';
+import { clearInterval } from 'timers';
 import { PackageHook } from '../types/hook.types';
-import { spin, SpinnerManager } from '../utils/spinner';
+import { StepCommand } from '../types/step.types';
 
-export interface UI {
-  packageLogger: (log: string) => void;
-  stepsSpinners: { [key: string]: SpinnerManager };
+export enum UIExecutionStatus {
+  SCHEDULED = 'SCHEDULED',
+  RUNNING = 'RUNNING',
+  ERROR = 'ERROR',
+  DONE = 'DONE',
 }
 
-export function init_ui(hook: PackageHook): UI {
-  const ui: UI = {
-    packageLogger: console.draft(
-      `${chalk.bold.inverse(` Hooks : ${hook.name} `)}${chalk.bgBlueBright.bold(' Running... ')}`,
-    ),
-    stepsSpinners: {},
-  };
-  console.log();
+export class StepUI {
+  status: string;
+  logger!: (log: string) => void;
+  interval!: ReturnType<typeof setInterval>;
 
-  for (const step of hook.steps) {
+  constructor(step: StepCommand) {
     console.log(`→ ${chalk.bold(step.name)} > ${step.command} `);
-    ui.stepsSpinners[step.name] = spin('Scheduled');
+    this.status = 'Scheduled';
+    this.start();
   }
 
-  return ui;
+  start(): void {
+    let dotStatus = '.. ';
+    this.logger = console.draft(this.status + dotStatus);
+    this.interval = setInterval(() => {
+      switch (dotStatus) {
+        case '.. ':
+          dotStatus = ' ..';
+          break;
+        case ' ..':
+          dotStatus = '. .';
+          break;
+        case '. .':
+          dotStatus = '.. ';
+          break;
+      }
+      this.logger(this.status + dotStatus);
+    }, 100);
+  }
+
+  stop(finalMessage: string): void {
+    clearInterval(this.interval);
+    this.logger(finalMessage);
+  }
+
+  setStatus(status: UIExecutionStatus): void {
+    switch (status) {
+      case UIExecutionStatus.RUNNING:
+        this.status = 'Running';
+        break;
+      case UIExecutionStatus.SCHEDULED:
+        this.status = 'Scheduled';
+        break;
+      case UIExecutionStatus.ERROR:
+        this.status = 'Error';
+        break;
+    }
+  }
+}
+export class HookUI {
+  hook: PackageHook;
+  stepsUI: { [key: string]: StepUI } = {};
+  header: (log: string) => void;
+
+  constructor(hook: PackageHook) {
+    this.hook = hook;
+    this.header = console.draft();
+    this.setHookStatus(UIExecutionStatus.RUNNING);
+
+    for (const step of hook.steps) {
+      this.stepsUI[step.name] = new StepUI(step);
+    }
+
+    console.log();
+  }
+
+  setHookStatus(status: UIExecutionStatus): void {
+    switch (status) {
+      case UIExecutionStatus.RUNNING:
+        this.header(`${chalk.bold.inverse(` Hooks : ${this.hook.name} `)}${chalk.bgBlueBright.bold(' Running... ')}`);
+        break;
+      case UIExecutionStatus.DONE:
+        this.header(`${chalk.bold.inverse(` Hooks : ${this.hook.name} `)}${chalk.bgGreen.bold(' Done ✓ ')}`);
+        break;
+      case UIExecutionStatus.ERROR:
+        this.header(`${chalk.bold.inverse(` Hooks : ${this.hook.name} `)}${chalk.bgRed.bold(' Error × ')}`);
+        break;
+    }
+  }
 }
 
 export const center = (txt: string, sep = '-'): void => {

@@ -8,16 +8,7 @@ import { HookType } from '../types/hook.types';
 import config from '../config';
 import client from '../client';
 import logger from '../display/logger';
-
-const packageQuestion = (packages: string[]) => ({
-  type: 'list',
-  name: 'packageName',
-  message: 'Choose a package where to install the step:',
-  choices: packages,
-  filter(packageName: string) {
-    return packageName === '@root' ? '.' : packageName;
-  },
-});
+import { packageQuestion } from '../prompts/install';
 
 interface InstallArguments {
   stepIdentifier: string;

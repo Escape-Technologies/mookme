@@ -8,18 +8,7 @@ import inquirer from 'inquirer';
 import client from '../client';
 import logger from '../display/logger';
 
-const emailQuestion = {
-  type: 'input',
-  name: 'email',
-  message: 'Please enter your email on the mookme hub: ',
-};
-
-const passwordQuestion = {
-  type: 'password',
-  name: 'password',
-  message: 'Your password on the mookme hub: ',
-  mask: '*',
-};
+import { emailQuestion, passwordQuestion } from '../prompts/authenticate';
 
 interface AuthenticateArguments {
   email: string;
