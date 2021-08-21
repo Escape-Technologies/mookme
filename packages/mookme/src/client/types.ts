@@ -4,6 +4,13 @@ export interface LoginResponse {
   access_token: string;
 }
 
+export interface RegisterResponse {
+  email: string;
+  username: string;
+  key: string;
+  id: number;
+}
+
 export interface MeResponse {
   key: string;
 }

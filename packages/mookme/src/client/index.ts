@@ -1,7 +1,14 @@
 import axios, { AxiosError, AxiosInstance } from 'axios';
 import config from '../config';
 import logger from '../display/logger';
-import { LoginResponse, MeResponse, PublishStepResponse, PublishStepBody, GetStepResponse } from './types';
+import {
+  LoginResponse,
+  MeResponse,
+  PublishStepResponse,
+  PublishStepBody,
+  GetStepResponse,
+  RegisterResponse,
+} from './types';
 
 export class MookmeClient {
   private client: AxiosInstance;
@@ -10,6 +17,21 @@ export class MookmeClient {
     this.client = axios.create({
       baseURL: config.cli.backendUrl,
     });
+  }
+
+  async register(email: string, username: string, password: string): Promise<RegisterResponse> {
+    try {
+      const response = await this.client.post<RegisterResponse>('/users', {
+        email,
+        password,
+        passwordConfirmation: password,
+        username,
+      });
+      return response.data;
+    } catch (e) {
+      handleResponseException(e);
+      process.exit(1);
+    }
   }
 
   async login(email: string, password: string): Promise<LoginResponse> {
