@@ -54,8 +54,7 @@
     "packages": [
       "docs",
       "mookme",
-      "hub",
-      "hub-front"
+      "hub"
     ]
   }
 }
