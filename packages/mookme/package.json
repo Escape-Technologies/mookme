@@ -14,8 +14,7 @@
     "prettier": "prettier 'src/**/*.ts'",
     "prettier:fix": "prettier --write 'src/**/*.ts'",
     "eslint": "eslint 'src/**/*.ts'",
-    "eslint:fix": "eslint --fix 'src/**/*.ts'",
-    "postinstall": "node scripts/postinstall.js"
+    "eslint:fix": "eslint --fix 'src/**/*.ts'"
   },
   "repository": {
     "type": "git",

@@ -17,8 +17,7 @@
     "eslint:fix": "eslint --fix 'src/**/*.ts'",
     "docs:dev": "vuepress dev docs",
     "docs:build": "vuepress build docs",
-    "docs:lint": "markdownlint -c docs/.markdownlint.json docs",
-    "postinstall": "node scripts/postinstall.js"
+    "docs:lint": "markdownlint -c docs/.markdownlint.json docs"
   },
   "repository": {
     "type": "git",
