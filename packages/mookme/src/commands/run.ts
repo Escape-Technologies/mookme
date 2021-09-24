@@ -4,7 +4,7 @@ import { hookTypes, HookType } from '../types/hook.types';
 import { hookPackage, processResults } from '../utils/hook-package';
 import { center } from '../display/ui';
 import { getNotStagedFiles, detectAndProcessModifiedFiles, getStagedFiles } from '../utils/git';
-import { loadHooks } from '../utils/load-hooks';
+import { loadHooks, setupPATH } from '../utils/load-hooks';
 import config from '../config';
 import logger from '../display/logger';
 interface Options {
@@ -38,6 +38,7 @@ export function addRun(program: commander.Command): void {
         process.exit(1);
       }
 
+      setupPATH();
       const hooks = loadHooks(hookType, { all: opts.all });
 
       if (hooks.length === 0) {

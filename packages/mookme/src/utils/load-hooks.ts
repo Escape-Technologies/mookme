@@ -8,6 +8,16 @@ export interface LoadHookOptions {
   all?: boolean;
 }
 
+export function setupPATH(): void {
+  const { rootDir } = config.project;
+  const partialsPath = path.join(rootDir, '.hooks', 'partials');
+  if (fs.existsSync(partialsPath)) {
+    process.env.PATH = `${process.env.PATH}:${partialsPath}`;
+  } else {
+    logger.warning(`'No \`partial\` scripts folder found at path ${partialsPath}`);
+  }
+}
+
 function matchExactPath(filePath: string, to_match: string): boolean {
   const position = filePath.indexOf(to_match);
   if (position === -1) {
@@ -31,6 +41,9 @@ function interpolateSharedSteps(hooks: PackageHook[]): PackageHook[] {
   const sharedSteps: { [key: string]: StepCommand } = fs
     .readdirSync(sharedFolderPath)
     .reduce((acc, sharedHookFileName) => {
+      if (sharedHookFileName.split('.').pop() !== 'json') {
+        return acc;
+      }
       const sharedHookName = sharedHookFileName.replace('.json', '');
       return {
         ...acc,
