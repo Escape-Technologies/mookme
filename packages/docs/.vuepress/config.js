@@ -14,6 +14,7 @@ module.exports = {
     sidebar: [
       "",
       "get-started/",
+      "features/",
       "examples/",
       "references/"
     ],
