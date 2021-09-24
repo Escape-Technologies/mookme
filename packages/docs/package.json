@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "vuepress dev .",
     "build": "vuepress build .",
-    "lint": "markdownlint -c docs/.markdownlint.json . -i node_modules"
+    "lint": "markdownlint -c .markdownlint.json . -i node_modules"
   },
   "repository": {
     "type": "git",
