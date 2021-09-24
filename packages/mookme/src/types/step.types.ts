@@ -5,6 +5,7 @@ export interface StepCommand {
   command: string;
   onlyOn?: string;
   serial?: boolean;
+  from?: string;
 }
 
 export interface StepError {

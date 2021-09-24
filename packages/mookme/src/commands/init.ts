@@ -108,6 +108,8 @@ export function addInit(program: commander.Command): void {
 
         console.log('Initializing hooks folders...');
         createDirIfNeeded('./.hooks');
+        createDirIfNeeded('./.hooks/shared');
+        fs.writeFileSync('./.hooks/shared/.gitkeep', '');
         packagesHooksDirPaths.forEach((hookDir) => {
           createDirIfNeeded(hookDir);
         });

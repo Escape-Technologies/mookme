@@ -2,6 +2,8 @@ import path from 'path';
 import fs from 'fs';
 import { PackageHook } from '../types/hook.types';
 import config from '../config';
+import { StepCommand } from '../types/step.types';
+import logger from '../display/logger';
 export interface LoadHookOptions {
   all?: boolean;
 }
@@ -13,6 +15,48 @@ function matchExactPath(filePath: string, to_match: string): boolean {
   }
   const remainingPath = filePath.slice(position + to_match.length);
   return remainingPath.length > 0 ? remainingPath.startsWith('/') : true;
+}
+
+function interpolateSharedSteps(hooks: PackageHook[]): PackageHook[] {
+  const { rootDir } = config.project;
+  const sharedFolderPath = path.join(rootDir, '.hooks', 'shared');
+
+  if (!fs.existsSync(sharedFolderPath)) {
+    logger.warning(
+      `Skipping step interpolation because there is no \`shared\` folder at path ${path.join(rootDir, '.hooks')}`,
+    );
+    return hooks;
+  }
+
+  const sharedSteps: { [key: string]: StepCommand } = fs
+    .readdirSync(sharedFolderPath)
+    .reduce((acc, sharedHookFileName) => {
+      const sharedHookName = sharedHookFileName.replace('.json', '');
+      return {
+        ...acc,
+        [sharedHookName]: JSON.parse(
+          fs.readFileSync(path.join(sharedFolderPath, sharedHookFileName), 'utf-8'),
+        ) as StepCommand,
+      };
+    }, {});
+
+  for (const hook of hooks) {
+    const interpolatedSteps = [];
+    for (const step of hook.steps) {
+      if (step.from) {
+        if (!sharedSteps[step.from]) {
+          logger.failure(`Shared step \`${step.from}\` is referenced in hook \`${hook.name}\` but is not defined`);
+          process.exit(1);
+        }
+        interpolatedSteps.push(sharedSteps[step.from]);
+      } else {
+        interpolatedSteps.push(step);
+      }
+    }
+    hook.steps = interpolatedSteps;
+  }
+
+  return hooks;
 }
 
 export const loadHooks = (hookType: string, opts: LoadHookOptions): PackageHook[] => {
@@ -57,5 +101,7 @@ export const loadHooks = (hookType: string, opts: LoadHookOptions): PackageHook[
     });
   }
 
-  return hooks;
+  const res = interpolateSharedSteps(hooks);
+
+  return res;
 };
