@@ -110,6 +110,8 @@ export function addInit(program: commander.Command): void {
         createDirIfNeeded('./.hooks');
         createDirIfNeeded('./.hooks/shared');
         fs.writeFileSync('./.hooks/shared/.gitkeep', '');
+        createDirIfNeeded('./.hooks/partials');
+        fs.writeFileSync('./.hooks/partials/.gitkeep', '');
         packagesHooksDirPaths.forEach((hookDir) => {
           createDirIfNeeded(hookDir);
         });
