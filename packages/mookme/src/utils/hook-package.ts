@@ -33,8 +33,8 @@ export async function hookPackage(hook: PackageHook): Promise<StepError[]> {
   const errors: { hook: PackageHook; step: StepCommand; error: Error }[] = [];
 
   for (const step of hook.steps) {
+    const stepUI = ui.stepsUI[step.name];
     try {
-      const stepUI = ui.stepsUI[step.name];
       const stepPromise: Promise<{ step: StepCommand; msg: Error } | null> = runStep(step, options, stepUI);
 
       // Regardless of whether the step is serial or not, it will be awaited at the end of this function
@@ -44,7 +44,7 @@ export async function hookPackage(hook: PackageHook): Promise<StepError[]> {
         // Serial steps are blocking
         const stepError = await stepPromise;
         const newStatus: UIExecutionStatus = stepError == null ? UIExecutionStatus.DONE : UIExecutionStatus.ERROR;
-        ui.setHookStatus(newStatus);
+        stepUI.setStatus(newStatus);
         if (stepError !== null) {
           errors.push(handleStepError(stepError, hook));
         }
@@ -52,20 +52,22 @@ export async function hookPackage(hook: PackageHook): Promise<StepError[]> {
         // Non-serial steps are just launched and result is processed in a callback
         stepPromise.then((stepError) => {
           const newStatus: UIExecutionStatus = stepError == null ? UIExecutionStatus.DONE : UIExecutionStatus.ERROR;
-          ui.setHookStatus(newStatus);
+          stepUI.setStatus(newStatus);
           if (stepError !== null) {
             errors.push(handleStepError(stepError, hook));
           }
         });
       }
     } catch (err) {
-      ui.setHookStatus(UIExecutionStatus.ERROR);
+      stepUI.setStatus(UIExecutionStatus.ERROR);
       throw err;
     }
   }
 
   // In every cases, we await for every step promises before processing hook results
-  await Promise.all(promises);
+  await Promise.all(promises)
+    .then(() => ui.setHookStatus(UIExecutionStatus.DONE))
+    .catch(() => ui.setHookStatus(UIExecutionStatus.ERROR));
 
   return errors;
 }
