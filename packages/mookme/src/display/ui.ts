@@ -16,7 +16,11 @@ export class StepUI {
   interval!: ReturnType<typeof setInterval>;
 
   constructor(step: StepCommand) {
-    console.log(`→ ${chalk.bold(step.name)} > ${step.command} `);
+    let displayedCommand = step.command;
+    if (step.command.length > process.stdout.columns - (step.name.length + 10)) {
+      displayedCommand = step.command.substring(0, process.stdout.columns - step.name.length - 15) + '...';
+    }
+    console.log(`→ ${chalk.bold(step.name)} > ${displayedCommand} `);
     this.status = 'Scheduled';
     this.start();
   }
