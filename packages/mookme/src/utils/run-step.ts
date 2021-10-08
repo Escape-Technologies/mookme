@@ -24,7 +24,10 @@ export function runStep(
   const args = config.executionContext.hookArgs!.split(' ').filter((arg) => arg !== '');
   stepUI.setStatus(UIExecutionStatus.RUNNING);
   return new Promise((resolve) => {
-    const packagePath = path.join(config.project.packagesPath, options.packageName);
+    const packagePath = path.join(
+      config.project.packagesPath,
+      options.packageName === '__global' ? '' : options.packageName,
+    );
 
     if (step.onlyOn) {
       try {
@@ -56,7 +59,7 @@ export function runStep(
         ? `source ${options.venvActivate} && ${step.command} && deactivate`
         : step.command;
 
-    const cp = exec(command.replace('{args}', `"${args.join(' ')}"`), { cwd: packagePath, shell: '/bin/bash' });
+    const cp = exec(command.replace('{args}', `"${args.join(' ')}"`), { cwd: packagePath });
 
     let out = '';
     cp.stdout?.on('data', (chunk) => {
