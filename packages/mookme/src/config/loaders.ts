@@ -40,8 +40,8 @@ export function loadAuthConfig(): AuthConfig {
     process.exit(1);
   }
 
-  const credentials: { key: string } = JSON.parse(fs.readFileSync(credentialsPath).toString());
-  return credentials;
+  // const credentials: { key: string } = JSON.parse(fs.readFileSync(credentialsPath).toString());
+  return { key: 'no-op' };
 }
 
 export function loadPackageJSONandProjectConfig(): { project?: ProjectConfig; packageJSON: PkgJSON } {
