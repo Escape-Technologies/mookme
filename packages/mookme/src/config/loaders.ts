@@ -32,13 +32,13 @@ export function loadCLIConfig(): CLIConfig {
 }
 
 export function loadAuthConfig(): AuthConfig {
-  const credentialsPath = path.join(os.homedir(), '.config', 'mookme', 'credentials.json');
+  // const credentialsPath = path.join(os.homedir(), '.config', 'mookme', 'credentials.json');
 
-  if (!fs.existsSync(path.join(credentialsPath))) {
-    logger.failure('No credentials found. Exiting.');
-    logger.info('Did you run `mookme authenticate` ?');
-    process.exit(1);
-  }
+  // if (!fs.existsSync(path.join(credentialsPath))) {
+  //   logger.failure('No credentials found. Exiting.');
+  //   logger.info('Did you run `mookme authenticate` ?');
+  //   process.exit(1);
+  // }
 
   // const credentials: { key: string } = JSON.parse(fs.readFileSync(credentialsPath).toString());
   return { key: 'no-op' };
