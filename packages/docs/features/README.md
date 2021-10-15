@@ -8,10 +8,10 @@ Given a project directory such as this:
 
 ```=shell
 project-root
+ |------- .mookme.json
  |------- .hooks
      |------- shared
             |------- flake8.json
- |------- package.json
  |------- packages
       |------- some-package
             |------- .hooks
@@ -43,10 +43,10 @@ Given a project directory such as this:
 
 ```sh
 project-root
+ |------- .mookme.json
  |------- .hooks
      |------- partials
             |------- pylint-changed-files
- |------- package.json
  |------- packages
       |------- some-package
             |------- .hooks
@@ -61,7 +61,7 @@ git diff --cached --name-only --relative | while read line; do [ ! -f \"$line\" 
 ```
 
 ::: tip
-The `<project-root>/.hooks/partials` is automatically generated with a `.gitkeep` file by `mookme init`.
+The `<project-root>/.hooks/partials` is automatically generated with a `.gitkeep` file by `npx mookme init`.
 :::
 
 One can declare a script in flake8 (don't forget to chmod+x) and then re-use it in some-package/.hooks/pre-commit.json by directly invoking the script's name:
