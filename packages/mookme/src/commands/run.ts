@@ -23,6 +23,7 @@ export function addRun(program: commander.Command): void {
     .option('-a, --all <all>', 'Run hooks for all packages', '')
     .option('--args <args>', 'The arguments being passed to the hooks', '')
     .action(async (opts: Options) => {
+      config.init();
       const initialNotStagedFiles = getNotStagedFiles();
       const stagedFiles = getStagedFiles();
 

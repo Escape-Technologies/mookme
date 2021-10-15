@@ -1,0 +1,8 @@
+{
+    "packagesPath": "packages",
+    "packages": [
+        "docs",
+        "mookme",
+        "hub"
+    ]
+}

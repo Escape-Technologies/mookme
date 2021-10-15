@@ -47,13 +47,5 @@
     "draftlog": "^1.0.13",
     "inquirer": "^8.0.0",
     "wildcard-match": "^5.1.0"
-  },
-  "mookme": {
-    "packagesPath": "packages",
-    "packages": [
-      "docs",
-      "mookme",
-      "hub"
-    ]
   }
 }

@@ -103,5 +103,3 @@ function parseAxiosError(e: AxiosError): void {
     logger.failure(`\n${'='.repeat(29)}`);
   }
 }
-
-export default new MookmeClient();

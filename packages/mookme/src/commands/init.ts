@@ -4,6 +4,7 @@ import fs from 'fs';
 
 import { writeGitHooksFiles } from '../utils/git';
 import { addedBehaviorQuestion, choiceQuestion, confirmQuestion, folderQuestion } from '../prompts/init';
+import logger from '../display/logger';
 
 function createDirIfNeeded(path: string) {
   if (!fs.existsSync(path)) {
@@ -68,13 +69,6 @@ export function addInit(program: commander.Command): void {
       clear();
       const { addedBehavior } = (await inquirer.prompt([addedBehaviorQuestion])) as { addedBehavior: string };
 
-      const packageJSON = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-      packageJSON.mookme = {
-        packagesPath,
-        packages: selectedPackages,
-        addedBehavior,
-      };
-
       const mookMeConfig = {
         packagesPath: `.${packagesPath ? `/${packagesPath}` : ''}`,
         packages: selectedPackages,
@@ -84,10 +78,10 @@ export function addInit(program: commander.Command): void {
       const packagesHooksDirPaths = selectedPackages.map((mod) => `${mookMeConfig.packagesPath}/${mod}/.hooks`);
 
       clear();
-      console.log('\nThe following configuration will be added into your package.json:');
-      console.log('mookme: ', JSON.stringify(mookMeConfig, null, 2));
+      logger.log('\nThe following configuration will be written into .mookme.json:');
+      console.log(JSON.stringify(mookMeConfig, null, 2));
 
-      console.log('\nThe following directories will also be created:');
+      logger.log('\nThe following directories will also be created:');
       packagesHooksDirPaths.forEach((hookDir) => console.log(`- ${hookDir}`));
       console.log(`- ./.hooks`);
 
@@ -101,22 +95,39 @@ export function addInit(program: commander.Command): void {
       ])) as { confirm: boolean };
 
       if (confirm) {
-        console.log('Writing configuration...');
-        packageJSON.mookme = mookMeConfig;
-        fs.writeFileSync('package.json', JSON.stringify(packageJSON, null, 2));
-        console.log('Done.');
+        logger.warning('Writing configuration...');
+        fs.writeFileSync('.mookme.json', JSON.stringify(mookMeConfig, null, 2));
+        logger.success('Done.');
 
-        console.log('Initializing hooks folders...');
+        logger.warning('Initializing hooks folders...');
         createDirIfNeeded('./.hooks');
         createDirIfNeeded('./.hooks/shared');
         fs.writeFileSync('./.hooks/shared/.gitkeep', '');
         createDirIfNeeded('./.hooks/partials');
         fs.writeFileSync('./.hooks/partials/.gitkeep', '');
+        fs.writeFileSync(
+          './.hooks/pre-commit.json',
+          JSON.stringify(
+            {
+              steps: [
+                {
+                  name: 'Example hook',
+                  command: 'echo "Hello world!"',
+                },
+              ],
+            },
+            null,
+            2,
+          ),
+        );
+        logger.success('An example hook has been written in `./.hooks/pre-commit.json`');
         packagesHooksDirPaths.forEach((hookDir) => {
           createDirIfNeeded(hookDir);
         });
 
         writeGitHooksFiles();
       }
+
+      logger.success('Your hooks are configured.');
     });
 }

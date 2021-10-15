@@ -1,6 +1,6 @@
 import commander from 'commander';
 import inquirer from 'inquirer';
-import client from '../client';
+import { MookmeClient } from '../client';
 import { saveKeyInConfig } from '../config/init-folders';
 import logger from '../display/logger';
 import { passwordQuestion, usernameQuestion, emailQuestion, passwordConfirmationQuestion } from '../prompts/register';
@@ -10,6 +10,8 @@ export function addRegister(program: commander.Command): void {
     .command('register')
     .description('Register on mookme hub')
     .action(async () => {
+      const client = new MookmeClient();
+
       logger.success('Welcome on Mookme !');
       logger.log('You will need to procide the following information:');
       logger.log('- email\n- username\n- password');

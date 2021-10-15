@@ -1,26 +1,18 @@
-import logger from '../display/logger';
-import { loadAuthConfig, loadCLIConfig, loadPackageJSONandProjectConfig } from './loaders';
-import { AuthConfig, CLIConfig, ExecutionContext, MookmeConfig, PkgJSON, ProjectConfig } from './types';
-
-let CONFIG: MookmeConfig;
+import { loadAuthConfig, loadCLIConfig, loadProjectConfig } from './loaders';
+import { AuthConfig, CLIConfig, ExecutionContext, MookmeConfig, ProjectConfig } from './types';
 
 export class Config {
-  private config: MookmeConfig;
+  private config?: MookmeConfig;
   public executionContext: ExecutionContext = {};
 
-  static loadConfig(): void {
-    CONFIG = {
-      auth: loadAuthConfig(),
-      cli: loadCLIConfig(),
-      ...loadPackageJSONandProjectConfig(),
-    };
-  }
-
-  constructor() {
-    if (!CONFIG) {
-      Config.loadConfig();
+  init(): void {
+    if (!this.config) {
+      this.config = {
+        auth: loadAuthConfig(),
+        cli: loadCLIConfig(),
+        project: loadProjectConfig(),
+      };
     }
-    this.config = CONFIG;
   }
 
   updateExecutionContext(newContext: ExecutionContext): void {
@@ -31,24 +23,27 @@ export class Config {
   }
 
   get project(): ProjectConfig {
-    if (!this.config.project) {
-      logger.failure('Project configuration has not been loaded. Exiting.');
-      logger.info('Did you run `mookme init` ?');
+    if (!this.config) {
+      console.trace('Config object has not been initialized');
       process.exit(1);
     }
     return this.config.project;
   }
 
   get cli(): CLIConfig {
+    if (!this.config) {
+      console.trace('Config object has not been initialized');
+      process.exit(1);
+    }
     return this.config.cli;
   }
 
   get auth(): AuthConfig {
+    if (!this.config) {
+      console.trace('Config object has not been initialized');
+      process.exit(1);
+    }
     return this.config.auth;
-  }
-
-  get packageJSON(): PkgJSON {
-    return this.config.packageJSON;
   }
 }
 
