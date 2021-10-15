@@ -13,8 +13,6 @@ export function setupPATH(): void {
   const partialsPath = path.join(rootDir, '.hooks', 'partials');
   if (fs.existsSync(partialsPath)) {
     process.env.PATH = `${process.env.PATH}:${partialsPath}`;
-  } else {
-    logger.warning(`'No \`partial\` scripts folder found at path ${partialsPath}`);
   }
 }
 
@@ -32,9 +30,6 @@ function interpolateSharedSteps(hooks: PackageHook[]): PackageHook[] {
   const sharedFolderPath = path.join(rootDir, '.hooks', 'shared');
 
   if (!fs.existsSync(sharedFolderPath)) {
-    logger.warning(
-      `Skipping step interpolation because there is no \`shared\` folder at path ${path.join(rootDir, '.hooks')}`,
-    );
     return hooks;
   }
 
