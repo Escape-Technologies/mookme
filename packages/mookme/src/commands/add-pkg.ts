@@ -10,7 +10,9 @@ export function addAddPkg(program: commander.Command): void {
     .requiredOption('-p, --pkg <pkg>', 'The path to the package you want to add')
     .description('Add a new package to an existing mookme configuration')
     .action(async ({ pkg }) => {
-      const pkgJSON = config.packageJSON;
+      config.init();
+
+      const projectConfig = config.project;
       const { rootDir, packagesPath, packages } = config.project;
 
       if (packages.includes(pkg)) {
@@ -26,11 +28,11 @@ export function addAddPkg(program: commander.Command): void {
       }
 
       packages.push(pkg);
-      pkgJSON.mookme.packages = packages;
+      projectConfig.packages = packages;
       logger.success('\nThe following entry will be added to your package.json:');
-      logger.log(`-> package.json -> mookme -> packages -> ${pkg}`);
+      logger.log(`-> .mookme.json -> packages -> ${pkg}`);
 
-      fs.writeFileSync(`${rootDir}/package.json`, JSON.stringify(pkgJSON, null, 2));
+      fs.writeFileSync(`${rootDir}/package.json`, JSON.stringify(projectConfig, null, 2));
 
       const pkgHooksPath = path.join(pkgPath, '.hooks');
       if (!fs.existsSync(pkgHooksPath)) {

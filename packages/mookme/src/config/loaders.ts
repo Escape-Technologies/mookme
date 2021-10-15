@@ -1,34 +1,39 @@
 import path from 'path';
-import os from 'os';
 import fs from 'fs';
 
-import { AuthConfig, CLIConfig, PkgJSON, ProjectConfig } from './types';
+import { AuthConfig, CLIConfig, ProjectConfig } from './types';
 import logger from '../display/logger';
 
 export function getRootDir(): string {
   let isRoot = false;
   let rootDir = process.cwd();
-  while (!isRoot) {
-    isRoot = fs.existsSync(`${rootDir}/.git`);
+  let i = 0;
+  while (!isRoot && i < 20) {
+    isRoot = fs.existsSync(`${rootDir}/.mookme.json`);
     if (!isRoot) {
       rootDir = `${rootDir}/..`;
     }
+    i++;
+  }
+  if (!isRoot) {
+    logger.failure("Could not find any `.mookme.json` file in this folder or it's parents");
+    process.exit(1);
   }
 
   return path.resolve(rootDir);
 }
 
 export function loadCLIConfig(): CLIConfig {
-  const cliConfigPath = path.join(os.homedir(), '.config', 'mookme', 'cli.json');
+  // const cliConfigPath = path.join(os.homedir(), '.config', 'mookme', 'cli.json');
 
-  let cliConfig: CLIConfig;
-  if (!fs.existsSync(path.join(cliConfigPath))) {
-    cliConfig = { backendUrl: 'http://localhost:4000' };
-  } else {
-    cliConfig = JSON.parse(fs.readFileSync(cliConfigPath).toString());
-  }
+  // let cliConfig: CLIConfig;
+  // if (!fs.existsSync(path.join(cliConfigPath))) {
+  //   cliConfig = { backendUrl: 'http://localhost:4000' };
+  // } else {
+  //   cliConfig = JSON.parse(fs.readFileSync(cliConfigPath).toString());
+  // }
 
-  return cliConfig;
+  return { backendUrl: 'no-op' };
 }
 
 export function loadAuthConfig(): AuthConfig {
@@ -44,30 +49,19 @@ export function loadAuthConfig(): AuthConfig {
   return { key: 'no-op' };
 }
 
-export function loadPackageJSONandProjectConfig(): { project?: ProjectConfig; packageJSON: PkgJSON } {
+export function loadProjectConfig(): ProjectConfig {
   const rootDir = getRootDir();
 
-  if (!fs.existsSync(`${rootDir}/package.json`)) {
-    logger.failure(`package.json file not found at path ${rootDir}. Exiting.`);
-    process.exit(1);
-  }
-
-  const rawPackageJSON = JSON.parse(fs.readFileSync(`${rootDir}/package.json`, 'utf8'));
-
-  const projectConfig = rawPackageJSON.mookme as ProjectConfig;
+  const projectConfig = JSON.parse(fs.readFileSync(`${rootDir}/.mookme.json`, 'utf8')) as ProjectConfig;
 
   if (!projectConfig) {
-    return {
-      project: undefined,
-      packageJSON: rawPackageJSON,
-    };
+    logger.failure('Project configuration has not been loaded. Exiting.');
+    logger.info('Did you run `mookme init` ?');
+    process.exit(1);
   }
 
   projectConfig.rootDir = rootDir;
   projectConfig.packagesPath = path.resolve(`${rootDir}/${projectConfig.packagesPath}`);
 
-  return {
-    project: projectConfig,
-    packageJSON: rawPackageJSON,
-  };
+  return projectConfig;
 }

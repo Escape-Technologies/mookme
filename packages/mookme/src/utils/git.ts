@@ -87,7 +87,7 @@ export function writeGitHooksFiles(): void {
 
   hookTypes.forEach((type) => {
     logger.info(`- ./.git/hooks/${type}`);
-    const mookmeCmd = `./node_modules/@escape.tech/mookme/bin/index.js run --type ${type} --args "$1"`;
+    const mookmeCmd = `npx mookme run --type ${type} --args "$1"`;
     if (fs.existsSync(`./.git/hooks/${type}`)) {
       const hook = fs.readFileSync(`./.git/hooks/${type}`).toString();
       if (!hook.includes(mookmeCmd)) {

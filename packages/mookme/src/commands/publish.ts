@@ -1,7 +1,7 @@
 import commander from 'commander';
 import fs from 'fs';
 import path from 'path';
-import client from '../client';
+import { MookmeClient } from '../client';
 import { PublishStepBody } from '../client/types';
 import config from '../config';
 import logger from '../display/logger';
@@ -16,6 +16,9 @@ export function addPublish(program: commander.Command): void {
     )
     .description('Publish step on Mookme hub')
     .action(async ({ step, name }) => {
+      config.init();
+      const client = new MookmeClient();
+
       const stepFilePath = path.join(process.cwd(), step);
 
       if (fs.existsSync(stepFilePath)) {
