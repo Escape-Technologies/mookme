@@ -3,17 +3,21 @@
 ## Installation
 
 ```bash
-npm install @escape.tech/mookme
+npm install -g @escape.tech/mookme
 ```
 
 ## Configuration
 
+### Requirements
+
+`Mookme` requires Node.js to work properly.
+
 ### First configuration
 
-**Case 1 : You're the first to configure `Mookme` on your project**
+**Case 1 : You are the first to configure `Mookme` on your project**
 
 ```bash
-mookme init
+npx mookme init
 ```
 
 This will display a prompter to let you define **where you packages are located**, how you want the hooks to behave
@@ -29,7 +33,7 @@ Every step of this process is clearly shown and nothing will be written without 
 This will only write your `.git/hooks` scripts.
 
 ```bash
-mookme init --only-hook
+npx mookme init --only-hook
 ```
 
 ## Writing your hooks
@@ -46,6 +50,7 @@ Hook are written in a folder `.hooks` located at the root of your project and at
 
 ```bash
 <root> # where your .git is located
+|- .mookme.json
 |- .hooks # will always be executed when you commit
 |  |- pre-commit.json # will be executed with the pre-commit git hook
 |  |- commit-msg.json  # will be executed with the commit-msg git hook

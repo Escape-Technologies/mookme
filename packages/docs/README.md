@@ -24,7 +24,7 @@ You are welcome to use it and enjoy it's simplicity.
   - What is the root folder where the packages of the repo are stored
   - What are the paths to these packages.
 
-**Don't worry**, we provide a CLI tool let you easily enter this configuration: Just run `mookme init`
+**Don't worry**, we provide a CLI tool let you easily enter this configuration: Just run `npx mookme init`
 
 - You write your hooks in json files (see writing hooks)
 - You do your stuff & commit, `Mookme` will evaluate which packages have staged changes, and will run hooks defined in
