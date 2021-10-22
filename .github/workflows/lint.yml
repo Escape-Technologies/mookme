@@ -5,9 +5,13 @@ name: Unit Testing
 
 on:
   push:
-    branches: [ master ]
+    branches:
+      - master
+      - beta
   pull_request:
-    branches: [ master ]
+    branches:
+      - master
+      - beta
 
 jobs:
   lint-mookme:
