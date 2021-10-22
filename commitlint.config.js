@@ -6,7 +6,7 @@ const Configuration = {
   extends: ["@commitlint/config-angular"],
   /*
    * Resolve and load @commitlint/format from node_modules.
-   * Referenced package must be installed
+   * Referenced package must be installed yep
    */
   formatter: "@commitlint/format",
   /*
