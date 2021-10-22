@@ -1,0 +1,44 @@
+name: Release npm package
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+          token: ${{ secrets.ACCESS_TOKEN }}
+
+
+      - name: Cache node modules
+        uses: actions/cache@v1
+        with:
+          path: node_modules
+          key: ${{ runner.OS }}-build-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-build-
+            ${{ runner.OS }}-
+
+      - name: Install
+        run: |
+          npm install
+          cd packages/mookme
+          npm install
+
+      - name: Build
+        run: |
+          cd packages/mookme
+          npm run build
+
+      - name: Publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          cd packages/mookme
+          npx semantic-release
