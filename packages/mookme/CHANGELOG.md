@@ -1,3 +1,12 @@
+# [1.1.0-beta.1](https://github.com/Escape-Technologies/mookme/compare/v1.0.0...v1.1.0-beta.1) (2021-10-22)
+
+
+### Features
+
+* **mookme:** add beta release channel ([b9dd8b2](https://github.com/Escape-Technologies/mookme/commit/b9dd8b2ca56800c3441c013841742d8d7e7b009b))
+* **mookme:** add beta workflows ([0706e36](https://github.com/Escape-Technologies/mookme/commit/0706e363b21b81b1194abbd6cb7d037cbaa82ff0))
+* **mookme:** init beta channel ([08b227d](https://github.com/Escape-Technologies/mookme/commit/08b227d9dc96d95a751340de33f76aa8502374de))
+
 # [0.6.0-beta.1](https://github.com/Escape-Technologies/mookme/compare/v0.5.0...v0.6.0-beta.1) (2021-10-22)
 
 
