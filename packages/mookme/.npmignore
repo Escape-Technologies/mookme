@@ -7,3 +7,4 @@
 assets
 tsconfig.json
 README.md
+.releaserc
