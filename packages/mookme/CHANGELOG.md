@@ -1,3 +1,11 @@
+# [0.2.0](https://github.com/Escape-Technologies/mookme/compare/v0.1.0...v0.2.0) (2021-10-22)
+
+
+### Features
+
+* **mookme:** add semantic release configuration ([cae746a](https://github.com/Escape-Technologies/mookme/commit/cae746af32a3955243d3d3f5369d99ae7a9e40ec))
+* **mookme:** add semantic release configurationfor git ([2023e64](https://github.com/Escape-Technologies/mookme/commit/2023e6486093fe8de1d21a6ac76d7310d7160692))
+
 # [0.1.0](https://github.com/Escape-Technologies/mookme/compare/v0.0.21...v0.1.0) (2021-10-22)
 
 
