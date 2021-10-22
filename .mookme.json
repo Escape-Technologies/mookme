@@ -1,8 +1,8 @@
 {
-    "packagesPath": "packages",
-    "packages": [
-        "docs",
-        "mookme",
-        "hub"
-    ]
+  "packagesPath": "./packages",
+  "packages": [
+    "docs",
+    "mookme"
+  ],
+  "addedBehavior": "exit"
 }
