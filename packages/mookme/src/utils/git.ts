@@ -87,10 +87,16 @@ export function writeGitHooksFiles(): void {
 
   hookTypes.forEach((type) => {
     logger.info(`- ./.git/hooks/${type}`);
+    const mookmeLegacyCmd = `./node_modules/@escape.tech/mookme/bin/index.js run --type ${type} --args "$1"`;
     const mookmeCmd = `npx mookme run --type ${type} --args "$1"`;
     if (fs.existsSync(`./.git/hooks/${type}`)) {
       const hook = fs.readFileSync(`./.git/hooks/${type}`).toString();
-      if (!hook.includes(mookmeCmd)) {
+      if (hook.includes(mookmeLegacyCmd)) {
+        logger.log(`Legacy mookme invokation detected, updating it...`);
+        const newHook = hook.replace(mookmeLegacyCmd, mookmeCmd);
+        fs.writeFileSync(`./.git/hooks/${type}`, newHook);
+        execSync(`chmod +x ./.git/hooks/${type}`);
+      } else if (!hook.includes(mookmeCmd)) {
         fs.appendFileSync(`./.git/hooks/${type}`, `\n${mookmeCmd}`, { flag: 'a+' });
         execSync(`chmod +x ./.git/hooks/${type}`);
       } else {

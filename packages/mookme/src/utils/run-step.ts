@@ -24,10 +24,10 @@ export function runStep(
   const args = config.executionContext.hookArgs!.split(' ').filter((arg) => arg !== '');
   stepUI.setStatus(UIExecutionStatus.RUNNING);
   return new Promise((resolve) => {
-    const packagePath = path.join(
-      config.project.packagesPath,
-      options.packageName === '__global' ? '' : options.packageName,
-    );
+    const packagePath =
+      options.packageName === '__global'
+        ? config.project.rootDir
+        : path.join(config.project.packagesPath, options.packageName);
 
     if (step.onlyOn) {
       try {

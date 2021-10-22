@@ -90,7 +90,7 @@ export function addInit(program: commander.Command): void {
           type: 'confirm',
           name: 'confirm',
           message: 'Do you confirm ?',
-          default: false,
+          default: true,
         },
       ])) as { confirm: boolean };
 

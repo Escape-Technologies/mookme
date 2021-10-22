@@ -1,23 +1,9 @@
 {
   "name": "@escape.tech/mookme",
-  "version": "0.0.21",
-  "description": "A git hook manager designed for monorepos",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "bin": {
-    "mookme": "bin/index.js"
-  },
+  "version": "0.0.1",
+  "description": "The monorepo for Mookme",
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc -w",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prettier": "prettier 'src/**/*.ts'",
-    "prettier:fix": "prettier --write 'src/**/*.ts'",
-    "eslint": "eslint 'src/**/*.ts'",
-    "eslint:fix": "eslint --fix 'src/**/*.ts'",
-    "docs:dev": "vuepress dev docs",
-    "docs:build": "vuepress build docs",
-    "docs:lint": "markdownlint -c docs/.markdownlint.json docs"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -39,13 +25,5 @@
   "devDependencies": {
     "@commitlint/cli": "^12.1.1",
     "@commitlint/config-angular": "^12.1.1"
-  },
-  "dependencies": {
-    "@types/node": "^15.0.2",
-    "chalk": "^4.1.1",
-    "commander": "^7.2.0",
-    "draftlog": "^1.0.13",
-    "inquirer": "^8.0.0",
-    "wildcard-match": "^5.1.0"
   }
 }

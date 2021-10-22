@@ -101,11 +101,11 @@ export const loadHooks = (hookType: string, opts: LoadHookOptions): PackageHook[
       }
     });
 
-  if (fs.existsSync(`${packagesPath}/.hooks/${hookType}.json`)) {
+  if (fs.existsSync(`${rootDir}/.hooks/${hookType}.json`)) {
     hooks.push({
       name: '__global',
       cwd: rootDir || process.cwd(),
-      steps: JSON.parse(fs.readFileSync(`${packagesPath}/.hooks/${hookType}.json`, 'utf-8')).steps,
+      steps: JSON.parse(fs.readFileSync(`${rootDir}/.hooks/${hookType}.json`, 'utf-8')).steps,
     });
   }
 

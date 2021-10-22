@@ -21,3 +21,5 @@ export function saveKeyInConfig(key: string): void {
   fs.writeFileSync(credentialsPath, JSON.stringify({ key }, null, 2));
   logger.success(`Credentials have been stored at path \`${credentialsPath}\``);
 }
+
+//test
