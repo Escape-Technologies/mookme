@@ -1,6 +1,7 @@
 {
     "branches": [
-        "master"
+        "master",
+        {"name": "beta", "channel": "beta", "prerelease": "beta"}
     ],
     "repositoryUrl": "git@github.com:Escape-Technologies/mookme.git",
     "dryRun": false,
