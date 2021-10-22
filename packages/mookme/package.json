@@ -1,6 +1,6 @@
 {
   "name": "@escape.tech/mookme",
-  "version": "0.5.0",
+  "version": "1.0.0",
   "description": "A git hook manager designed for monorepos",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
