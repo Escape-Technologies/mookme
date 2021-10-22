@@ -1,3 +1,10 @@
+# [0.3.0](https://github.com/Escape-Technologies/mookme/compare/v0.2.0...v0.3.0) (2021-10-22)
+
+
+### Features
+
+* **mookme:** enable npm publication ([d5f27c9](https://github.com/Escape-Technologies/mookme/commit/d5f27c9b1617109fd58c11f79f65a645a5560344))
+
 # [0.2.0](https://github.com/Escape-Technologies/mookme/compare/v0.1.0...v0.2.0) (2021-10-22)
 
 
