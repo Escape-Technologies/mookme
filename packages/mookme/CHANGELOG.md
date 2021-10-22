@@ -1,3 +1,10 @@
+# [0.5.0](https://github.com/Escape-Technologies/mookme/compare/v0.4.1...v0.5.0) (2021-10-22)
+
+
+### Features
+
+* **mookme:** add publish ci workflow ([486ce28](https://github.com/Escape-Technologies/mookme/commit/486ce28cdaeed718e758279055e1bb23424e8957))
+
 ## [0.4.1](https://github.com/Escape-Technologies/mookme/compare/v0.4.0...v0.4.1) (2021-10-22)
 
 
