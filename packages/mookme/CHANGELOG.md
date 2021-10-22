@@ -1,3 +1,11 @@
+## [0.4.1](https://github.com/Escape-Technologies/mookme/compare/v0.4.0...v0.4.1) (2021-10-22)
+
+
+### Bug Fixes
+
+* **ci:** remove automation ([d3534c6](https://github.com/Escape-Technologies/mookme/commit/d3534c6669e215ad9b26249f01a1b73b82ba5f9b))
+* **mookme:** fix ci release ([b77c714](https://github.com/Escape-Technologies/mookme/commit/b77c71464a8fa607dfaf6324dff9c82fcfb9b724))
+
 ## [0.3.1](https://github.com/Escape-Technologies/mookme/compare/v0.3.0...v0.3.1) (2021-10-22)
 
 
