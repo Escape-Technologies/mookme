@@ -8,13 +8,16 @@
     "mookme": "bin/index.js"
   },
   "scripts": {
+    "prebuild": "rm -rf dist",
     "build": "tsc",
     "dev": "tsc -w",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prettier": "prettier 'src/**/*.ts'",
     "prettier:fix": "prettier --write 'src/**/*.ts'",
     "eslint": "eslint 'src/**/*.ts'",
-    "eslint:fix": "eslint --fix 'src/**/*.ts'"
+    "eslint:fix": "eslint --fix 'src/**/*.ts'",
+    "prepublish": "npm run build",
+    "publish": "npm publish --access public"
   },
   "repository": {
     "type": "git",
