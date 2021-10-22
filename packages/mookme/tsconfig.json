@@ -2,7 +2,6 @@
   "extends": "@tsconfig/node10/tsconfig.json",
   "compilerOptions": {
     "incremental": true,
-    "lib": ["es2017", "es7", "es6", "dom"],
     "declaration": true,
     "outDir": "./dist",
     "rootDir": "./src",

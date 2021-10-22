@@ -8,7 +8,7 @@
     "mookme": "bin/index.js"
   },
   "scripts": {
-    "prebuild": "rm -rf dist",
+    "prebuild": "rm ./.tmp/ts-build-infos.json && rm -rf dist",
     "build": "tsc",
     "dev": "tsc -w",
     "test": "echo \"Error: no test specified\" && exit 1",
