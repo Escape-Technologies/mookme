@@ -1,3 +1,10 @@
+## [0.3.1](https://github.com/Escape-Technologies/mookme/compare/v0.3.0...v0.3.1) (2021-10-22)
+
+
+### Bug Fixes
+
+* **mookme:** fix changelog version ([78b845f](https://github.com/Escape-Technologies/mookme/commit/78b845f8c34a4e0d763a39bf05c85cba06e05967))
+
 # [0.3.0](https://github.com/Escape-Technologies/mookme/compare/v0.2.0...v0.3.0) (2021-10-22)
 
 
