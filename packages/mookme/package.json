@@ -16,8 +16,7 @@
     "prettier:fix": "prettier --write 'src/**/*.ts'",
     "eslint": "eslint 'src/**/*.ts'",
     "eslint:fix": "eslint --fix 'src/**/*.ts'",
-    "prepublish": "npm run build",
-    "publish": "npm publish --access public"
+    "prepare": "npm run build"
   },
   "repository": {
     "type": "git",
