@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/Escape-Technologies/mookme/compare/v1.0.0...v1.0.1) (2021-10-25)
+
+
+### Bug Fixes
+
+* **mookme:** fix package.json resolution ([1a5547a](https://github.com/Escape-Technologies/mookme/commit/1a5547a498c0deb4873f64ac0824f8d77df19e1e))
+
 # [0.5.0](https://github.com/Escape-Technologies/mookme/compare/v0.4.1...v0.5.0) (2021-10-22)
 
 
