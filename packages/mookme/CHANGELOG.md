@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/Escape-Technologies/mookme/compare/v1.0.1...v1.0.2) (2021-10-25)
+
+
+### Bug Fixes
+
+* **mookme:** fix command execution shell ([518e36a](https://github.com/Escape-Technologies/mookme/commit/518e36ac414027de0a773cf095f9d36de1e73b1d))
+
 ## [1.0.1](https://github.com/Escape-Technologies/mookme/compare/v1.0.0...v1.0.1) (2021-10-25)
 
 
