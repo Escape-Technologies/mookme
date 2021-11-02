@@ -4,7 +4,7 @@ import fs from 'fs';
 import { AuthConfig, CLIConfig, ProjectConfig } from './types';
 import logger from '../display/logger';
 
-export function getRootDir(target: string, throwIfNotFound = true): string {
+export function getRootDir(target: string): string | undefined {
   let isRoot = false;
   let rootDir = process.cwd();
   let i = 0;
@@ -15,9 +15,8 @@ export function getRootDir(target: string, throwIfNotFound = true): string {
     }
     i++;
   }
-  if (!isRoot && throwIfNotFound) {
-    logger.failure("Could not find any `.mookme.json` file in this folder or it's parents");
-    process.exit(1);
+  if (!isRoot) {
+    return undefined;
   }
 
   return path.resolve(rootDir);
@@ -49,26 +48,33 @@ export function loadAuthConfig(): AuthConfig {
   return { key: 'no-op' };
 }
 
+function tryMigrateLegacyConfig() {
+  const legacyRootDir = getRootDir('package.json');
+  if (legacyRootDir !== undefined) {
+    const pkgJSON = JSON.parse(fs.readFileSync(`${legacyRootDir}/package.json`, 'utf8'));
+    if (pkgJSON.mookme) {
+      logger.warning(`Legacy mookme configuration object detected in package.json`);
+      fs.writeFileSync(`${legacyRootDir}/.mookme.json`, JSON.stringify(pkgJSON.mookme, null, 2), 'utf8');
+      delete pkgJSON.mookme;
+      fs.writeFileSync(`${legacyRootDir}/package.json`, JSON.stringify(pkgJSON, null, 2), 'utf8');
+      logger.success('Succesfully moved config from package.json to .mookme.json');
+    }
+  }
+}
+
 export function loadProjectConfig(): ProjectConfig {
-  const legacyRootDir = getRootDir('package.json', false);
-  if (!fs.existsSync(`${legacyRootDir}/.mookme.json`)) {
-    if (fs.existsSync(`${legacyRootDir}/package.json`)) {
-      const pkgJSON = JSON.parse(fs.readFileSync(`${legacyRootDir}/package.json`, 'utf8'));
-      if (pkgJSON.mookme) {
-        logger.warning(`Legacy mookme configuration object detected in package.json`);
-        fs.writeFileSync(`${legacyRootDir}/.mookme.json`, JSON.stringify(pkgJSON.mookme, null, 2), 'utf8');
-        delete pkgJSON.mookme;
-        fs.writeFileSync(`${legacyRootDir}/package.json`, JSON.stringify(pkgJSON, null, 2), 'utf8');
-        logger.success('Succesfully moved config from package.json to .mookme.json');
-      } else {
-        logger.failure('No .mmokme.json file found. Exiting.');
-        logger.info('Did you run `mookme init` ?');
-        process.exit(1);
-      }
+  let rootDir = getRootDir('.mookme.json');
+
+  if (rootDir === undefined) {
+    tryMigrateLegacyConfig();
+    rootDir = getRootDir('.mookme.json');
+    if (rootDir === undefined) {
+      logger.failure("Could not find any `.mookme.json` file in this folder or it's parents");
+      logger.info('Did you run `mookme init` ?');
+      process.exit(1);
     }
   }
 
-  const rootDir = getRootDir('.mookme.json');
   const projectConfig = JSON.parse(fs.readFileSync(`${rootDir}/.mookme.json`, 'utf8')) as ProjectConfig;
   projectConfig.rootDir = rootDir;
   projectConfig.packagesPath = path.resolve(`${rootDir}/${projectConfig.packagesPath}`);
