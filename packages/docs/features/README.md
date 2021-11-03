@@ -32,8 +32,6 @@ You can declare a step in `/.hooks/shared/flake8.json`…
 }
 ```
 
-
-
 … and then re-use it in `some-package/.hooks/pre-commit.json` with the `from` keyword:
 
 ```json
