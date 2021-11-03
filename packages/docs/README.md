@@ -42,9 +42,7 @@ script would, the `.git/hooks` folder is a not a versioned one, *hence it will p
 - The hook setup is a one liner for the new developers landing in your team. It won't download anything, just write a
 small line in your `.git/hooks` files
 
-### `pre-commit`
-
-*(our tool before developing Mookme)*
+### `pre-commit` *(our tool before developing Mookme)*
 
 We had several issues with `pre-commit`, that led us to develop our own tool :
 
