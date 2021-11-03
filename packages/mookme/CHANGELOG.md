@@ -1,3 +1,11 @@
+## [1.0.3](https://github.com/Escape-Technologies/mookme/compare/v1.0.2...v1.0.3) (2021-11-03)
+
+
+### Bug Fixes
+
+* markdownlint ([10baed0](https://github.com/Escape-Technologies/mookme/commit/10baed07a7bcaaaab357da670866f3850192c71e))
+* updating docs with examples and fixing typos ([9fb32af](https://github.com/Escape-Technologies/mookme/commit/9fb32af8c9a06a05bcd7dd7b5277743305fc4745))
+
 ## [1.0.2](https://github.com/Escape-Technologies/mookme/compare/v1.0.1...v1.0.2) (2021-10-25)
 
 
