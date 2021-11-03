@@ -81,7 +81,7 @@ available git hooks, eg :
 Your hooks are defined in simple json files.
 
 - For complete reference, see the JSON hooks reference
-- For specific hook examples, see the recipes.
+- For specific hook examples, see the recipes
 
 A hook defines a list of `steps`, which are basically commands to run, with a name for proper display. A few
 configuration option are available, but the minimal requirement is `name` and `command`.
@@ -104,7 +104,7 @@ package's `.hooks'` folder is located
 :::
 
 ::: warning
-{args}` are replaced with the hook arguments when the command is executed. See [the  git documentation on hooks](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks)
+`{args}` are replaced with the hook arguments when the command is executed. See [the  Git documentation on hooks](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks)
 :::
 
-**More examples to [get you started !](./docs/hooks-examples/index.md)**
+**More examples to [get you started](./docs/hooks-examples/index.md)**!
