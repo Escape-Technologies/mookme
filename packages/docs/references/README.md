@@ -6,7 +6,7 @@ The main initialization command. It :
 
 - prompts for one or multiple packages folder path
 - asks you to select one or multiple package at each path
-- creates the `.hooks` folder in each package where you can write **dedicated hooks !** that will be triggered only
+- creates the `.hooks` folder in each package where you can write **dedicated hooks!** that will be triggered only
 when changes in this package occur
 - creates a `.hooks` folder at the root of your project where you can write **project-wide hooks** that will be
 triggered on every commit

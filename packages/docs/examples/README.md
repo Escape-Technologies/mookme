@@ -6,9 +6,9 @@
 
 ### Prerequisite
 
-- You have installed `mookme`
+- You have installed `Mookme`
 - You have installed and configured [commitlint](https://github.com/conventional-changelog/commitlint)
-- You have setup `mookme` using `npx mookme init` (see [get started](../../README.md) if needed)
+- You have setup `Mookme` using `npx mookme init` (see [get started](../../README.md) if needed)
 
 ### Hook
 
@@ -59,7 +59,7 @@ the following configuration :
 }
 ```
 
-*Alternative : setup a `npm` script and directly invoke `eslint` in the command field :*
+*Alternative: setup a `npm` script and directly invoke `eslint` in the command field :*
 
 ```js
 {
@@ -82,8 +82,8 @@ the following configuration :
 
 ### Prerequisite
 
-- You have installed `mookme`
-- You have setup `mookme` using `npx mookme init` (see [get started](../../README.md) if needed)
+- You have installed `Mookme`
+- You have setup `Mookme` using `npx mookme init` (see [get started](../../README.md) if needed)
 - You have a working virtual environment in your package
 
 ### Hook
