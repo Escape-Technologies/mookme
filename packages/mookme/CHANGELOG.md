@@ -1,3 +1,10 @@
+# [1.1.0-beta.3](https://github.com/Escape-Technologies/mookme/compare/v1.1.0-beta.2...v1.1.0-beta.3) (2021-11-05)
+
+
+### Features
+
+* **mookme:** bump mookme to node 16 ([da3f5ca](https://github.com/Escape-Technologies/mookme/commit/da3f5ca3b0fd57c9648fb89c90bc3d904a7a4f30))
+
 # [1.1.0-beta.2](https://github.com/Escape-Technologies/mookme/compare/v1.1.0-beta.1...v1.1.0-beta.2) (2021-11-05)
 
 
