@@ -22,6 +22,8 @@ jobs:
       uses: actions/setup-node@v2
     - name: lint
       run: |
+        node -v
+        npm -v
         cd packages/mookme
         npm install      
         npm run eslint
