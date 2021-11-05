@@ -1,11 +1,10 @@
-import path from 'path';
 import draftlog from 'draftlog';
 import chalk from 'chalk';
-import wcmatch from 'wildcard-match';
 import { exec } from 'child_process';
 import { StepCommand } from '../types/step.types';
 import config from '../config';
 import { StepUI, UIExecutionStatus } from '../display/ui';
+import { computeExecutedCommand, getMatchedFiles, resolvePackagePath } from './run-helpers';
 
 draftlog(console);
 
@@ -24,24 +23,17 @@ export function runStep(
   const args = config.executionContext.hookArgs!.split(' ').filter((arg) => arg !== '');
   stepUI.setStatus(UIExecutionStatus.RUNNING);
   return new Promise((resolve) => {
-    const packagePath =
-      options.packageName === '__global'
-        ? config.project.rootDir
-        : path.join(config.project.packagesPath, options.packageName);
+    const packagePath = resolvePackagePath(config.project.rootDir, config.project.packagesPath, options.packageName);
 
     if (step.onlyOn) {
       try {
-        const matcher = wcmatch(step.onlyOn);
-
-        const matched = (config.executionContext.stagedFiles || [])
-          .map((fPath: string) => path.join(config.project.rootDir, fPath))
-          .filter((fPath: string) => {
-            return fPath.includes(packagePath);
-          })
-          .map((fPath: string) => fPath.replace(`${packagePath}/`, ''))
-          .filter((rPath: string) => matcher(rPath));
-
-        if (matched.length === 0) {
+        const matchedFiles = getMatchedFiles(
+          step.onlyOn,
+          packagePath,
+          config.executionContext.stagedFiles,
+          config.project.rootDir,
+        );
+        if (matchedFiles.length === 0) {
           stepUI.stop(`⏩ Skipped. (no match with "${step.onlyOn}")`);
           return resolve(null);
         }
@@ -54,13 +46,10 @@ export function runStep(
       }
     }
 
-    const command =
-      options.type === 'python' && options.venvActivate
-        ? `source ${options.venvActivate} && ${step.command} && deactivate`
-        : step.command;
-
+    const command = computeExecutedCommand(step.command, options.type, options.venvActivate);
     const cp = exec(command.replace('{args}', `"${args.join(' ')}"`), { cwd: packagePath, shell: '/bin/bash' });
 
+    /* handle command outputs */
     let out = '';
     cp.stdout?.on('data', (chunk) => {
       out += `\n${chunk}`;
@@ -71,6 +60,7 @@ export function runStep(
       error += `\n${chunk}`;
     });
 
+    /* handle command success or failure */
     cp.on('exit', (code) => {
       if (code === 0) {
         stepUI.stop('✅ Done.');

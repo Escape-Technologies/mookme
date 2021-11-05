@@ -1,10 +1,10 @@
 import path from 'path';
 import fs from 'fs';
 
-import { AuthConfig, CLIConfig, ProjectConfig } from './types';
+import { AuthConfig, CLIConfig, ProjectConfig } from '../config/types';
 import logger from '../display/logger';
 
-export function getRootDir(target: string): string | undefined {
+function getRootDir(target: string): string | undefined {
   let isRoot = false;
   let rootDir = process.cwd();
   let i = 0;
