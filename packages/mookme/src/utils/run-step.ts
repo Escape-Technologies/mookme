@@ -59,7 +59,7 @@ export function runStep(
         ? `source ${options.venvActivate} && ${step.command} && deactivate`
         : step.command;
 
-    const cp = exec(command.replace('{args}', `"${args.join(' ')}"`), { cwd: packagePath });
+    const cp = exec(command.replace('{args}', `"${args.join(' ')}"`), { cwd: packagePath, shell: '/bin/bash' });
 
     let out = '';
     cp.stdout?.on('data', (chunk) => {

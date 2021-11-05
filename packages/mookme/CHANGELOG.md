@@ -14,6 +14,27 @@
 
 * **mookme:** add beta release channel ([c3ef31d](https://github.com/Escape-Technologies/mookme/commit/c3ef31d8977d3a408ef81fefd29079dc69875ea5))
 * **mookme:** add beta workflows ([8393db1](https://github.com/Escape-Technologies/mookme/commit/8393db1282c174611b0294483700b44ad813021d))
+## [1.0.3](https://github.com/Escape-Technologies/mookme/compare/v1.0.2...v1.0.3) (2021-11-03)
+
+
+### Bug Fixes
+
+* markdownlint ([10baed0](https://github.com/Escape-Technologies/mookme/commit/10baed07a7bcaaaab357da670866f3850192c71e))
+* updating docs with examples and fixing typos ([9fb32af](https://github.com/Escape-Technologies/mookme/commit/9fb32af8c9a06a05bcd7dd7b5277743305fc4745))
+
+## [1.0.2](https://github.com/Escape-Technologies/mookme/compare/v1.0.1...v1.0.2) (2021-10-25)
+
+
+### Bug Fixes
+
+* **mookme:** fix command execution shell ([518e36a](https://github.com/Escape-Technologies/mookme/commit/518e36ac414027de0a773cf095f9d36de1e73b1d))
+
+## [1.0.1](https://github.com/Escape-Technologies/mookme/compare/v1.0.0...v1.0.1) (2021-10-25)
+
+
+### Bug Fixes
+
+* **mookme:** fix package.json resolution ([1a5547a](https://github.com/Escape-Technologies/mookme/commit/1a5547a498c0deb4873f64ac0824f8d77df19e1e))
 
 # [0.5.0](https://github.com/Escape-Technologies/mookme/compare/v0.4.1...v0.5.0) (2021-10-22)
 
