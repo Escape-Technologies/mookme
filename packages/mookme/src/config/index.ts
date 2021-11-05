@@ -1,4 +1,4 @@
-import { loadAuthConfig, loadCLIConfig, loadProjectConfig } from './loaders';
+import { loadAuthConfig, loadCLIConfig, loadProjectConfig } from '../loaders/config';
 import { AuthConfig, CLIConfig, ExecutionContext, MookmeConfig, ProjectConfig } from './types';
 
 export class Config {

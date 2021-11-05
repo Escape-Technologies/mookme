@@ -1,9 +1,9 @@
 import path from 'path';
 import fs from 'fs';
-import { PackageHook } from '../types/hook.types';
-import config from '../config';
-import { StepCommand } from '../types/step.types';
+import { HookType, PackageHook } from '../types/hook.types';
+import config, { Config } from '../config';
 import logger from '../display/logger';
+import { loadSharedSteps } from './shared-steps';
 export interface LoadHookOptions {
   all?: boolean;
 }
@@ -25,28 +25,8 @@ function matchExactPath(filePath: string, to_match: string): boolean {
   return remainingPath.length > 0 ? remainingPath.startsWith('/') : true;
 }
 
-function interpolateSharedSteps(hooks: PackageHook[]): PackageHook[] {
-  const { rootDir } = config.project;
-  const sharedFolderPath = path.join(rootDir, '.hooks', 'shared');
-
-  if (!fs.existsSync(sharedFolderPath)) {
-    return hooks;
-  }
-
-  const sharedSteps: { [key: string]: StepCommand } = fs
-    .readdirSync(sharedFolderPath)
-    .reduce((acc, sharedHookFileName) => {
-      if (sharedHookFileName.split('.').pop() !== 'json') {
-        return acc;
-      }
-      const sharedHookName = sharedHookFileName.replace('.json', '');
-      return {
-        ...acc,
-        [sharedHookName]: JSON.parse(
-          fs.readFileSync(path.join(sharedFolderPath, sharedHookFileName), 'utf-8'),
-        ) as StepCommand,
-      };
-    }, {});
+function interpolateSharedSteps(hooks: PackageHook[], sharedFolderPath: string): PackageHook[] {
+  const sharedSteps = loadSharedSteps(sharedFolderPath);
 
   for (const hook of hooks) {
     const interpolatedSteps = [];
@@ -67,16 +47,19 @@ function interpolateSharedSteps(hooks: PackageHook[]): PackageHook[] {
   return hooks;
 }
 
-export const loadHooks = (hookType: string, opts: LoadHookOptions): PackageHook[] => {
-  const stagedFiles = config.executionContext.stagedFiles || [];
-
+export function filterAndBuildHooks(
+  stagedFiles: string[],
+  hookType: HookType,
+  config: Config,
+  options: { all?: boolean } = {},
+): PackageHook[] {
+  const hooks: PackageHook[] = [];
   const rootDir = config.project.rootDir;
   const { packages, packagesPath } = config.project;
 
-  const hooks: PackageHook[] = [];
   packages
     .filter((pkgName) => {
-      if (opts.all) {
+      if (options.all) {
         return true;
       } else {
         return !!stagedFiles.find((file) => matchExactPath(path.join(rootDir, file), path.join(packagesPath, pkgName)));
@@ -101,6 +84,15 @@ export const loadHooks = (hookType: string, opts: LoadHookOptions): PackageHook[
       }
     });
 
+  return hooks;
+}
+
+export const loadHooks = (hookType: HookType, opts: LoadHookOptions): PackageHook[] => {
+  const stagedFiles = config.executionContext.stagedFiles || [];
+
+  const rootDir = config.project.rootDir;
+  let hooks: PackageHook[] = filterAndBuildHooks(stagedFiles, hookType, config, opts);
+
   if (fs.existsSync(`${rootDir}/.hooks/${hookType}.json`)) {
     hooks.push({
       name: '__global',
@@ -109,7 +101,10 @@ export const loadHooks = (hookType: string, opts: LoadHookOptions): PackageHook[
     });
   }
 
-  const res = interpolateSharedSteps(hooks);
+  const sharedHookPath = path.join(rootDir, '.hooks', 'shared');
+  if (fs.existsSync(sharedHookPath)) {
+    hooks = interpolateSharedSteps(hooks, sharedHookPath);
+  }
 
-  return res;
+  return hooks;
 };

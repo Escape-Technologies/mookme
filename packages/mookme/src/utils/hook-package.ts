@@ -30,7 +30,7 @@ export async function hookPackage(hook: PackageHook): Promise<StepError[]> {
   };
 
   const promises = [];
-  const errors: { hook: PackageHook; step: StepCommand; error: Error }[] = [];
+  const errors: StepError[] = [];
 
   for (const step of hook.steps) {
     const stepUI = ui.stepsUI[step.name];
