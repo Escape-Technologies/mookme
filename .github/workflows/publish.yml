@@ -27,7 +27,6 @@ jobs:
 
       - name: Install
         run: |
-          node -V
           npm install
           cd packages/mookme
           npm install
