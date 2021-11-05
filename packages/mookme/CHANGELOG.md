@@ -1,3 +1,15 @@
+# [1.1.0-beta.4](https://github.com/Escape-Technologies/mookme/compare/v1.1.0-beta.3...v1.1.0-beta.4) (2021-11-05)
+
+
+### Bug Fixes
+
+* **ci:** fix release ci ([e318c32](https://github.com/Escape-Technologies/mookme/commit/e318c328181d3f9615abb352655c3b8b1f47d73e))
+
+
+### Features
+
+* **mookme:** bump ci node versions ([164c0aa](https://github.com/Escape-Technologies/mookme/commit/164c0aa99a3991fabd0d578d7b49a1a53413e7b3))
+
 # [1.1.0-beta.3](https://github.com/Escape-Technologies/mookme/compare/v1.1.0-beta.2...v1.1.0-beta.3) (2021-11-05)
 
 
