@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/Escape-Technologies/mookme/compare/v1.0.3...v1.1.0) (2021-12-07)
+
+
+### Features
+
+* **mookme:** use released mookme on mookme ([0c87ed8](https://github.com/Escape-Technologies/mookme/commit/0c87ed8657e03a45ce1223660b03f5ccd829c023))
+
 ## [1.0.3](https://github.com/Escape-Technologies/mookme/compare/v1.0.2...v1.0.3) (2021-11-03)
 
 
