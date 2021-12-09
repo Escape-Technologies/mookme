@@ -156,6 +156,9 @@ export function addInit(program: commander.Command): void {
         writeGitHooksFiles();
       }
 
+      logger.warning('\nAdding local hooks to .gitignore');
+      fs.appendFileSync(`./.gitignore`, `\n**/.hooks/*.local.json\n`, { flag: 'a+' });
+
       logger.success('Your hooks are configured.');
     });
 }

@@ -84,6 +84,14 @@ export function filterAndBuildHooks(
       }
     });
 
+  hooks.forEach((hook) => {
+    const localHooksPath = `${packagesPath}/${hook.name}/.hooks/${hookType}.local.json`;
+    if (fs.existsSync(localHooksPath)) {
+      const localHook = JSON.parse(fs.readFileSync(localHooksPath, 'utf-8'));
+      hook.steps = [...localHook.steps, ...hook.steps];
+    }
+  });
+
   return hooks;
 }
 
@@ -94,11 +102,19 @@ export const loadHooks = (hookType: HookType, opts: LoadHookOptions): PackageHoo
   let hooks: PackageHook[] = filterAndBuildHooks(stagedFiles, hookType, config, opts);
 
   if (fs.existsSync(`${rootDir}/.hooks/${hookType}.json`)) {
-    hooks.push({
+    const globalHook: PackageHook = {
       name: '__global',
       cwd: rootDir || process.cwd(),
       steps: JSON.parse(fs.readFileSync(`${rootDir}/.hooks/${hookType}.json`, 'utf-8')).steps,
-    });
+    };
+
+    const localHooksPath = `${rootDir}/.hooks/${hookType}.local.json`;
+    if (fs.existsSync(localHooksPath)) {
+      const localHook = JSON.parse(fs.readFileSync(localHooksPath, 'utf-8'));
+      globalHook.steps = [...localHook.steps, ...globalHook.steps];
+    }
+
+    hooks.push(globalHook);
   }
 
   const sharedHookPath = path.join(rootDir, '.hooks', 'shared');
