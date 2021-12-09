@@ -13,6 +13,18 @@ interface Options {
   all: boolean;
 }
 
+export function addRun(program: commander.Command): void {
+  program
+    .command('run')
+    .requiredOption(
+      '-t, --type <type>',
+      'A valid git hook type ("pre-commit", "prepare-commit", "commit-msg", "post-commit")',
+    )
+    .option('-a, --all <all>', 'Run hooks for all packages', '')
+    .option('--args <args>', 'The arguments being passed to the hooks', '')
+    .action(run);
+}
+
 export async function run(opts: Options): Promise<void> {
   config.init();
   const initialNotStagedFiles = getNotStagedFiles();
@@ -49,16 +61,4 @@ export async function run(opts: Options): Promise<void> {
 
   // unstashIfNeeded(type);
   detectAndProcessModifiedFiles(initialNotStagedFiles, config.project.addedBehavior);
-}
-
-export function addRun(program: commander.Command): void {
-  program
-    .command('run')
-    .requiredOption(
-      '-t, --type <type>',
-      'A valid git hook type ("pre-commit", "prepare-commit", "commit-msg", "post-commit")',
-    )
-    .option('-a, --all <all>', 'Run hooks for all packages', '')
-    .option('--args <args>', 'The arguments being passed to the hooks', '')
-    .action(run);
 }
