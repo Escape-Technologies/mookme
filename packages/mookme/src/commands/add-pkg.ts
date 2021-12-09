@@ -32,7 +32,7 @@ export function addAddPkg(program: commander.Command): void {
       logger.success('\nThe following entry will be added to your package.json:');
       logger.log(`-> .mookme.json -> packages -> ${pkg}`);
 
-      fs.writeFileSync(`${rootDir}/package.json`, JSON.stringify(projectConfig, null, 2));
+      fs.writeFileSync(`${rootDir}/.mookme.json`, JSON.stringify(projectConfig, null, 2));
 
       const pkgHooksPath = path.join(pkgPath, '.hooks');
       if (!fs.existsSync(pkgHooksPath)) {
