@@ -1,3 +1,11 @@
+# [1.1.0-beta.5](https://github.com/Escape-Technologies/mookme/compare/v1.1.0-beta.4...v1.1.0-beta.5) (2021-12-09)
+
+
+### Features
+
+* **mookme:** add basic testing framework ([cdfab59](https://github.com/Escape-Technologies/mookme/commit/cdfab59cde387896348aa460aefcc7f5970e85b5))
+* **mookme:** add unit testing scaffold ([5564975](https://github.com/Escape-Technologies/mookme/commit/5564975e7b384a349c13cc41e54a3e0ad7446c6c))
+
 # [1.1.0-beta.4](https://github.com/Escape-Technologies/mookme/compare/v1.1.0-beta.3...v1.1.0-beta.4) (2021-11-05)
 
 
