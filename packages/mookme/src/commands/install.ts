@@ -4,7 +4,7 @@ import path from 'path';
 import commander from 'commander';
 import inquirer from 'inquirer';
 
-import { HookType } from '../types/hook.types';
+import { HookType, hookTypes } from '../types/hook.types';
 import config from '../config';
 import { MookmeClient } from '../client';
 import logger from '../display/logger';
@@ -24,13 +24,13 @@ export function addInstall(program: commander.Command): void {
       'The step to install in the following format: @<step-creator>/<step-name>',
     )
     .requiredOption('-t, --hook-type <hook-type>', 'The hook type where to install the step')
-    .option('-p, --package-name <package-name>', 'The package xhere to install the step')
+    .option('-p, --package-name <package-name>', 'The package where to install the step')
     .description('Install a step retrieved from the store in the desired package')
     .action(async ({ stepIdentifier, packageName, hookType }: InstallArguments) => {
       config.init();
       const client = new MookmeClient();
 
-      if (!Object.values(HookType).includes(hookType)) {
+      if (!hookTypes.includes(hookType)) {
         logger.failure(`Invalid hook type ${hookType}. Exiting.`);
         process.exit(1);
       }

@@ -22,7 +22,7 @@ export const getStagedFiles = (): string[] =>
 export const stashIfNeeded = (hookType: HookType): void => {
   const shouldStash = execSync('git ls-files --others --exclude-standard --modified').toString().split('\n').length > 1;
 
-  if (hookType === HookType.preCommit && !!shouldStash) {
+  if (hookType === HookType.PRE_COMMIT && !!shouldStash) {
     logger.warning('Stashing unstaged changes in order to run hooks properly');
     logger.info(`> git stash push --keep-index --include-untracked`);
     execSync(`git stash push --keep-index --include-untracked`).toString();
@@ -40,7 +40,7 @@ export const stashIfNeeded = (hookType: HookType): void => {
 };
 
 export const unstashIfNeeded = (hookType: HookType): void => {
-  if (hookType === HookType.preCommit && hasStashed) {
+  if (hookType === HookType.PRE_COMMIT && hasStashed) {
     console.log();
     logger.warning('Unstashing unstaged changes in order to run hooks properly');
     try {
