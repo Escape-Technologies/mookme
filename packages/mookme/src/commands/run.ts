@@ -1,6 +1,6 @@
 import commander from 'commander';
 
-import { HookType } from '../types/hook.types';
+import { HookType, VSCSensitiveHook } from '../types/hook.types';
 import { hookPackage, processResults } from '../utils/hook-package';
 import { center } from '../display/ui';
 import { getNotStagedFiles, detectAndProcessModifiedFiles, getStagedFiles } from '../utils/git';
@@ -60,5 +60,8 @@ export async function run(opts: Options): Promise<void> {
   }
 
   // unstashIfNeeded(type);
-  detectAndProcessModifiedFiles(initialNotStagedFiles, config.project.addedBehavior);
+  // Do not start modified files procedure, unless we are about to commit
+  if (VSCSensitiveHook.includes(opts.type)) {
+    detectAndProcessModifiedFiles(initialNotStagedFiles, config.project.addedBehavior);
+  }
 }
