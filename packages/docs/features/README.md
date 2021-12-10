@@ -87,3 +87,37 @@ One can declare a script in flake8 (don't forget to `chmod+x`) and then re-use i
   ]
 }
 ```
+
+## Uncommited steps (gitignore)
+
+Mookme steps are shared by default. The point of the tool is to provide a shared git hooks configuration. However we understand that sometimes, one would like to have a custom mookme configuration.
+
+You can use {hook-type}.local.json files that are located and formatted in the very same way that current hook files are.
+
+For instance, with the following configuration:
+
+```json
+// package1/.hooks/pre-commit.json
+{
+  "steps": [
+    {
+      "name": "common hook",
+      "command": "npm run lint:fix"
+    }
+  ]
+}
+```
+
+```json
+// package1/.hooks/pre-commit.local.json
+{
+  "steps": [
+    {
+      "name": "local hook",
+      "command": "npm test"
+    }
+  ]
+}
+```
+
+You will run both setps when committing. The difference between these two files is that `package1/.hooks/pre-commit.local.json` is git-ignored by default through the command-line project initialization.
