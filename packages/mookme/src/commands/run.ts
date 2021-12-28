@@ -41,7 +41,7 @@ export async function run(opts: Options): Promise<void> {
   const hooks = loadHooks(hookType, { all: opts.all });
 
   if (hooks.length === 0) {
-    logger.warning('No hooks to run.');
+    // logger.warning('No hooks to run.');
     return;
   }
 
