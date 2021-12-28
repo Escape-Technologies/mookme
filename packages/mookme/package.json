@@ -7,6 +7,9 @@
   "bin": {
     "mookme": "bin/index.js"
   },
+  "files": [
+    "dist/**/*.js"
+  ],
   "scripts": {
     "prebuild": "rm -f ./.tmp/ts-build-infos.json && rm -rf dist",
     "build": "tsc",
@@ -29,12 +32,17 @@
     "hook",
     "monorepos"
   ],
-  "author": "lecanu.maxence@gmail.com",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/Escape-Technologies/mookme/issues"
+  "author": {
+    "name": "Maxence Lecanu",
+    "email": "lecanu.maxence@gmail.com",
+    "url": "https://me.mlecanu.com"
   },
-  "homepage": "https://github.com/Escape-Technologies/mookme",
+  "license": "MIT",
+  "homepage": "https://mookme.org",
+  "bugs": {
+    "url": "https://github.com/Escape-Technologies/mookme/issues",
+    "email": "lecanu.maxence@gmail.com"
+  },
   "devDependencies": {
     "@commitlint/cli": "^12.1.1",
     "@commitlint/config-angular": "^12.1.1",
