@@ -1,3 +1,11 @@
+# [1.1.0-beta.7](https://github.com/Escape-Technologies/mookme/compare/v1.1.0-beta.6...v1.1.0-beta.7) (2021-12-28)
+
+
+### Bug Fixes
+
+* **mookme:** fix package.json ([1659d2b](https://github.com/Escape-Technologies/mookme/commit/1659d2b819209634aa43431c709bc269bc77c7e6))
+* **mookme:** remove useless log ([5dd1ced](https://github.com/Escape-Technologies/mookme/commit/5dd1ced134b3c47f70ff80f1747b042a69eb41da))
+
 # [1.1.0-beta.6](https://github.com/Escape-Technologies/mookme/compare/v1.1.0-beta.5...v1.1.0-beta.6) (2021-12-28)
 
 
