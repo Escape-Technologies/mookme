@@ -1,3 +1,17 @@
+# [1.1.0-beta.6](https://github.com/Escape-Technologies/mookme/compare/v1.1.0-beta.5...v1.1.0-beta.6) (2021-12-28)
+
+
+### Bug Fixes
+
+* **mookme:** fix add-pkg command ([6d25077](https://github.com/Escape-Technologies/mookme/commit/6d25077f6a0a36cd8a9e50c046999f0c0d93cdbd))
+* **tests:** remove logs ([9b29dbc](https://github.com/Escape-Technologies/mookme/commit/9b29dbcfdebebcdce3cc623a940cc8aeb56ef233))
+
+
+### Features
+
+* **docs:** added local steps to the documentation ([9e1bb52](https://github.com/Escape-Technologies/mookme/commit/9e1bb520adf52327e691ae2cf9322166d23be365))
+* **mookme:** add support for gitignored steps ([d2a8a93](https://github.com/Escape-Technologies/mookme/commit/d2a8a937feeb4ac15de81056301a6c57d75339ea))
+
 # [1.1.0-beta.5](https://github.com/Escape-Technologies/mookme/compare/v1.1.0-beta.4...v1.1.0-beta.5) (2021-12-09)
 
 
