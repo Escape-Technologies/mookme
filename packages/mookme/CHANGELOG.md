@@ -1,6 +1,5 @@
 # [1.1.0-beta.7](https://github.com/Escape-Technologies/mookme/compare/v1.1.0-beta.6...v1.1.0-beta.7) (2021-12-28)
 
-
 ### Bug Fixes
 
 * **mookme:** fix package.json ([1659d2b](https://github.com/Escape-Technologies/mookme/commit/1659d2b819209634aa43431c709bc269bc77c7e6))
@@ -8,12 +7,10 @@
 
 # [1.1.0-beta.6](https://github.com/Escape-Technologies/mookme/compare/v1.1.0-beta.5...v1.1.0-beta.6) (2021-12-28)
 
-
 ### Bug Fixes
 
 * **mookme:** fix add-pkg command ([6d25077](https://github.com/Escape-Technologies/mookme/commit/6d25077f6a0a36cd8a9e50c046999f0c0d93cdbd))
 * **tests:** remove logs ([9b29dbc](https://github.com/Escape-Technologies/mookme/commit/9b29dbcfdebebcdce3cc623a940cc8aeb56ef233))
-
 
 ### Features
 
@@ -22,7 +19,6 @@
 
 # [1.1.0-beta.5](https://github.com/Escape-Technologies/mookme/compare/v1.1.0-beta.4...v1.1.0-beta.5) (2021-12-09)
 
-
 ### Features
 
 * **mookme:** add basic testing framework ([cdfab59](https://github.com/Escape-Technologies/mookme/commit/cdfab59cde387896348aa460aefcc7f5970e85b5))
@@ -30,11 +26,9 @@
 
 # [1.1.0-beta.4](https://github.com/Escape-Technologies/mookme/compare/v1.1.0-beta.3...v1.1.0-beta.4) (2021-11-05)
 
-
 ### Bug Fixes
 
 * **ci:** fix release ci ([e318c32](https://github.com/Escape-Technologies/mookme/commit/e318c328181d3f9615abb352655c3b8b1f47d73e))
-
 
 ### Features
 
@@ -42,13 +36,13 @@
 
 # [1.1.0-beta.3](https://github.com/Escape-Technologies/mookme/compare/v1.1.0-beta.2...v1.1.0-beta.3) (2021-11-05)
 
+# [1.1.0](https://github.com/Escape-Technologies/mookme/compare/v1.0.3...v1.1.0) (2021-12-07)
 
 ### Features
 
 * **mookme:** bump mookme to node 16 ([da3f5ca](https://github.com/Escape-Technologies/mookme/commit/da3f5ca3b0fd57c9648fb89c90bc3d904a7a4f30))
 
 # [1.1.0-beta.2](https://github.com/Escape-Technologies/mookme/compare/v1.1.0-beta.1...v1.1.0-beta.2) (2021-11-05)
-
 
 ### Bug Fixes
 
@@ -59,7 +53,6 @@
 
 # [1.1.0-beta.1](https://github.com/Escape-Technologies/mookme/compare/v1.0.0...v1.1.0-beta.1) (2021-10-22)
 
-
 ### Features
 
 * **mookme:** add beta release channel ([b9dd8b2](https://github.com/Escape-Technologies/mookme/commit/b9dd8b2ca56800c3441c013841742d8d7e7b009b))
@@ -68,13 +61,13 @@
 
 # [0.6.0-beta.1](https://github.com/Escape-Technologies/mookme/compare/v0.5.0...v0.6.0-beta.1) (2021-10-22)
 
-
 ### Features
 
 * **mookme:** add beta release channel ([c3ef31d](https://github.com/Escape-Technologies/mookme/commit/c3ef31d8977d3a408ef81fefd29079dc69875ea5))
 * **mookme:** add beta workflows ([8393db1](https://github.com/Escape-Technologies/mookme/commit/8393db1282c174611b0294483700b44ad813021d))
-## [1.0.3](https://github.com/Escape-Technologies/mookme/compare/v1.0.2...v1.0.3) (2021-11-03)
+* **mookme:** use released mookme on mookme ([0c87ed8](https://github.com/Escape-Technologies/mookme/commit/0c87ed8657e03a45ce1223660b03f5ccd829c023))
 
+## [1.0.3](https://github.com/Escape-Technologies/mookme/compare/v1.0.2...v1.0.3) (2021-11-03)
 
 ### Bug Fixes
 
@@ -83,13 +76,11 @@
 
 ## [1.0.2](https://github.com/Escape-Technologies/mookme/compare/v1.0.1...v1.0.2) (2021-10-25)
 
-
 ### Bug Fixes
 
 * **mookme:** fix command execution shell ([518e36a](https://github.com/Escape-Technologies/mookme/commit/518e36ac414027de0a773cf095f9d36de1e73b1d))
 
 ## [1.0.1](https://github.com/Escape-Technologies/mookme/compare/v1.0.0...v1.0.1) (2021-10-25)
-
 
 ### Bug Fixes
 
@@ -97,13 +88,11 @@
 
 # [0.5.0](https://github.com/Escape-Technologies/mookme/compare/v0.4.1...v0.5.0) (2021-10-22)
 
-
 ### Features
 
 * **mookme:** add publish ci workflow ([486ce28](https://github.com/Escape-Technologies/mookme/commit/486ce28cdaeed718e758279055e1bb23424e8957))
 
 ## [0.4.1](https://github.com/Escape-Technologies/mookme/compare/v0.4.0...v0.4.1) (2021-10-22)
-
 
 ### Bug Fixes
 
@@ -112,13 +101,11 @@
 
 ## [0.3.1](https://github.com/Escape-Technologies/mookme/compare/v0.3.0...v0.3.1) (2021-10-22)
 
-
 ### Bug Fixes
 
 * **mookme:** fix changelog version ([78b845f](https://github.com/Escape-Technologies/mookme/commit/78b845f8c34a4e0d763a39bf05c85cba06e05967))
 
 # [0.3.0](https://github.com/Escape-Technologies/mookme/compare/v0.2.0...v0.3.0) (2021-10-22)
-
 
 ### Features
 
@@ -126,14 +113,12 @@
 
 # [0.2.0](https://github.com/Escape-Technologies/mookme/compare/v0.1.0...v0.2.0) (2021-10-22)
 
-
 ### Features
 
 * **mookme:** add semantic release configuration ([cae746a](https://github.com/Escape-Technologies/mookme/commit/cae746af32a3955243d3d3f5369d99ae7a9e40ec))
 * **mookme:** add semantic release configurationfor git ([2023e64](https://github.com/Escape-Technologies/mookme/commit/2023e6486093fe8de1d21a6ac76d7310d7160692))
 
 # [0.1.0](https://github.com/Escape-Technologies/mookme/compare/v0.0.21...v0.1.0) (2021-10-22)
-
 
 ### Bug Fixes
 
@@ -165,7 +150,6 @@
 * move published files in cli package ([06820ad](https://github.com/Escape-Technologies/mookme/commit/06820ad55b5f178eaa58edde70eea15793ea452e))
 * **repo:** move README to root folder ([612f0c0](https://github.com/Escape-Technologies/mookme/commit/612f0c07d4303886682a05235252f87b55fa68bf))
 * **repo:** move README to root folder ([c6482e2](https://github.com/Escape-Technologies/mookme/commit/c6482e29bc14dbe9fd7eb7b18eae0c63d69a0044))
-
 
 ### Features
 
