@@ -1,3 +1,27 @@
+# [1.2.0-beta.1](https://github.com/Escape-Technologies/mookme/compare/v1.1.0...v1.2.0-beta.1) (2021-12-28)
+
+
+### Bug Fixes
+
+* **ci:** fix release ci ([e318c32](https://github.com/Escape-Technologies/mookme/commit/e318c328181d3f9615abb352655c3b8b1f47d73e))
+* **mookme:** fix add-pkg command ([6d25077](https://github.com/Escape-Technologies/mookme/commit/6d25077f6a0a36cd8a9e50c046999f0c0d93cdbd))
+* **mookme:** fix package.json ([1659d2b](https://github.com/Escape-Technologies/mookme/commit/1659d2b819209634aa43431c709bc269bc77c7e6))
+* **mookme:** remove useless log ([5dd1ced](https://github.com/Escape-Technologies/mookme/commit/5dd1ced134b3c47f70ff80f1747b042a69eb41da))
+* **tests:** remove logs ([9b29dbc](https://github.com/Escape-Technologies/mookme/commit/9b29dbcfdebebcdce3cc623a940cc8aeb56ef233))
+
+
+### Features
+
+* **docs:** added local steps to the documentation ([9e1bb52](https://github.com/Escape-Technologies/mookme/commit/9e1bb520adf52327e691ae2cf9322166d23be365))
+* **mookme:** add basic testing framework ([cdfab59](https://github.com/Escape-Technologies/mookme/commit/cdfab59cde387896348aa460aefcc7f5970e85b5))
+* **mookme:** add beta release channel ([b9dd8b2](https://github.com/Escape-Technologies/mookme/commit/b9dd8b2ca56800c3441c013841742d8d7e7b009b))
+* **mookme:** add beta workflows ([0706e36](https://github.com/Escape-Technologies/mookme/commit/0706e363b21b81b1194abbd6cb7d037cbaa82ff0))
+* **mookme:** add support for gitignored steps ([d2a8a93](https://github.com/Escape-Technologies/mookme/commit/d2a8a937feeb4ac15de81056301a6c57d75339ea))
+* **mookme:** add unit testing scaffold ([5564975](https://github.com/Escape-Technologies/mookme/commit/5564975e7b384a349c13cc41e54a3e0ad7446c6c))
+* **mookme:** bump ci node versions ([164c0aa](https://github.com/Escape-Technologies/mookme/commit/164c0aa99a3991fabd0d578d7b49a1a53413e7b3))
+* **mookme:** bump mookme to node 16 ([da3f5ca](https://github.com/Escape-Technologies/mookme/commit/da3f5ca3b0fd57c9648fb89c90bc3d904a7a4f30))
+* **mookme:** init beta channel ([08b227d](https://github.com/Escape-Technologies/mookme/commit/08b227d9dc96d95a751340de33f76aa8502374de))
+
 # [1.1.0-beta.7](https://github.com/Escape-Technologies/mookme/compare/v1.1.0-beta.6...v1.1.0-beta.7) (2021-12-28)
 
 ### Bug Fixes
