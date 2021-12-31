@@ -1,3 +1,10 @@
+# [1.2.0-beta.4](https://github.com/Escape-Technologies/mookme/compare/v1.2.0-beta.3...v1.2.0-beta.4) (2021-12-31)
+
+
+### Features
+
+* **mookme:** deploy beta-docs ([d204b7e](https://github.com/Escape-Technologies/mookme/commit/d204b7ee43e25488fc29800b86248c84200bc6e6))
+
 # [1.2.0-beta.3](https://github.com/Escape-Technologies/mookme/compare/v1.2.0-beta.2...v1.2.0-beta.3) (2021-12-31)
 
 
