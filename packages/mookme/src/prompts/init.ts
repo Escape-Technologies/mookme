@@ -1,6 +1,8 @@
 import chalk from 'chalk';
 import fs from 'fs';
+import inquirer from 'inquirer';
 import { ADDED_BEHAVIORS } from '../config/types';
+import { HookType, hookTypes } from '../types/hook.types';
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const folderQuestion = (name: string, from = '') => ({
@@ -30,6 +32,19 @@ export const choiceQuestion = (name: string, message: string, choices: string[])
   choices,
   pageSize: process.stdout.rows / 2,
 });
+
+export async function selectHookTypes(skip = false): Promise<HookType[]> {
+  let typesToHook: HookType[];
+  if (skip) {
+    typesToHook = hookTypes;
+  } else {
+    const { types } = (await inquirer.prompt([
+      choiceQuestion('types', 'Select git events to hook :\n', hookTypes),
+    ])) as { types: HookType[] };
+    typesToHook = types;
+  }
+  return typesToHook;
+}
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const confirmQuestion = (name: string, message: string) => ({

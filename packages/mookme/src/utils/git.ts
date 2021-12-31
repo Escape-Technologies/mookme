@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { execSync } from 'child_process';
-import { HookType, hookTypes } from '../types/hook.types';
+import { HookType } from '../types/hook.types';
 import { ADDED_BEHAVIORS } from '../config/types';
 import config from '../config';
 import logger from '../display/logger';
@@ -78,7 +78,7 @@ export function detectAndProcessModifiedFiles(initialNotStagedFiles: string[], b
   }
 }
 
-export function writeGitHooksFiles(rootDir = '.'): void {
+export function writeGitHooksFiles(hookTypes: HookType[], rootDir = '.'): void {
   const gitFolderPath = `${rootDir}/.git`;
   if (!fs.existsSync(`${gitFolderPath}/hooks`)) {
     fs.mkdirSync(`${gitFolderPath}/hooks`);
@@ -120,7 +120,11 @@ export function writeGitIgnoreFiles(packagesPath: string[]): void {
       logger.warning(`Package ${pkgPath} has no \`.gitignore\` file, creating it...`);
       fs.writeFileSync(`${pkgPath}/.gitignore`, `.hooks/*.local.json\n`);
     } else {
-      fs.appendFileSync(`${pkgPath}/.gitignore`, `\n.hooks/*.local.json\n`, { flag: 'a+' });
+      const line = '.hooks/*.local.json';
+      const gitignoreContent = fs.readFileSync(`${pkgPath}/.gitignore`).toString();
+      if (gitignoreContent.includes(line)) {
+        fs.appendFileSync(`${pkgPath}/.gitignore`, `\n.hooks/*.local.json\n`, { flag: 'a+' });
+      }
     }
   }
 }
