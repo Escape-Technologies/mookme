@@ -1,3 +1,11 @@
+# [1.2.0-beta.10](https://github.com/Escape-Technologies/mookme/compare/v1.2.0-beta.9...v1.2.0-beta.10) (2021-12-31)
+
+
+### Bug Fixes
+
+* **docs:** add changelog in docs ([a4fbe77](https://github.com/Escape-Technologies/mookme/commit/a4fbe77f02fa64a4b9bd94b41211dec085da6cdb))
+* **mookme:** add beta documentation in readme ([94f97f2](https://github.com/Escape-Technologies/mookme/commit/94f97f250fd33e4fa98a247219efdea9aa806128))
+
 # [1.2.0-beta.9](https://github.com/Escape-Technologies/mookme/compare/v1.2.0-beta.8...v1.2.0-beta.9) (2021-12-31)
 
 
