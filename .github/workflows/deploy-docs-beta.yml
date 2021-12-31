@@ -33,6 +33,7 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.BETA_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.BETA_AWS_SECRET_ACCESS_KEY }}
+          AWS_CLOUDFRONT_ID: ${{ secrets.BETA_DOCS_CLOUDFRONT_ID }}
         run: |
           aws s3 sync packages/docs/.vuepress/dist s3://mookme-documentation-beta --delete
-          aws cloudfront create-invalidation --distribution-id ${{ secrets.BETA_DOCS_CLOUDFRONT_ID }} --paths "/*"
+          aws cloudfront create-invalidation --distribution-id $AWS_CLOUDFRONT_ID --paths "/*"
