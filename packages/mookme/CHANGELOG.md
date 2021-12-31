@@ -1,3 +1,10 @@
+# [1.2.0-beta.9](https://github.com/Escape-Technologies/mookme/compare/v1.2.0-beta.8...v1.2.0-beta.9) (2021-12-31)
+
+
+### Bug Fixes
+
+* **mookme:** add readme in JSON pkg ([f713d0e](https://github.com/Escape-Technologies/mookme/commit/f713d0e3a277a8eb23b7ee92cbefb84f6a60fbd4))
+
 # [1.2.0-beta.8](https://github.com/Escape-Technologies/mookme/compare/v1.2.0-beta.7...v1.2.0-beta.8) (2021-12-31)
 
 
