@@ -1,3 +1,16 @@
+# [1.2.0-beta.2](https://github.com/Escape-Technologies/mookme/compare/v1.2.0-beta.1...v1.2.0-beta.2) (2021-12-31)
+
+
+### Bug Fixes
+
+* **mookme:** fix dependencies ([11fa8a3](https://github.com/Escape-Technologies/mookme/commit/11fa8a38383f0730980a4c5e2b31a4ec56425d3d))
+* **mookme:** fix init for local hooks ([b056550](https://github.com/Escape-Technologies/mookme/commit/b0565502b7d011c3103015f89c6fe3a2aec097c1))
+
+
+### Features
+
+* **mookme:** add support for more commit hook types ([f3bfe6d](https://github.com/Escape-Technologies/mookme/commit/f3bfe6d83bd3bfa2075e51168fe526b5cd415a9e))
+
 # [1.2.0-beta.1](https://github.com/Escape-Technologies/mookme/compare/v1.1.0...v1.2.0-beta.1) (2021-12-28)
 
 
