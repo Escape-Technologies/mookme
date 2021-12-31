@@ -6,17 +6,23 @@ The main initialization command. It :
 
 - prompts for one or multiple packages folder path
 - asks you to select one or multiple package at each path
+- asks you to selec one or multiple git event to hook
 - creates the `.hooks` folder in each package where you can write **dedicated hooks!** that will be triggered only
 when changes in this package occur
 - creates a `.hooks` folder at the root of your project where you can write **project-wide hooks** that will be
 triggered on every commit
 - writes `.git/hooks` files
+- writes into the `.gitignore` files of your root project and specified packages to ignore [local steps](/features/#uncommited-steps-gitignore)
 
 ### Options
 
 - `--only-hook` (optional)
 
 Skip prompters and only write `.git/hooks` files. This is for installation in an already-configured project.
+
+- `--skip-types-selection` (optional)
+
+Skip hook types selection and hook every git event.
 
 ## `mookme add-pkg`
 
@@ -66,13 +72,9 @@ Skip the selection of hooks to run based on git-staged files, and run hooks of e
 
 ## Hook files
 
-With `mookme`, your hooks are stored in JSON files called `{hook-type}.json` where the hook type is one of the
-available git hooks, eg :
+### General description
 
-- `pre-commit`
-- `prepare-commit-msg`
-- `commit-msg`
-- `post-commit`
+See [Writing your hooks](/get-started/#writing-your-hooks)
 
 ### Available options
 
@@ -88,13 +90,15 @@ The list of steps (commands) being executed by this hook. In a step you can defi
 | `cmd`      | The command invoked at this step |   yes |
 | `onlyOn` | A shell wildcard conditioning the execution of the step based on modified files      |    no |
 | `serial` | A boolean value describing if the package hook execution should await for the step to end |    no |
+| `from` | Extend a shared step |    no |
 
 ::: warning
 A serial step that fails will not prevent the execution of the following steps
+:::
 
 - `type`
 
-A flag used mainly to tell `mookme` this is a python hook, and might need a virtual environment to be activated.
+A flag used mainly to tell `mookme` this is a python hook, and might need a virtual environment to be activated. Possible values are `python, js, script`
 
 - `venvActivate`
 

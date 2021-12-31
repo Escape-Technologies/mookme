@@ -3,7 +3,7 @@
 ## Installation
 
 ```bash
-npm install -g @escape.tech/mookme
+npm install @escape.tech/mookme
 ```
 
 ## Configuration
@@ -75,13 +75,26 @@ available git hooks, eg :
 - `prepare-commit-msg`
 - `commit-msg`
 - `post-commit`
+- `post-merge`,
+- `post-rewrite`,
+- `pre-rebase`,
+- `post-checkout`,
+- `pre-push`,
+
+::: warning
+The exit behavior is only applied on pre-commit hook types: `pre-commit`, `prepare-commit-msg`, `commit-msg`, `post-commit`
+:::
+
+::: warning
+If the command executed by a hook fails, it will prevent the git command to be executed. We recommend you to use the pre-receive hooks carefully, with relatively safe commands, otherwise you might prevent your team for doign stuff like `git pull` or `git fetch`.
+:::
 
 ### Example of hook file
 
 Your hooks are defined in simple json files.
 
-- For complete reference, see the JSON hooks reference
-- For specific hook examples, see the recipes
+- For complete reference, see the [JSON hooks reference](/references/#hook-files)
+- For specific hook examples, see the [recipes](/examples)
 
 A hook defines a list of `steps`, which are basically commands to run, with a name for proper display. A few
 configuration option are available, but the minimal requirement is `name` and `command`.
