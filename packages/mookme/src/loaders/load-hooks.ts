@@ -1,6 +1,6 @@
 import path from 'path';
 import fs from 'fs';
-import { HookType, hookTypes, PackageHook, VSCSensitiveHook } from '../types/hook.types';
+import { HookType, PackageHook, VSCSensitiveHook } from '../types/hook.types';
 import config, { Config } from '../config';
 import logger from '../display/logger';
 import { loadSharedSteps } from './shared-steps';
@@ -53,46 +53,50 @@ export function filterAndBuildHooks(
   config: Config,
   options: { all?: boolean } = {},
 ): PackageHook[] {
-  const hooks: PackageHook[] = [];
   const rootDir = config.project.rootDir;
   const { packages, packagesPath } = config.project;
 
-  packages
-    .filter((pkgName) => {
-      if (options.all || VSCSensitiveHook.includes(hookType)) {
-        return true;
-      } else {
-        return !!stagedFiles.find((file) => matchExactPath(path.join(rootDir, file), path.join(packagesPath, pkgName)));
-      }
-    })
-    .filter((pkgName) => fs.existsSync(`${packagesPath}/${pkgName}/.hooks/${hookType}.json`))
-    .map((pkgName) => ({
-      name: pkgName,
-      path: `${packagesPath}/${pkgName}/.hooks/${hookType}.json`,
-      cwd: `${packagesPath}/${pkgName}`,
-    }))
-    .forEach(({ name, path, cwd }) => {
-      const hook = JSON.parse(fs.readFileSync(path, 'utf-8'));
-      if (hook.steps.length > 0) {
-        hooks.push({
-          name,
-          cwd,
-          type: hook.type,
-          venvActivate: hook.venvActivate,
-          steps: hook.steps,
-        });
-      }
-    });
-
-  hooks.forEach((hook) => {
-    const localHooksPath = `${packagesPath}/${hook.name}/.hooks/${hookType}.local.json`;
-    if (fs.existsSync(localHooksPath)) {
-      const localHook = JSON.parse(fs.readFileSync(localHooksPath, 'utf-8'));
-      hook.steps = [...localHook.steps, ...hook.steps];
+  const packagesFromVCS = packages.filter((pkgName) => {
+    if (options.all || VSCSensitiveHook.includes(hookType)) {
+      return true;
+    } else {
+      return !!stagedFiles.find((file) => matchExactPath(path.join(rootDir, file), path.join(packagesPath, pkgName)));
     }
   });
 
-  return hooks;
+  function prepareHooks(pkgs: string[], local = false) {
+    const hooks: PackageHook[] = [];
+    pkgs
+      .map((pkgName) => ({
+        name: pkgName,
+        path: `${packagesPath}/${pkgName}/.hooks/${hookType}${local ? '.local' : ''}.json`,
+        cwd: `${packagesPath}/${pkgName}`,
+      }))
+      .forEach(({ name, path, cwd }) => {
+        const hook = JSON.parse(fs.readFileSync(path, 'utf-8'));
+        if (hook.steps.length > 0) {
+          hooks.push({
+            name,
+            cwd,
+            type: hook.type,
+            venvActivate: hook.venvActivate,
+            steps: hook.steps,
+          });
+        }
+      });
+    return hooks;
+  }
+
+  const hooks: PackageHook[] = prepareHooks(
+    packagesFromVCS.filter((pkgName) => fs.existsSync(`${packagesPath}/${pkgName}/.hooks/${hookType}.json`)),
+  );
+
+  const localHooks: PackageHook[] = prepareHooks(
+    packagesFromVCS.filter((pkgName) => fs.existsSync(`${packagesPath}/${pkgName}/.hooks/${hookType}.local.json`)),
+    true,
+  );
+
+  return [...hooks, ...localHooks].sort((a, b) => (a.name < b.name ? -1 : 1));
 }
 
 export const loadHooks = (hookType: HookType, opts: LoadHookOptions): PackageHook[] => {
