@@ -2,9 +2,10 @@ import commander from 'commander';
 import inquirer from 'inquirer';
 import fs from 'fs';
 
-import { writeGitHooksFiles } from '../utils/git';
+import { writeGitHooksFiles, writeGitIgnoreFiles } from '../utils/git';
 import { addedBehaviorQuestion, choiceQuestion, confirmQuestion, folderQuestion } from '../prompts/init';
 import logger from '../display/logger';
+import { loadProjectConfig } from '../loaders/config';
 
 function createDirIfNeeded(path: string) {
   if (!fs.existsSync(path)) {
@@ -24,7 +25,9 @@ export function addInit(program: commander.Command): void {
     .option('--yes', 'Skip confirmation prompter')
     .action(async (opts) => {
       if (opts.onlyHook) {
-        writeGitHooksFiles();
+        const config = loadProjectConfig();
+        writeGitHooksFiles(config.rootDir);
+        writeGitIgnoreFiles(config.packages.map((pkg) => `${config.packagesPath}/${pkg}`));
         process.exit(0);
       }
 

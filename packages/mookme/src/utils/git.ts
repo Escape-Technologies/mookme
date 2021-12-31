@@ -78,34 +78,49 @@ export function detectAndProcessModifiedFiles(initialNotStagedFiles: string[], b
   }
 }
 
-export function writeGitHooksFiles(): void {
-  if (!fs.existsSync('./.git/hooks')) {
-    fs.mkdirSync('./.git/hooks');
+export function writeGitHooksFiles(rootDir = '.'): void {
+  const gitFolderPath = `${rootDir}/.git`;
+  if (!fs.existsSync(`${gitFolderPath}/hooks`)) {
+    fs.mkdirSync(`${gitFolderPath}/hooks`);
   }
 
   logger.info('Writing Git hooks files');
 
   hookTypes.forEach((type) => {
-    logger.info(`- ./.git/hooks/${type}`);
+    logger.info(`- ${gitFolderPath}/hooks/${type}`);
     const mookmeLegacyCmd = `./node_modules/@escape.tech/mookme/bin/index.js run --type ${type} --args "$1"`;
     const mookmeCmd = `npx mookme run --type ${type} --args "$1"`;
-    if (fs.existsSync(`./.git/hooks/${type}`)) {
-      const hook = fs.readFileSync(`./.git/hooks/${type}`).toString();
+    if (fs.existsSync(`${gitFolderPath}/hooks/${type}`)) {
+      const hook = fs.readFileSync(`${gitFolderPath}/hooks/${type}`).toString();
       if (hook.includes(mookmeLegacyCmd)) {
         logger.log(`Legacy mookme invokation detected, updating it...`);
         const newHook = hook.replace(mookmeLegacyCmd, mookmeCmd);
-        fs.writeFileSync(`./.git/hooks/${type}`, newHook);
-        execSync(`chmod +x ./.git/hooks/${type}`);
+        fs.writeFileSync(`${gitFolderPath}/hooks/${type}`, newHook);
+        execSync(`chmod +x ${gitFolderPath}/hooks/${type}`);
       } else if (!hook.includes(mookmeCmd)) {
-        fs.appendFileSync(`./.git/hooks/${type}`, `\n${mookmeCmd}`, { flag: 'a+' });
-        execSync(`chmod +x ./.git/hooks/${type}`);
+        fs.appendFileSync(`${gitFolderPath}/hooks/${type}`, `\n${mookmeCmd}`, { flag: 'a+' });
+        execSync(`chmod +x ${gitFolderPath}/hooks/${type}`);
       } else {
         logger.log(`Hook ${type} is already declared, skipping...`);
       }
     } else {
       logger.warning(`Hook ${type} does not exist, creating file...`);
-      fs.appendFileSync(`./.git/hooks/${type}`, `#!/bin/bash\n${mookmeCmd}`, { flag: 'a+' });
-      execSync(`chmod +x ./.git/hooks/${type}`);
+      fs.appendFileSync(`${gitFolderPath}/hooks/${type}`, `#!/bin/bash\n${mookmeCmd}`, { flag: 'a+' });
+      execSync(`chmod +x ${gitFolderPath}/hooks/${type}`);
     }
   });
+}
+
+export function writeGitIgnoreFiles(packagesPath: string[]): void {
+  logger.info('Writing `.gitignore files`');
+
+  for (const pkgPath of packagesPath) {
+    logger.info(`- ${pkgPath}`);
+    if (!fs.existsSync(`${pkgPath}/.gitignore`)) {
+      logger.warning(`Package ${pkgPath} has no \`.gitignore\` file, creating it...`);
+      fs.writeFileSync(`${pkgPath}/.gitignore`, `.hooks/*.local.json\n`);
+    } else {
+      fs.appendFileSync(`${pkgPath}/.gitignore`, `\n.hooks/*.local.json\n`, { flag: 'a+' });
+    }
+  }
 }
