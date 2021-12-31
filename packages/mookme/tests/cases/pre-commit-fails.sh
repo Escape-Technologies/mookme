@@ -15,6 +15,7 @@ node $ROOT_FOLDER/dist/index.js init \
     --yes \
     --packages package1 \
     --added-behaviour exit \
+    --skip-types-selection \
     --packages-path ""
 
 echo '{"steps": [{"name": "Oups", "command": "exit 1"}]}' > package1/.hooks/pre-commit.json

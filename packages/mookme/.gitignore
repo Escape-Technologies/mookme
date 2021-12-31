@@ -3,3 +3,4 @@ dist
 .tmp
 coverage
 tests/logs/*.log
+.hooks/*.local.json

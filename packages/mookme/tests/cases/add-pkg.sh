@@ -15,6 +15,7 @@ node $ROOT_FOLDER/dist/index.js init \
     --yes \
     --packages package1 \
     --added-behaviour exit \
+    --skip-types-selection \
     --packages-path "" > /dev/null
 
 mkdir -p package2

@@ -3,7 +3,13 @@ import inquirer from 'inquirer';
 import fs from 'fs';
 
 import { writeGitHooksFiles, writeGitIgnoreFiles } from '../utils/git';
-import { addedBehaviorQuestion, choiceQuestion, confirmQuestion, folderQuestion } from '../prompts/init';
+import {
+  addedBehaviorQuestion,
+  choiceQuestion,
+  confirmQuestion,
+  folderQuestion,
+  selectHookTypes,
+} from '../prompts/init';
 import logger from '../display/logger';
 import { loadProjectConfig } from '../loaders/config';
 
@@ -22,12 +28,13 @@ export function addInit(program: commander.Command): void {
     .option('--packages [packages...]', 'Provide packages list and skip the associated prompter')
     .option('--added-behaviour <added-behaviour>', 'Provide added behaviour and skip the associated prompter')
     .option('--packages-path <packages-path>', 'Provide packages path and skip the associated prompter')
+    .option('--skip-types-selection', 'Skip hook types selection')
     .option('--yes', 'Skip confirmation prompter')
     .action(async (opts) => {
       if (opts.onlyHook) {
         const config = loadProjectConfig();
-        writeGitHooksFiles(config.rootDir);
-        writeGitIgnoreFiles(config.packages.map((pkg) => `${config.packagesPath}/${pkg}`));
+        const hookTypes = await selectHookTypes(opts.skipTypesSelection);
+        writeGitHooksFiles(hookTypes, config.rootDir);
         process.exit(0);
       }
 
@@ -100,6 +107,8 @@ export function addInit(program: commander.Command): void {
 
       const packagesHooksDirPaths = selectedPackages.map((mod) => `${mookMeConfig.packagesPath}/${mod}/.hooks`);
 
+      const hookTypes = await selectHookTypes(opts.skipTypesSelection);
+
       clear();
       logger.info('\nThe following configuration will be written into .mookme.json:');
       logger.log(JSON.stringify(mookMeConfig, null, 2));
@@ -156,7 +165,8 @@ export function addInit(program: commander.Command): void {
           createDirIfNeeded(hookDir);
         });
 
-        writeGitHooksFiles();
+        writeGitHooksFiles(hookTypes);
+        writeGitIgnoreFiles(mookMeConfig.packages.map((pkg) => `${mookMeConfig.packagesPath}/${pkg}`));
       }
 
       logger.warning('\nAdding local hooks to .gitignore');
