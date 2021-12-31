@@ -1,3 +1,16 @@
+# [1.2.0-beta.8](https://github.com/Escape-Technologies/mookme/compare/v1.2.0-beta.7...v1.2.0-beta.8) (2021-12-31)
+
+
+### Bug Fixes
+
+* **mookme:** fix init command to log every file modification ([1069ff3](https://github.com/Escape-Technologies/mookme/commit/1069ff3afb92f7932a8bba91d432068ba482bb7b))
+* **mookme:** improve docs ([93d43d4](https://github.com/Escape-Technologies/mookme/commit/93d43d4e4f6995554cc2e3f2931eaed85a63605d))
+
+
+### Features
+
+* **mookme:** select hook types at project initialization ([b2921b7](https://github.com/Escape-Technologies/mookme/commit/b2921b70418751469de64911c54cc8ca1fbfa69d))
+
 # [1.2.0-beta.7](https://github.com/Escape-Technologies/mookme/compare/v1.2.0-beta.6...v1.2.0-beta.7) (2021-12-31)
 
 
