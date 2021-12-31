@@ -1,3 +1,10 @@
+# [1.2.0-beta.3](https://github.com/Escape-Technologies/mookme/compare/v1.2.0-beta.2...v1.2.0-beta.3) (2021-12-31)
+
+
+### Bug Fixes
+
+* **mookme:** bump mookme version used in project ([e8f490f](https://github.com/Escape-Technologies/mookme/commit/e8f490f04711ee41572aa942d891a48056af27c1))
+
 # [1.2.0-beta.2](https://github.com/Escape-Technologies/mookme/compare/v1.2.0-beta.1...v1.2.0-beta.2) (2021-12-31)
 
 
