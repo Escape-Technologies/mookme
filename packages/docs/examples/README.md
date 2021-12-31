@@ -2,7 +2,7 @@
 
 ## `commitlint`
 
-> This guide will help you in the setup of a hook a hook for linting your commits with [commitlint](https://github.com/conventional-changelog/commitlint)*
+> This guide will help you in the setup of a hook a hook for linting your commits with [commitlint](https://github.com/conventional-changelog/commitlint)
 
 ### Prerequisite
 

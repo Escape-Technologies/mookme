@@ -6,7 +6,7 @@
 
 ## What is Mookme ?
 
-Mookme is a Git hook manager. It's sole purpose is to execute some scripts when you want to commit. It could be a
+Mookme is a Git hook manager. It's sole purpose is to execute some scripts when you want to commit or do other git stuff. It could be a
 linter, tests, your favorite commit message checker.
 
 **Everything that is invoked through a cli can be used with Mookme!**
@@ -14,7 +14,7 @@ linter, tests, your favorite commit message checker.
 Despite being a very young project, it is ready to use, even if it remains a beta under active development.
 
 You are welcome to use it and enjoy it's simplicity.
-**If you encounter any bug or weird behavior, don't be afraid to open an issue :)**
+**If you encounter any bug or weird behavior, don't be afraid to open an [issue](https://github.com/Escape-Technologies/mookme/issues) :)**
 
 <img src="demo.gif" alt="A fresh look at your new git hooks ;)" width="600"/>
 
