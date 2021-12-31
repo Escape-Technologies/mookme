@@ -25,6 +25,6 @@
   "devDependencies": {
     "@commitlint/cli": "^12.1.1",
     "@commitlint/config-angular": "^12.1.1",
-    "@escape.tech/mookme": "^1.2.0-beta.2"
+    "@escape.tech/mookme": "^1.2.0-beta.7"
   }
 }

@@ -113,6 +113,15 @@ export function addInit(program: commander.Command): void {
       logger.info('\nThe following configuration will be written into .mookme.json:');
       logger.log(JSON.stringify(mookMeConfig, null, 2));
 
+      logger.info('\n The follwowing git hooks will be created:');
+      hookTypes.forEach((t) => logger.log(`./.git/hooks/${t}`));
+
+      logger.info('\n`.hooks/*.local.env` will be appended into the following `.gitignore` files:');
+      selectedPackages
+        .map((mod) => `${mookMeConfig.packagesPath}/${mod}/.gitignore`)
+        .forEach((p) => logger.log(`- ${p}`));
+      logger.log(`- ./.gitignore`);
+
       logger.info('\nThe following directories will also be created:');
       packagesHooksDirPaths.forEach((hookDir) => logger.log(`- ${hookDir}`));
       logger.log(`- ./.hooks`);
@@ -166,6 +175,8 @@ export function addInit(program: commander.Command): void {
         });
 
         writeGitHooksFiles(hookTypes);
+        const paths = mookMeConfig.packages.map((pkg) => `${mookMeConfig.packagesPath}/${pkg}`);
+        paths.push('./.gitignore');
         writeGitIgnoreFiles(mookMeConfig.packages.map((pkg) => `${mookMeConfig.packagesPath}/${pkg}`));
       }
 
