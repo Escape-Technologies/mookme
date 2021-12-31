@@ -10,6 +10,7 @@ module.exports = {
     displayAllHeaders: true,
     nav: [
       { text: "GitHub", link: "https://github.com/Escape-Technologies/mookme"},
+      { text: "Changelog", link: "https://github.com/Escape-Technologies/mookme/blob/beta/packages/mookme/CHANGELOG.md"}
     ],
     sidebar: [
       "",
