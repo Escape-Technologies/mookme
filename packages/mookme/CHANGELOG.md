@@ -1,3 +1,10 @@
+# [1.2.0-beta.11](https://github.com/Escape-Technologies/mookme/compare/v1.2.0-beta.10...v1.2.0-beta.11) (2022-01-04)
+
+
+### Bug Fixes
+
+* **mookme:** fix package vcs determination ([a591059](https://github.com/Escape-Technologies/mookme/commit/a591059d3f329c2b37e658816016885b6b5c6024))
+
 # [1.2.0-beta.10](https://github.com/Escape-Technologies/mookme/compare/v1.2.0-beta.9...v1.2.0-beta.10) (2021-12-31)
 
 
