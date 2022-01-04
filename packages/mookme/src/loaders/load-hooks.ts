@@ -57,7 +57,7 @@ export function filterAndBuildHooks(
   const { packages, packagesPath } = config.project;
 
   const packagesFromVCS = packages.filter((pkgName) => {
-    if (options.all || VSCSensitiveHook.includes(hookType)) {
+    if (options.all || !VSCSensitiveHook.includes(hookType)) {
       return true;
     } else {
       return !!stagedFiles.find((file) => matchExactPath(path.join(rootDir, file), path.join(packagesPath, pkgName)));
