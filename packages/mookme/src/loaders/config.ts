@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 
-import { AuthConfig, CLIConfig, ProjectConfig } from '../config/types';
+import { ProjectConfig } from '../config/types';
 import logger from '../display/logger';
 
 function getRootDir(target: string): string | undefined {
@@ -20,32 +20,6 @@ function getRootDir(target: string): string | undefined {
   }
 
   return path.resolve(rootDir);
-}
-
-export function loadCLIConfig(): CLIConfig {
-  // const cliConfigPath = path.join(os.homedir(), '.config', 'mookme', 'cli.json');
-
-  // let cliConfig: CLIConfig;
-  // if (!fs.existsSync(path.join(cliConfigPath))) {
-  //   cliConfig = { backendUrl: 'http://localhost:4000' };
-  // } else {
-  //   cliConfig = JSON.parse(fs.readFileSync(cliConfigPath).toString());
-  // }
-
-  return { backendUrl: 'no-op' };
-}
-
-export function loadAuthConfig(): AuthConfig {
-  // const credentialsPath = path.join(os.homedir(), '.config', 'mookme', 'credentials.json');
-
-  // if (!fs.existsSync(path.join(credentialsPath))) {
-  //   logger.failure('No credentials found. Exiting.');
-  //   logger.info('Did you run `mookme authenticate` ?');
-  //   process.exit(1);
-  // }
-
-  // const credentials: { key: string } = JSON.parse(fs.readFileSync(credentialsPath).toString());
-  return { key: 'no-op' };
 }
 
 function tryMigrateLegacyConfig() {

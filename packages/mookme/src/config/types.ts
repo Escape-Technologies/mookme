@@ -25,8 +25,6 @@ export type PkgJSON = { [key: string]: any };
 
 export interface MookmeConfig {
   project: ProjectConfig;
-  cli: CLIConfig;
-  auth: AuthConfig;
 }
 
 export interface ExecutionContext {

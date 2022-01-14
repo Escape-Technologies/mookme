@@ -1,5 +1,5 @@
-import { loadAuthConfig, loadCLIConfig, loadProjectConfig } from '../loaders/config';
-import { AuthConfig, CLIConfig, ExecutionContext, MookmeConfig, ProjectConfig } from './types';
+import { loadProjectConfig } from '../loaders/config';
+import { ExecutionContext, MookmeConfig, ProjectConfig } from './types';
 
 export class Config {
   private config?: MookmeConfig;
@@ -8,8 +8,6 @@ export class Config {
   init(): void {
     if (!this.config) {
       this.config = {
-        auth: loadAuthConfig(),
-        cli: loadCLIConfig(),
         project: loadProjectConfig(),
       };
     }
@@ -28,22 +26,6 @@ export class Config {
       process.exit(1);
     }
     return this.config.project;
-  }
-
-  get cli(): CLIConfig {
-    if (!this.config) {
-      console.trace('Config object has not been initialized');
-      process.exit(1);
-    }
-    return this.config.cli;
-  }
-
-  get auth(): AuthConfig {
-    if (!this.config) {
-      console.trace('Config object has not been initialized');
-      process.exit(1);
-    }
-    return this.config.auth;
   }
 }
 
