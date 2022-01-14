@@ -1,3 +1,10 @@
+# [1.2.0-beta.12](https://github.com/Escape-Technologies/mookme/compare/v1.2.0-beta.11...v1.2.0-beta.12) (2022-01-14)
+
+
+### Bug Fixes
+
+* **mookme:** clean hub's dead code ([01b888a](https://github.com/Escape-Technologies/mookme/commit/01b888a759ded4b34feb2a6e51153a951db80ba9))
+
 # [1.2.0-beta.11](https://github.com/Escape-Technologies/mookme/compare/v1.2.0-beta.10...v1.2.0-beta.11) (2022-01-04)
 
 
