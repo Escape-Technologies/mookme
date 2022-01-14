@@ -1,3 +1,44 @@
+# [1.2.0](https://github.com/Escape-Technologies/mookme/compare/v1.1.0...v1.2.0) (2022-01-14)
+
+
+### Bug Fixes
+
+* **ci:** fix release ci ([e318c32](https://github.com/Escape-Technologies/mookme/commit/e318c328181d3f9615abb352655c3b8b1f47d73e))
+* **docs:** add changelog in docs ([a4fbe77](https://github.com/Escape-Technologies/mookme/commit/a4fbe77f02fa64a4b9bd94b41211dec085da6cdb))
+* **mookme:** add beta documentation in readme ([94f97f2](https://github.com/Escape-Technologies/mookme/commit/94f97f250fd33e4fa98a247219efdea9aa806128))
+* **mookme:** add readme in JSON pkg ([f713d0e](https://github.com/Escape-Technologies/mookme/commit/f713d0e3a277a8eb23b7ee92cbefb84f6a60fbd4))
+* **mookme:** bump mookme version used in project ([e8f490f](https://github.com/Escape-Technologies/mookme/commit/e8f490f04711ee41572aa942d891a48056af27c1))
+* **mookme:** clean hub's dead code ([01b888a](https://github.com/Escape-Technologies/mookme/commit/01b888a759ded4b34feb2a6e51153a951db80ba9))
+* **mookme:** fix add-pkg command ([6d25077](https://github.com/Escape-Technologies/mookme/commit/6d25077f6a0a36cd8a9e50c046999f0c0d93cdbd))
+* **mookme:** fix dependencies ([11fa8a3](https://github.com/Escape-Technologies/mookme/commit/11fa8a38383f0730980a4c5e2b31a4ec56425d3d))
+* **mookme:** fix docs deployment ([0c49fa6](https://github.com/Escape-Technologies/mookme/commit/0c49fa6583d800914a6589bf6672f7e37130d1d1))
+* **mookme:** fix docs deployment ([4f35f5f](https://github.com/Escape-Technologies/mookme/commit/4f35f5f59d7237d654fb56ef694524ee988cb47c))
+* **mookme:** fix init command to log every file modification ([1069ff3](https://github.com/Escape-Technologies/mookme/commit/1069ff3afb92f7932a8bba91d432068ba482bb7b))
+* **mookme:** fix init for local hooks ([b056550](https://github.com/Escape-Technologies/mookme/commit/b0565502b7d011c3103015f89c6fe3a2aec097c1))
+* **mookme:** fix package vcs determination ([a591059](https://github.com/Escape-Technologies/mookme/commit/a591059d3f329c2b37e658816016885b6b5c6024))
+* **mookme:** fix package.json ([1659d2b](https://github.com/Escape-Technologies/mookme/commit/1659d2b819209634aa43431c709bc269bc77c7e6))
+* **mookme:** improve docs ([93d43d4](https://github.com/Escape-Technologies/mookme/commit/93d43d4e4f6995554cc2e3f2931eaed85a63605d))
+* **mookme:** remove useless log ([5dd1ced](https://github.com/Escape-Technologies/mookme/commit/5dd1ced134b3c47f70ff80f1747b042a69eb41da))
+* **package:** fix CI ([24019c1](https://github.com/Escape-Technologies/mookme/commit/24019c1f8e5b909e5e5711048143e7b3bee8ccfb))
+* **tests:** remove logs ([9b29dbc](https://github.com/Escape-Technologies/mookme/commit/9b29dbcfdebebcdce3cc623a940cc8aeb56ef233))
+
+
+### Features
+
+* **docs:** added local steps to the documentation ([9e1bb52](https://github.com/Escape-Technologies/mookme/commit/9e1bb520adf52327e691ae2cf9322166d23be365))
+* **mookme:** add basic testing framework ([cdfab59](https://github.com/Escape-Technologies/mookme/commit/cdfab59cde387896348aa460aefcc7f5970e85b5))
+* **mookme:** add beta release channel ([b9dd8b2](https://github.com/Escape-Technologies/mookme/commit/b9dd8b2ca56800c3441c013841742d8d7e7b009b))
+* **mookme:** add beta workflows ([0706e36](https://github.com/Escape-Technologies/mookme/commit/0706e363b21b81b1194abbd6cb7d037cbaa82ff0))
+* **mookme:** add support for gitignored steps ([d2a8a93](https://github.com/Escape-Technologies/mookme/commit/d2a8a937feeb4ac15de81056301a6c57d75339ea))
+* **mookme:** add support for more commit hook types ([f3bfe6d](https://github.com/Escape-Technologies/mookme/commit/f3bfe6d83bd3bfa2075e51168fe526b5cd415a9e))
+* **mookme:** add unit testing scaffold ([5564975](https://github.com/Escape-Technologies/mookme/commit/5564975e7b384a349c13cc41e54a3e0ad7446c6c))
+* **mookme:** bump ci node versions ([164c0aa](https://github.com/Escape-Technologies/mookme/commit/164c0aa99a3991fabd0d578d7b49a1a53413e7b3))
+* **mookme:** bump mookme to node 16 ([da3f5ca](https://github.com/Escape-Technologies/mookme/commit/da3f5ca3b0fd57c9648fb89c90bc3d904a7a4f30))
+* **mookme:** deploy beta-docs ([e2e649c](https://github.com/Escape-Technologies/mookme/commit/e2e649c8d5f9282a61865698300706e8d855df79))
+* **mookme:** deploy beta-docs ([d204b7e](https://github.com/Escape-Technologies/mookme/commit/d204b7ee43e25488fc29800b86248c84200bc6e6))
+* **mookme:** init beta channel ([08b227d](https://github.com/Escape-Technologies/mookme/commit/08b227d9dc96d95a751340de33f76aa8502374de))
+* **mookme:** select hook types at project initialization ([b2921b7](https://github.com/Escape-Technologies/mookme/commit/b2921b70418751469de64911c54cc8ca1fbfa69d))
+
 # [1.2.0-beta.11](https://github.com/Escape-Technologies/mookme/compare/v1.2.0-beta.10...v1.2.0-beta.11) (2022-01-04)
 
 
