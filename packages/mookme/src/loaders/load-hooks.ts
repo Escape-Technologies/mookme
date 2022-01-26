@@ -1,8 +1,8 @@
 import path from 'path';
 import fs from 'fs';
-import { HookType, PackageHook, VSCSensitiveHook } from '../types/hook.types';
+import { HookType, PackageHook, VCSSensitiveHook } from '../types/hook.types';
 import config, { Config } from '../config';
-import logger from '../display/logger';
+import logger from '../utils/logger';
 import { loadSharedSteps } from './shared-steps';
 export interface LoadHookOptions {
   all?: boolean;
@@ -57,7 +57,7 @@ export function filterAndBuildHooks(
   const { packages, packagesPath } = config.project;
 
   const packagesFromVCS = packages.filter((pkgName) => {
-    if (options.all || !VSCSensitiveHook.includes(hookType)) {
+    if (options.all || !VCSSensitiveHook.includes(hookType)) {
       return true;
     } else {
       return !!stagedFiles.find((file) => matchExactPath(path.join(rootDir, file), path.join(packagesPath, pkgName)));

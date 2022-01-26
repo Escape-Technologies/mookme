@@ -1,8 +1,8 @@
 import { PackageHook } from '../types/hook.types';
 import { runStep } from './run-step';
 import { StepCommand, StepError } from '../types/step.types';
-import { HookUI, UIExecutionStatus } from '../display/ui';
-import logger from '../display/logger';
+import logger from './logger';
+import { bus, EventType } from '../events';
 
 function handleStepError(
   stepError: {
@@ -21,8 +21,6 @@ function handleStepError(
 }
 
 export async function hookPackage(hook: PackageHook): Promise<StepError[]> {
-  const ui: HookUI = new HookUI(hook);
-
   const options = {
     packageName: hook.name,
     type: hook.type,
@@ -32,10 +30,18 @@ export async function hookPackage(hook: PackageHook): Promise<StepError[]> {
   const promises = [];
   const errors: StepError[] = [];
 
+  bus.emit(EventType.PackageRegistered, {
+    name: hook.name,
+    steps: hook.steps,
+  });
+
+  bus.emit(EventType.PackageRunning, {
+    name: hook.name,
+  });
+
   for (const step of hook.steps) {
-    const stepUI = ui.stepsUI[step.name];
     try {
-      const stepPromise: Promise<{ step: StepCommand; msg: Error } | null> = runStep(step, options, stepUI);
+      const stepPromise: Promise<{ step: StepCommand; msg: Error } | null> = runStep(step, options);
 
       // Regardless of whether the step is serial or not, it will be awaited at the end of this function
       promises.push(stepPromise);
@@ -43,31 +49,27 @@ export async function hookPackage(hook: PackageHook): Promise<StepError[]> {
       if (step.serial) {
         // Serial steps are blocking
         const stepError = await stepPromise;
-        const newStatus: UIExecutionStatus = stepError == null ? UIExecutionStatus.DONE : UIExecutionStatus.ERROR;
-        stepUI.setStatus(newStatus);
         if (stepError !== null) {
           errors.push(handleStepError(stepError, hook));
         }
       } else {
         // Non-serial steps are just launched and result is processed in a callback
         stepPromise.then((stepError) => {
-          const newStatus: UIExecutionStatus = stepError == null ? UIExecutionStatus.DONE : UIExecutionStatus.ERROR;
-          stepUI.setStatus(newStatus);
           if (stepError !== null) {
             errors.push(handleStepError(stepError, hook));
           }
         });
       }
     } catch (err) {
-      stepUI.setStatus(UIExecutionStatus.ERROR);
+      bus.emit(EventType.StepFailure, { packageName: hook.name, stepName: step.name });
       throw err;
     }
   }
 
   // In every cases, we await for every step promises before processing hook results
   await Promise.all(promises)
-    .then(() => ui.setHookStatus(UIExecutionStatus.DONE))
-    .catch(() => ui.setHookStatus(UIExecutionStatus.ERROR));
+    .then(() => bus.emit(EventType.PackageSuccess, { name: hook.name }))
+    .catch(() => bus.emit(EventType.PackageFailure, { name: hook.name }));
 
   return errors;
 }

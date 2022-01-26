@@ -1,12 +1,13 @@
 import commander from 'commander';
 
-import { HookType, VSCSensitiveHook } from '../types/hook.types';
+import { HookType, VCSSensitiveHook } from '../types/hook.types';
 import { hookPackage, processResults } from '../utils/hook-package';
-import { center } from '../display/ui';
 import { getNotStagedFiles, detectAndProcessModifiedFiles, getStagedFiles } from '../utils/git';
 import { loadHooks, setupPATH } from '../loaders/load-hooks';
 import config from '../config';
-import logger from '../display/logger';
+import logger from '../utils/logger';
+import { MookmeUI } from '../ui';
+
 interface Options {
   type: HookType;
   args: string;
@@ -26,7 +27,10 @@ export function addRun(program: commander.Command): void {
 }
 
 export async function run(opts: Options): Promise<void> {
+  // Load the different config files
   config.init();
+
+  // Load the VCS state
   const initialNotStagedFiles = getNotStagedFiles();
   const stagedFiles = getStagedFiles();
 
@@ -37,31 +41,34 @@ export async function run(opts: Options): Promise<void> {
     stagedFiles,
   });
 
+  // Extend the path with partial commands
   setupPATH();
-  const hooks = loadHooks(hookType, { all: opts.all });
 
+  // Load packages hooks to run
+  const hooks = loadHooks(hookType, { all: opts.all });
   if (hooks.length === 0) {
-    // logger.warning('No hooks to run.');
     return;
   }
 
-  const title = ` Running commit hook ${hookType} `;
-  console.log();
-  center(title);
+  // Initialize the UI
+  const ui = new MookmeUI(true);
 
+  // Run them concurrently and await the results
   const promisedHooks = hooks.map((hook) => hookPackage(hook));
-
-  try {
-    const packagesErrors = await Promise.all(promisedHooks);
-    processResults(packagesErrors);
-  } catch (err) {
+  const packagesErrors = await Promise.all(promisedHooks).catch((err) => {
     logger.failure(' Unexpected error ! ');
     console.error(err);
-  }
+    process.exit(1);
+  });
 
-  // unstashIfNeeded(type);
+  // Wait for every remaining UI events to be processed
+  setTimeout(() => {
+    ui.stop();
+    processResults(packagesErrors);
+  }, 500);
+
   // Do not start modified files procedure, unless we are about to commit
-  if (VSCSensitiveHook.includes(opts.type)) {
+  if (VCSSensitiveHook.includes(opts.type)) {
     detectAndProcessModifiedFiles(initialNotStagedFiles, config.project.addedBehavior);
   }
 }

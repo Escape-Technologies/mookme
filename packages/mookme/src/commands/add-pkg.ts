@@ -2,7 +2,7 @@ import commander from 'commander';
 import fs from 'fs';
 import path from 'path';
 import config from '../config';
-import logger from '../display/logger';
+import logger from '../utils/logger';
 
 export function addAddPkg(program: commander.Command): void {
   program

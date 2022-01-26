@@ -3,9 +3,7 @@ import { execSync } from 'child_process';
 import { HookType } from '../types/hook.types';
 import { ADDED_BEHAVIORS } from '../config/types';
 import config from '../config';
-import logger from '../display/logger';
-
-let hasStashed = false;
+import logger from './logger';
 
 export const getNotStagedFiles = (): string[] =>
   execSync('echo $(git diff --name-only)')
@@ -18,39 +16,6 @@ export const getStagedFiles = (): string[] =>
     .toString()
     .split(' ')
     .map((pth) => pth.replace('\n', ''));
-
-export const stashIfNeeded = (hookType: HookType): void => {
-  const shouldStash = execSync('git ls-files --others --exclude-standard --modified').toString().split('\n').length > 1;
-
-  if (hookType === HookType.PRE_COMMIT && !!shouldStash) {
-    logger.warning('Stashing unstaged changes in order to run hooks properly');
-    logger.info(`> git stash push --keep-index --include-untracked`);
-    execSync(`git stash push --keep-index --include-untracked`).toString();
-
-    logger.warning('\nList of stashed and modified files:');
-    const stashedAndModified = execSync('git --no-pager stash show --name-only').toString();
-    logger.log(stashedAndModified);
-
-    logger.warning('List of stashed and untracked files:');
-    const stashedAndUntracked = execSync('git --no-pager show stash@{0}^3:').toString().split('\n').slice(2).join('\n');
-    logger.log(stashedAndUntracked);
-
-    hasStashed = true;
-  }
-};
-
-export const unstashIfNeeded = (hookType: HookType): void => {
-  if (hookType === HookType.PRE_COMMIT && hasStashed) {
-    console.log();
-    logger.warning('Unstashing unstaged changes in order to run hooks properly');
-    try {
-      execSync('git stash pop');
-    } catch (err) {
-      logger.failure('Could not unstash file ! You should run `git stash pop` and fix conflicts');
-      console.error(err);
-    }
-  }
-};
 
 export function detectAndProcessModifiedFiles(initialNotStagedFiles: string[], behavior: ADDED_BEHAVIORS): void {
   const { rootDir } = config.project;
