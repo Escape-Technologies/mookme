@@ -1,12 +1,9 @@
-import draftlog from 'draftlog';
 import chalk from 'chalk';
 import { exec } from 'child_process';
 import { StepCommand } from '../types/step.types';
 import config from '../config';
-import { StepUI, UIExecutionStatus } from '../display/ui';
 import { computeExecutedCommand, getMatchedFiles, resolvePackagePath } from './run-helpers';
-
-draftlog(console);
+import { bus, EventType } from '../events';
 
 export interface RunStepOptions {
   packageName: string;
@@ -14,14 +11,10 @@ export interface RunStepOptions {
   venvActivate?: string;
 }
 
-export function runStep(
-  step: StepCommand,
-  options: RunStepOptions,
-  stepUI: StepUI,
-): Promise<{ step: StepCommand; msg: Error } | null> {
+export function runStep(step: StepCommand, options: RunStepOptions): Promise<{ step: StepCommand; msg: Error } | null> {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const args = config.executionContext.hookArgs!.split(' ').filter((arg) => arg !== '');
-  stepUI.setStatus(UIExecutionStatus.RUNNING);
+  bus.emit(EventType.StepRunning, { packageName: options.packageName, stepName: step.name });
   return new Promise((resolve) => {
     const packagePath = resolvePackagePath(config.project.rootDir, config.project.packagesPath, options.packageName);
 
@@ -34,11 +27,11 @@ export function runStep(
           config.project.rootDir,
         );
         if (matchedFiles.length === 0) {
-          stepUI.stop(`⏩ Skipped. (no match with "${step.onlyOn}")`);
+          bus.emit(EventType.StepSkipped, { packageName: options.packageName, stepName: step.name });
           return resolve(null);
         }
       } catch (err) {
-        stepUI.stop('❌ Error.');
+        bus.emit(EventType.StepFailure, { packageName: options.packageName, stepName: step.name });
         resolve({
           step,
           msg: new Error(`Invalid \`onlyOn\` pattern: ${step.onlyOn}\n${err}`),
@@ -63,14 +56,14 @@ export function runStep(
     /* handle command success or failure */
     cp.on('exit', (code) => {
       if (code === 0) {
-        stepUI.stop('✅ Done.');
+        bus.emit(EventType.StepSuccess, { packageName: options.packageName, stepName: step.name });
         resolve(null);
       } else {
+        bus.emit(EventType.StepFailure, { packageName: options.packageName, stepName: step.name });
         resolve({
           step,
           msg: new Error(error + chalk.bold('\nstdout :\n') + out),
         });
-        stepUI.stop('❌ Error.');
       }
     });
   });

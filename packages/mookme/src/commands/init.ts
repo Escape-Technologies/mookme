@@ -10,7 +10,7 @@ import {
   folderQuestion,
   selectHookTypes,
 } from '../prompts/init';
-import logger from '../display/logger';
+import logger from '../utils/logger';
 import { loadProjectConfig } from '../loaders/config';
 
 function createDirIfNeeded(path: string) {

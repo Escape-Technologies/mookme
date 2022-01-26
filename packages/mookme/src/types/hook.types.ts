@@ -1,5 +1,9 @@
 import { StepCommand } from './step.types';
 
+/**
+ * An enum of supported git hook types
+ *
+ */
 export enum HookType {
   PRE_COMMIT = 'pre-commit',
   PREPARE_COMMIT = 'prepare-commit-msg',
@@ -12,14 +16,41 @@ export enum HookType {
   PRE_PUSH = 'pre-push',
 }
 
-export const VSCSensitiveHook = [HookType.PRE_COMMIT, HookType.PREPARE_COMMIT];
+/**
+ * The list of hook types that should watch for modified files to add
+ *
+ */
+export const VCSSensitiveHook = [HookType.PRE_COMMIT, HookType.PREPARE_COMMIT];
 
+/**
+ * The list of hook types
+ *
+ */
 export const hookTypes = Object.values(HookType);
 
+/**
+ * An interface describing the package hook object used across the codebase
+ *
+ */
 export interface PackageHook {
+  /**
+   *
+   */
   name: string;
+  /**
+   * The list of step descriptors executed with the hook
+   */
   steps: StepCommand[];
+  /**
+   * The directory where the package is stored
+   */
   cwd: string;
+  /**
+   * The type of the hook
+   */
   type?: string;
+  /**
+   * A boolean denoting whether a virtualenv is started of not for this hook (eg for Python)
+   */
   venvActivate?: string;
 }

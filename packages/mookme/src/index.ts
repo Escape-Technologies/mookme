@@ -1,8 +1,5 @@
 import { Command } from 'commander';
 
-import draftlog from 'draftlog';
-draftlog(console);
-
 import { addAddPkg, addInit, addRun } from './commands';
 
 const program = new Command();

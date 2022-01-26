@@ -2,7 +2,7 @@ import path from 'path';
 import fs from 'fs';
 
 import { ProjectConfig } from '../config/types';
-import logger from '../display/logger';
+import logger from '../utils/logger';
 
 function getRootDir(target: string): string | undefined {
   let isRoot = false;
