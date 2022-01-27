@@ -1,13 +1,14 @@
 import chalk from 'chalk';
-import { UIExecutionStatus, UIPackageItem, UIStepItem } from './types';
+import { ExecutionStatus } from '../types/status.types';
+import { UIPackageItem, UIStepItem } from './types';
 import { ConsoleCanvas } from './writer';
 
 const stepDisplayedStatuses = {
-  [UIExecutionStatus.CREATED]: '🗓 Created',
-  [UIExecutionStatus.RUNNING]: '🦾 Running...',
-  [UIExecutionStatus.FAILURE]: '❌ Error.',
-  [UIExecutionStatus.SUCCESS]: '✅ Done.',
-  [UIExecutionStatus.SKIPPED]: '⏩ Skipped.',
+  [ExecutionStatus.CREATED]: '🗓 Created',
+  [ExecutionStatus.RUNNING]: '🦾 Running...',
+  [ExecutionStatus.FAILURE]: '❌ Error.',
+  [ExecutionStatus.SUCCESS]: '✅ Done.',
+  [ExecutionStatus.SKIPPED]: '⏩ Skipped.',
 };
 
 /**
@@ -36,7 +37,7 @@ export class Renderer {
       displayedCommand = step.command.substring(0, process.stdout.columns - step.name.length - 15) + '...';
     }
     this.writer.write(`→ ${chalk.bold(step.name)} > ${displayedCommand} `);
-    if (step.status === UIExecutionStatus.RUNNING) {
+    if (step.status === ExecutionStatus.RUNNING) {
       this.writer.write(`${stepDisplayedStatuses[step.status]} `);
     } else {
       this.writer.write(`${stepDisplayedStatuses[step.status]} `);
@@ -51,16 +52,16 @@ export class Renderer {
   _renderPacakage(pkg: UIPackageItem): void {
     this.writer.write();
     switch (pkg.status) {
-      case UIExecutionStatus.CREATED:
+      case ExecutionStatus.CREATED:
         this.writer.write(`${chalk.bold.inverse(` Hooks : ${pkg.name} `)}${chalk.bold.inverse(' Created... ')}`);
         break;
-      case UIExecutionStatus.RUNNING:
+      case ExecutionStatus.RUNNING:
         this.writer.write(`${chalk.bold.inverse(` Hooks : ${pkg.name} `)}${chalk.bgBlueBright.bold(' Running... ')}`);
         break;
-      case UIExecutionStatus.SUCCESS:
+      case ExecutionStatus.SUCCESS:
         this.writer.write(`${chalk.bold.inverse(` Hooks : ${pkg.name} `)}${chalk.bgGreen.bold(' Done ✓ ')}`);
         break;
-      case UIExecutionStatus.FAILURE:
+      case ExecutionStatus.FAILURE:
         this.writer.write(`${chalk.bold.inverse(` Hooks : ${pkg.name} `)}${chalk.bgRed.bold(' Error × ')}`);
         break;
     }

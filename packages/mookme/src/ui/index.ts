@@ -1,6 +1,7 @@
 import { bus, Events, EventType } from '../events';
+import { ExecutionStatus } from '../types/status.types';
 import { Renderer } from './renderer';
-import { UIExecutionStatus, UIPackageItem } from './types';
+import { UIPackageItem } from './types';
 
 /**
  * A class for managing the UI of Mookme. It provides a logical abstraction of the state of the application.
@@ -18,7 +19,7 @@ export class MookmeUI {
   /**
    * A reference to the interval used for the rendering loop.
    */
-  interval?: ReturnType<typeof setInterval>;
+  started = true;
   /**
    * The renderer instance used to render the UI state into the console
    */
@@ -29,34 +30,62 @@ export class MookmeUI {
    * @param start - a boolean denoting if the UI should be automatically started
    * @param renderer - an instance of the {@link Renderer} class used to render the UI state
    */
-  constructor(start = false, renderer?: Renderer) {
+  constructor(start = true, renderer?: Renderer) {
     this.renderer = renderer || new Renderer();
+    this.started = start;
 
-    bus.on(EventType.PackageRegistered, this.onPackageRegistered.bind(this));
-    bus.on(EventType.StepRegistered, this.onStepRegistered.bind(this));
-    bus.on(EventType.StepRunning, this.onStepRunning.bind(this));
-    bus.on(EventType.StepSuccess, this.onStepSuccess.bind(this));
-    bus.on(EventType.StepFailure, this.onStepFailure.bind(this));
-    bus.on(EventType.StepSkipped, this.onStepSkipped.bind(this));
+    bus.on(EventType.PackageRegistered, [this.onPackageRegistered.bind(this), this.render.bind(this)]);
+    bus.on(EventType.StepRegistered, [this.onStepRegistered.bind(this), this.render.bind(this)]);
+    bus.on(EventType.StepStatusChanged, [this.onStepStatusChange.bind(this), this.render.bind(this)]);
+  }
 
-    if (start) {
-      this.start();
+  /**
+   * Trigger a rendering of the UI if {@link MookmeUI.started} is true, eg. if {@link MookmeUI.start} has been called.
+   */
+  render(): void {
+    // Skip if the UI instance has not been asked to display the ui so far
+    if (this.started) {
+      this.renderer.render(this.packages);
     }
   }
 
   /**
-   * Start the UI rendering loop
+   * Start the UI watchers for rendering
    */
   start(): void {
-    this.interval = setInterval(() => this.renderer.render(this.packages), 50);
+    this.started = true;
   }
 
   /**
-   * Stop the UI rendering loop
+   * Stop the UI watchers for rendering
    */
   stop(): void {
-    if (this.interval) {
-      clearInterval(this.interval);
+    this.started = false;
+  }
+
+  /**
+   * A helper for updating the status of a package, based on the steps it contains and their statuses
+   *
+   * @param name - the name of the package
+   */
+  updatePackageStatus(name: string): void {
+    const pkg = this.packages.find((pkg) => pkg.name === name);
+    if (pkg) {
+      if (
+        pkg.steps.every((step) => step.status === ExecutionStatus.SKIPPED || step.status === ExecutionStatus.SUCCESS)
+      ) {
+        pkg.status = ExecutionStatus.SUCCESS;
+        return;
+      }
+      if (pkg.steps.some((step) => step.status === ExecutionStatus.FAILURE)) {
+        pkg.status = ExecutionStatus.FAILURE;
+        return;
+      }
+      if (pkg.steps.some((step) => step.status === ExecutionStatus.RUNNING)) {
+        pkg.status = ExecutionStatus.RUNNING;
+        return;
+      }
+      pkg.status = ExecutionStatus.CREATED;
     }
   }
 
@@ -69,40 +98,12 @@ export class MookmeUI {
   onPackageRegistered(data: Events[EventType.PackageRegistered]): void {
     this.packages.push({
       name: data.name,
-      status: UIExecutionStatus.CREATED,
+      status: ExecutionStatus.CREATED,
       steps: (data.steps || []).map((step) => ({
         ...step,
-        status: UIExecutionStatus.CREATED,
+        status: ExecutionStatus.CREATED,
       })),
     });
-  }
-
-  /**
-   * A helper for updating the status of a package, based on the steps it contains and their statuses
-   *
-   * @param name - the name of the package
-   */
-  updatePackageStatus(name: string): void {
-    const pkg = this.packages.find((pkg) => pkg.name === name);
-    if (pkg) {
-      if (
-        pkg.steps.every(
-          (step) => step.status === UIExecutionStatus.SKIPPED || step.status === UIExecutionStatus.SUCCESS,
-        )
-      ) {
-        pkg.status = UIExecutionStatus.SUCCESS;
-        return;
-      }
-      if (pkg.steps.some((step) => step.status === UIExecutionStatus.FAILURE)) {
-        pkg.status = UIExecutionStatus.FAILURE;
-        return;
-      }
-      if (pkg.steps.some((step) => step.status === UIExecutionStatus.RUNNING)) {
-        pkg.status = UIExecutionStatus.RUNNING;
-        return;
-      }
-      pkg.status = UIExecutionStatus.CREATED;
-    }
   }
 
   /**
@@ -116,75 +117,26 @@ export class MookmeUI {
     if (pkg) {
       pkg.steps.push({
         ...data.step,
-        status: UIExecutionStatus.CREATED,
+        status: ExecutionStatus.CREATED,
       });
+      // Update the new state of the step's package
       this.updatePackageStatus(pkg.name);
     }
   }
 
   /**
-   * Event handler for when a step is running
+   * Event handler for when a step's state change
    *
    * @param data - the event payload
    * @see {@link Events} for payload's description
    */
-  onStepRunning(data: Events[EventType.StepRunning]): void {
+  onStepStatusChange(data: Events[EventType.StepStatusChanged]): void {
     const pkg = this.packages.find((pkg) => pkg.name === data.packageName);
     if (pkg) {
       const step = pkg.steps.find((step) => step.name === data.stepName);
       if (step) {
-        step.status = UIExecutionStatus.RUNNING;
-        this.updatePackageStatus(pkg.name);
-      }
-    }
-  }
-
-  /**
-   * Event handler for when a step is successful
-   *
-   * @param data - the event payload
-   * @see {@link Events} for payload's description
-   */
-  onStepSuccess(data: Events[EventType.StepSuccess]): void {
-    const pkg = this.packages.find((pkg) => pkg.name === data.packageName);
-    if (pkg) {
-      const step = pkg.steps.find((step) => step.name === data.stepName);
-      if (step) {
-        step.status = UIExecutionStatus.SUCCESS;
-        this.updatePackageStatus(pkg.name);
-      }
-    }
-  }
-
-  /**
-   * Event handler for when a step is skipped
-   *
-   * @param data - the event payload
-   * @see {@link Events} for payload's description
-   */
-  onStepSkipped(data: Events[EventType.StepSkipped]): void {
-    const pkg = this.packages.find((pkg) => pkg.name === data.packageName);
-    if (pkg) {
-      const step = pkg.steps.find((step) => step.name === data.stepName);
-      if (step) {
-        step.status = UIExecutionStatus.SKIPPED;
-        this.updatePackageStatus(pkg.name);
-      }
-    }
-  }
-
-  /**
-   * Event handler for when a step has failed
-   *
-   * @param data - the event payload
-   * @see {@link Events} for payload's description
-   */
-  onStepFailure(data: Events[EventType.StepFailure]): void {
-    const pkg = this.packages.find((pkg) => pkg.name === data.packageName);
-    if (pkg) {
-      const step = pkg.steps.find((step) => step.name === data.stepName);
-      if (step) {
-        step.status = UIExecutionStatus.FAILURE;
+        step.status = data.status;
+        // Update the new state of the step's package
         this.updatePackageStatus(pkg.name);
       }
     }
