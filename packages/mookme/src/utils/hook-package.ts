@@ -3,6 +3,7 @@ import { runStep } from './run-step';
 import { StepCommand, StepError } from '../types/step.types';
 import logger from './logger';
 import { bus, EventType } from '../events';
+import { ExecutionStatus } from '../types/status.types';
 
 function handleStepError(
   stepError: {
@@ -35,10 +36,6 @@ export async function hookPackage(hook: PackageHook): Promise<StepError[]> {
     steps: hook.steps,
   });
 
-  bus.emit(EventType.PackageRunning, {
-    name: hook.name,
-  });
-
   for (const step of hook.steps) {
     try {
       const stepPromise: Promise<{ step: StepCommand; msg: Error } | null> = runStep(step, options);
@@ -61,15 +58,14 @@ export async function hookPackage(hook: PackageHook): Promise<StepError[]> {
         });
       }
     } catch (err) {
-      bus.emit(EventType.StepFailure, { packageName: hook.name, stepName: step.name });
+      bus.emit(EventType.StepStatusChanged, {
+        packageName: hook.name,
+        stepName: step.name,
+        status: ExecutionStatus.FAILURE,
+      });
       throw err;
     }
   }
-
-  // In every cases, we await for every step promises before processing hook results
-  await Promise.all(promises)
-    .then(() => bus.emit(EventType.PackageSuccess, { name: hook.name }))
-    .catch(() => bus.emit(EventType.PackageFailure, { name: hook.name }));
 
   return errors;
 }

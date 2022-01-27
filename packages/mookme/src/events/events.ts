@@ -1,12 +1,11 @@
+import { ExecutionStatus } from '../types/status.types';
+
 /**
  * The list of available event when using the `run` command
  */
 export enum EventType {
   StepRegistered = 'stepRegistered',
-  StepRunning = 'stepRunning',
-  StepSuccess = 'stepSuccess',
-  StepFailure = 'stepFailure',
-  StepSkipped = 'stepSkipped',
+  StepStatusChanged = 'stepStatusChanged',
   PackageRegistered = 'packageRegistered',
   PackageRunning = 'packageRunning',
   PackageSuccess = 'packageSuccess',
@@ -24,7 +23,7 @@ interface StepRegisteredPayload {
   step: { name: string; command: string };
 }
 
-interface StepStateChangedPayload {
+interface StepStatusChangedPayload {
   /**
    * The name of the package to update
    */
@@ -33,6 +32,10 @@ interface StepStateChangedPayload {
    * The name of the step to update
    */
   stepName: string;
+  /**
+   * The new status of the step
+   */
+  status: ExecutionStatus;
 }
 
 interface PackageRegisteredPayload {
@@ -46,24 +49,11 @@ interface PackageRegisteredPayload {
   steps?: { name: string; command: string }[];
 }
 
-interface PackageStateChangedPayload {
-  /**
-   * The name of the package to update
-   */
-  name: string;
-}
-
 /**
  * Map event types with their payload types
  */
 export type Events = {
   [EventType.StepRegistered]: StepRegisteredPayload;
-  [EventType.StepRunning]: StepStateChangedPayload;
-  [EventType.StepSuccess]: StepStateChangedPayload;
-  [EventType.StepFailure]: StepStateChangedPayload;
-  [EventType.StepSkipped]: StepStateChangedPayload;
+  [EventType.StepStatusChanged]: StepStatusChangedPayload;
   [EventType.PackageRegistered]: PackageRegisteredPayload;
-  [EventType.PackageRunning]: PackageStateChangedPayload;
-  [EventType.PackageSuccess]: PackageStateChangedPayload;
-  [EventType.PackageFailure]: PackageStateChangedPayload;
 };

@@ -51,7 +51,8 @@ export async function run(opts: Options): Promise<void> {
   }
 
   // Initialize the UI
-  const ui = new MookmeUI(true);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const ui = new MookmeUI();
 
   // Run them concurrently and await the results
   const promisedHooks = hooks.map((hook) => hookPackage(hook));
@@ -61,7 +62,7 @@ export async function run(opts: Options): Promise<void> {
     process.exit(1);
   });
 
-  // Wait for every remaining UI events to be processed
+  // Wait for events to be processed
   setTimeout(() => {
     ui.stop();
     processResults(packagesErrors);

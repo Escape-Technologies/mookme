@@ -4,6 +4,7 @@ import { StepCommand } from '../types/step.types';
 import config from '../config';
 import { computeExecutedCommand, getMatchedFiles, resolvePackagePath } from './run-helpers';
 import { bus, EventType } from '../events';
+import { ExecutionStatus } from '../types/status.types';
 
 export interface RunStepOptions {
   packageName: string;
@@ -14,7 +15,11 @@ export interface RunStepOptions {
 export function runStep(step: StepCommand, options: RunStepOptions): Promise<{ step: StepCommand; msg: Error } | null> {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const args = config.executionContext.hookArgs!.split(' ').filter((arg) => arg !== '');
-  bus.emit(EventType.StepRunning, { packageName: options.packageName, stepName: step.name });
+  bus.emit(EventType.StepStatusChanged, {
+    packageName: options.packageName,
+    stepName: step.name,
+    status: ExecutionStatus.RUNNING,
+  });
   return new Promise((resolve) => {
     const packagePath = resolvePackagePath(config.project.rootDir, config.project.packagesPath, options.packageName);
 
@@ -27,11 +32,19 @@ export function runStep(step: StepCommand, options: RunStepOptions): Promise<{ s
           config.project.rootDir,
         );
         if (matchedFiles.length === 0) {
-          bus.emit(EventType.StepSkipped, { packageName: options.packageName, stepName: step.name });
+          bus.emit(EventType.StepStatusChanged, {
+            packageName: options.packageName,
+            stepName: step.name,
+            status: ExecutionStatus.SKIPPED,
+          });
           return resolve(null);
         }
       } catch (err) {
-        bus.emit(EventType.StepFailure, { packageName: options.packageName, stepName: step.name });
+        bus.emit(EventType.StepStatusChanged, {
+          packageName: options.packageName,
+          stepName: step.name,
+          status: ExecutionStatus.FAILURE,
+        });
         resolve({
           step,
           msg: new Error(`Invalid \`onlyOn\` pattern: ${step.onlyOn}\n${err}`),
@@ -56,10 +69,18 @@ export function runStep(step: StepCommand, options: RunStepOptions): Promise<{ s
     /* handle command success or failure */
     cp.on('exit', (code) => {
       if (code === 0) {
-        bus.emit(EventType.StepSuccess, { packageName: options.packageName, stepName: step.name });
+        bus.emit(EventType.StepStatusChanged, {
+          packageName: options.packageName,
+          stepName: step.name,
+          status: ExecutionStatus.SUCCESS,
+        });
         resolve(null);
       } else {
-        bus.emit(EventType.StepFailure, { packageName: options.packageName, stepName: step.name });
+        bus.emit(EventType.StepStatusChanged, {
+          packageName: options.packageName,
+          stepName: step.name,
+          status: ExecutionStatus.FAILURE,
+        });
         resolve({
           step,
           msg: new Error(error + chalk.bold('\nstdout :\n') + out),
