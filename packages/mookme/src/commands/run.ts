@@ -1,12 +1,13 @@
 import commander from 'commander';
 
 import { HookType, VCSSensitiveHook } from '../types/hook.types';
-import { hookPackage, processResults } from '../utils/hook-package';
+import { processResults } from '../utils/run-helpers';
 import { getNotStagedFiles, detectAndProcessModifiedFiles, getStagedFiles } from '../utils/git';
-import { loadHooks, setupPATH } from '../loaders/load-hooks';
+import { loadPackagesToHook, setupPATH } from '../loaders/load-hooks';
 import config from '../config';
 import logger from '../utils/logger';
 import { MookmeUI } from '../ui';
+import { PackageRunner } from '../runner/package-runner';
 
 interface Options {
   type: HookType;
@@ -45,8 +46,8 @@ export async function run(opts: Options): Promise<void> {
   setupPATH();
 
   // Load packages hooks to run
-  const hooks = loadHooks(hookType, { all: opts.all });
-  if (hooks.length === 0) {
+  const packagesToHook = loadPackagesToHook(hookType, { all: opts.all });
+  if (packagesToHook.length === 0) {
     return;
   }
 
@@ -54,9 +55,12 @@ export async function run(opts: Options): Promise<void> {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const ui = new MookmeUI(true);
 
+  // Instanciate the package runners
+  const packageRunners = packagesToHook.map((pkg) => new PackageRunner(pkg));
+
   // Run them concurrently and await the results
-  const promisedHooks = hooks.map((hook) => hookPackage(hook));
-  const packagesErrors = await Promise.all(promisedHooks).catch((err) => {
+  const executions = packageRunners.map((runner) => runner.runPackageSteps());
+  const packagesErrors = await Promise.all(executions).catch((err) => {
     logger.failure(' Unexpected error ! ');
     console.error(err);
     process.exit(1);

@@ -99,7 +99,7 @@ export function filterAndBuildHooks(
   return [...hooks, ...localHooks].sort((a, b) => (a.name < b.name ? -1 : 1));
 }
 
-export const loadHooks = (hookType: HookType, opts: LoadHookOptions): PackageHook[] => {
+export const loadPackagesToHook = (hookType: HookType, opts: LoadHookOptions): PackageHook[] => {
   const stagedFiles = config.executionContext.stagedFiles || [];
 
   const rootDir = config.project.rootDir;

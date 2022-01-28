@@ -1,8 +1,8 @@
 import chalk from 'chalk';
 import { exec } from 'child_process';
 import path from 'path';
-import mookmeConfig, { Config } from '../config';
-import { bus as globalBus, EventBus, Events, EventType } from '../events';
+import config from '../config';
+import { bus, EventType } from '../events';
 import { PackageType } from '../types/hook.types';
 import { ExecutionStatus } from '../types/status.types';
 import { StepCommand } from '../types/step.types';
@@ -42,14 +42,6 @@ export class StepRunner {
    */
   packagePath: string;
   /**
-   * A config object, the global Mookme config by default. Can be replaced for testing purposes
-   */
-  config: Config;
-  /**
-   * An event bus object, the global Mookme event bus by default. Can be replaced for testing purposes
-   */
-  bus: EventBus<Events>;
-  /**
    * A boolean denoting if the step should be skipped. Computed during instanciation or with {@link StepRunner.isSkipped}
    */
   skipped = false;
@@ -61,19 +53,12 @@ export class StepRunner {
    * @param config - A config object, the global Mookme config by default. Can be replaced for testing purposes
    * @param bus - An event bus object, the global Mookme event bus by default. Can be replaced for testing purposes
    */
-  constructor(
-    step: StepCommand,
-    options: RunStepOptions,
-    config: Config = mookmeConfig,
-    bus: EventBus<Events> = globalBus,
-  ) {
+  constructor(step: StepCommand, options: RunStepOptions) {
     this.step = step;
     this.options = options;
-    this.config = config;
-    this.bus = bus;
 
     // Compute the absolute path to the package. Defaults to rootDir for global steps
-    const { rootDir, packagesPath } = this.config.project;
+    const { rootDir, packagesPath } = config.project;
     const { packageName } = this.options;
     this.packagePath = packageName === '__global' ? rootDir : path.join(packagesPath, packageName);
 
@@ -91,8 +76,8 @@ export class StepRunner {
         const matchedFiles = getMatchedFiles(
           this.step.onlyOn,
           this.packagePath,
-          this.config.executionContext.stagedFiles,
-          this.config.project.rootDir,
+          config.executionContext.stagedFiles,
+          config.project.rootDir,
         );
         if (matchedFiles.length === 0) {
           return true;
@@ -111,7 +96,7 @@ export class StepRunner {
    * @param status - the new status of the step
    */
   emitStepStatus(status: ExecutionStatus): void {
-    this.bus.emit(EventType.StepStatusChanged, {
+    bus.emit(EventType.StepStatusChanged, {
       packageName: this.options.packageName,
       stepName: this.step.name,
       status,
@@ -131,7 +116,7 @@ export class StepRunner {
 
     // Perform the args interpolation
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const args = this.config.executionContext.hookArgs!.split(' ').filter((arg) => arg !== '');
+    const args = config.executionContext.hookArgs!.split(' ').filter((arg) => arg !== '');
     execute.replace('{args}', `"${args.join(' ')}"`);
     return execute;
   }
