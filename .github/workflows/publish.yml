@@ -1,9 +1,9 @@
 name: Release npm package
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
-      - beta
 
 jobs:
   build:

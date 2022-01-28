@@ -3,24 +3,7 @@ import fs from 'fs';
 
 import { ProjectConfig } from '../config/types';
 import logger from '../utils/logger';
-
-function getRootDir(target: string): string | undefined {
-  let isRoot = false;
-  let rootDir = process.cwd();
-  let i = 0;
-  while (!isRoot && i < 20) {
-    isRoot = fs.existsSync(`${rootDir}/${target}`);
-    if (!isRoot) {
-      rootDir = `${rootDir}/..`;
-    }
-    i++;
-  }
-  if (!isRoot) {
-    return undefined;
-  }
-
-  return path.resolve(rootDir);
-}
+import { getRootDir } from '../utils/root-dir';
 
 function tryMigrateLegacyConfig() {
   const legacyRootDir = getRootDir('package.json');

@@ -2,7 +2,7 @@ import commander from 'commander';
 import inquirer from 'inquirer';
 import fs from 'fs';
 
-import { writeGitHooksFiles, writeGitIgnoreFiles } from '../utils/git';
+import { GitToolkit } from '../utils/git';
 import {
   addedBehaviorQuestion,
   choiceQuestion,
@@ -11,7 +11,6 @@ import {
   selectHookTypes,
 } from '../prompts/init';
 import logger from '../utils/logger';
-import { loadProjectConfig } from '../loaders/config';
 
 function createDirIfNeeded(path: string) {
   if (!fs.existsSync(path)) {
@@ -31,10 +30,11 @@ export function addInit(program: commander.Command): void {
     .option('--skip-types-selection', 'Skip hook types selection')
     .option('--yes', 'Skip confirmation prompter')
     .action(async (opts) => {
+      const git = new GitToolkit();
+
       if (opts.onlyHook) {
-        const config = loadProjectConfig();
         const hookTypes = await selectHookTypes(opts.skipTypesSelection);
-        writeGitHooksFiles(hookTypes, config.rootDir);
+        git.writeGitHooksFiles(hookTypes);
         process.exit(0);
       }
 
@@ -174,10 +174,10 @@ export function addInit(program: commander.Command): void {
           createDirIfNeeded(hookDir);
         });
 
-        writeGitHooksFiles(hookTypes);
+        git.writeGitHooksFiles(hookTypes);
         const paths = mookMeConfig.packages.map((pkg) => `${mookMeConfig.packagesPath}/${pkg}`);
         paths.push('./.gitignore');
-        writeGitIgnoreFiles(mookMeConfig.packages.map((pkg) => `${mookMeConfig.packagesPath}/${pkg}`));
+        git.writeGitIgnoreFiles(mookMeConfig.packages.map((pkg) => `${mookMeConfig.packagesPath}/${pkg}`));
       }
 
       logger.warning('\nAdding local hooks to .gitignore');
