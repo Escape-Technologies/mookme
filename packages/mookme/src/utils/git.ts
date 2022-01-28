@@ -42,6 +42,13 @@ export class GitToolkit {
       .map((pth) => pth.replace('\n', ''));
   }
 
+  getVCSState(): { staged: string[]; notStaged: string[] } {
+    return {
+      staged: this.getStagedFiles(),
+      notStaged: this.getNotStagedFiles(),
+    };
+  }
+
   detectAndProcessModifiedFiles(initialNotStagedFiles: string[], behavior: ADDED_BEHAVIORS): void {
     const notStagedFiles = execSync('echo $(git diff --name-only)')
       .toString()

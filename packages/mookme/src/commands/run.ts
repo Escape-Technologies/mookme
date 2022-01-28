@@ -1,20 +1,15 @@
 import commander from 'commander';
 
-import { HookType, VCSSensitiveHook } from '../types/hook.types';
-import { processResults } from '../utils/run-helpers';
 import { GitToolkit } from '../utils/git';
-import { loadPackagesToHook, setupPATH } from '../loaders/load-hooks';
 import config from '../config';
-import logger from '../utils/logger';
 import { MookmeUI } from '../ui';
-import { PackageExecutor } from '../executor/package-executor';
+import { RunOptions, RunRunner } from '../runner/run';
 
-interface Options {
-  type: HookType;
-  args: string;
-  all: boolean;
-}
-
+/**
+ * Extend an existing commander program instance with the `run` command of Mookme
+ *
+ * @param program - the instance of the commander program to extend
+ */
 export function addRun(program: commander.Command): void {
   program
     .command('run')
@@ -24,57 +19,16 @@ export function addRun(program: commander.Command): void {
     )
     .option('-a, --all <all>', 'Run hooks for all packages', '')
     .option('--args <args>', 'The arguments being passed to the hooks', '')
-    .action(run);
-}
+    .action(async (opts: RunOptions) => {
+      // Load the different config files
+      config.init();
 
-export async function run(opts: Options): Promise<void> {
-  // Load the different config files
-  config.init();
+      // Initialize the UI
+      const ui = new MookmeUI(false);
+      const git = new GitToolkit();
 
-  // Initialize the UI
-  const ui = new MookmeUI(true);
-
-  const git = new GitToolkit();
-
-  // Load the VCS state
-  const initialNotStagedFiles = git.getNotStagedFiles();
-  const stagedFiles = git.getStagedFiles();
-
-  const { type: hookType, args: hookArgs } = opts;
-  config.updateExecutionContext({
-    hookArgs,
-    hookType,
-    stagedFiles,
-  });
-
-  // Extend the path with partial commands
-  setupPATH();
-
-  // Load packages hooks to run
-  const packagesToHook = loadPackagesToHook(hookType, { all: opts.all });
-  if (packagesToHook.length === 0) {
-    return;
-  }
-
-  // Instanciate the package executors
-  const packageExecutors = packagesToHook.map((pkg) => new PackageExecutor(pkg));
-
-  // Run them concurrently and await the results
-  const executions = packageExecutors.map((executor) => executor.executePackageSteps());
-  const packagesErrors = await Promise.all(executions).catch((err) => {
-    logger.failure(' Unexpected error ! ');
-    console.error(err);
-    process.exit(1);
-  });
-
-  // Wait for events to be processed
-  setTimeout(() => {
-    processResults(packagesErrors);
-    ui.stop();
-  }, 500);
-
-  // Do not start modified files procedure, unless we are about to commit
-  if (VCSSensitiveHook.includes(opts.type)) {
-    git.detectAndProcessModifiedFiles(initialNotStagedFiles, config.project.addedBehavior);
-  }
+      // Instanciate a runner instance for the run command, and start it against the provided options
+      const runner = new RunRunner(ui, config, git);
+      await runner.run(opts);
+    });
 }

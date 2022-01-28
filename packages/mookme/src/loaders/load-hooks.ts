@@ -8,8 +8,12 @@ export interface LoadHookOptions {
   all?: boolean;
 }
 
-export function setupPATH(): void {
-  const { rootDir } = config.project;
+/**
+ * Extend the $PATH shell variable with the scripts defined in <rootDir>/.hooks/partials
+ *
+ * @param rootDir - the absolute path of the folder holding the `.mookme.json` file, where the global .hooks folder lives
+ */
+export function setupPATH(rootDir: string): void {
   const partialsPath = path.join(rootDir, '.hooks', 'partials');
   if (fs.existsSync(partialsPath)) {
     process.env.PATH = `${process.env.PATH}:${partialsPath}`;
