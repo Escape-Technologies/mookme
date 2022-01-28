@@ -32,6 +32,11 @@ export const hookTypes = Object.values(HookType);
  * An interface describing the package hook object used across the codebase
  *
  */
+
+export enum PackageType {
+  PYTHON = 'python',
+  JS = 'js',
+}
 export interface PackageHook {
   /**
    *
@@ -48,7 +53,7 @@ export interface PackageHook {
   /**
    * The type of the hook
    */
-  type?: string;
+  type?: PackageType;
   /**
    * A boolean denoting whether a virtualenv is started of not for this hook (eg for Python)
    */

@@ -52,7 +52,7 @@ export async function run(opts: Options): Promise<void> {
 
   // Initialize the UI
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const ui = new MookmeUI();
+  const ui = new MookmeUI(true);
 
   // Run them concurrently and await the results
   const promisedHooks = hooks.map((hook) => hookPackage(hook));
@@ -64,8 +64,8 @@ export async function run(opts: Options): Promise<void> {
 
   // Wait for events to be processed
   setTimeout(() => {
-    ui.stop();
     processResults(packagesErrors);
+    ui.stop();
   }, 500);
 
   // Do not start modified files procedure, unless we are about to commit

@@ -1,5 +1,5 @@
 import { PackageHook } from '../types/hook.types';
-import { runStep } from './run-step';
+import { RunStepOptions, StepRunner } from '../runner/step-runner';
 import { StepCommand, StepError } from '../types/step.types';
 import logger from './logger';
 import { bus, EventType } from '../events';
@@ -22,7 +22,7 @@ function handleStepError(
 }
 
 export async function hookPackage(hook: PackageHook): Promise<StepError[]> {
-  const options = {
+  const options: RunStepOptions = {
     packageName: hook.name,
     type: hook.type,
     venvActivate: hook.venvActivate,
@@ -36,9 +36,12 @@ export async function hookPackage(hook: PackageHook): Promise<StepError[]> {
     steps: hook.steps,
   });
 
-  for (const step of hook.steps) {
+  const runners = hook.steps.map((step) => new StepRunner(step, options));
+
+  for (const stepRunner of runners) {
+    const step = stepRunner.step;
     try {
-      const stepPromise: Promise<{ step: StepCommand; msg: Error } | null> = runStep(step, options);
+      const stepPromise: Promise<{ step: StepCommand; msg: Error } | null> = stepRunner.run();
 
       // Regardless of whether the step is serial or not, it will be awaited at the end of this function
       promises.push(stepPromise);
@@ -58,6 +61,8 @@ export async function hookPackage(hook: PackageHook): Promise<StepError[]> {
         });
       }
     } catch (err) {
+      // If this code is executed, there is some serious business going on, because the step execution is
+      // supposed to be wrapped in a catch-all block
       bus.emit(EventType.StepStatusChanged, {
         packageName: hook.name,
         stepName: step.name,
@@ -66,6 +71,9 @@ export async function hookPackage(hook: PackageHook): Promise<StepError[]> {
       throw err;
     }
   }
+
+  // Wait for the end of every step
+  await Promise.all(promises);
 
   return errors;
 }

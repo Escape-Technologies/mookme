@@ -17,11 +17,3 @@ export function getMatchedFiles(
     .map((fPath: string) => fPath.replace(`${packagePath}/`, ''))
     .filter((rPath: string) => matcher(rPath));
 }
-
-export function resolvePackagePath(rootDir: string, packagesPath: string, packageName: string): string {
-  return packageName === '__global' ? rootDir : path.join(packagesPath, packageName);
-}
-
-export function computeExecutedCommand(command: string, type?: string, venvActivate?: string): string {
-  return type === 'python' && venvActivate ? `source ${venvActivate} && ${command} && deactivate` : command;
-}
