@@ -1,5 +1,5 @@
 import { PackageHook } from '../types/hook.types';
-import { RunStepOptions, StepRunner } from '../runner/step-runner';
+import { ExecuteStepOptions, StepExecutor } from './step-executor';
 import { StepCommand, StepError } from '../types/step.types';
 import { bus, EventType } from '../events';
 import { ExecutionStatus } from '../types/status.types';
@@ -7,19 +7,19 @@ import { ExecutionStatus } from '../types/status.types';
 /**
  * A class for handling the hook execution for a package. It runs it's steps and process their results
  */
-export class PackageRunner {
+export class PackageExecutor {
   /**
-   * The package object being used for running the steps
+   * The package object being used for executing the steps
    */
   package: PackageHook;
   /**
    * The set of options retrieved from the package, and being passed to the step for their own execution
    */
-  options: RunStepOptions;
+  options: ExecuteStepOptions;
   /**
-   * The list of step runner attached to this package's steps
+   * The list of step executors attached to this package's steps
    */
-  stepRunners: StepRunner[];
+  stepExecutors: StepExecutor[];
 
   constructor(pkg: PackageHook) {
     this.package = pkg;
@@ -28,7 +28,7 @@ export class PackageRunner {
       type: pkg.type,
       venvActivate: pkg.venvActivate,
     };
-    this.stepRunners = pkg.steps.map((step) => new StepRunner(step, this.options));
+    this.stepExecutors = pkg.steps.map((step) => new StepExecutor(step, this.options));
 
     // Notify the application that this package is being hooked
     bus.emit(EventType.PackageRegistered, {
@@ -38,19 +38,19 @@ export class PackageRunner {
   }
 
   /**
-   * Run asynchronously every steps of the package attached to this runner.
+   * Run asynchronously every steps of the package attached to this executor.
    *
    * @returns A promised list containing every errors that occured during the package's steps
    */
-  async runPackageSteps(): Promise<StepError[]> {
+  async executePackageSteps(): Promise<StepError[]> {
     const promises = [];
     const errors: StepError[] = [];
 
-    for (const stepRunner of this.stepRunners) {
-      const step = stepRunner.step;
+    for (const executor of this.stepExecutors) {
+      const step = executor.step;
       try {
         // Start the step
-        const stepPromise: Promise<{ step: StepCommand; msg: Error } | null> = stepRunner.run();
+        const stepPromise: Promise<{ step: StepCommand; msg: Error } | null> = executor.run();
 
         // Regardless of whether the step is serial or not, it will be awaited at the end of this function
         promises.push(stepPromise);
