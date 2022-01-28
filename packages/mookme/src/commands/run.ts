@@ -7,7 +7,7 @@ import { loadPackagesToHook, setupPATH } from '../loaders/load-hooks';
 import config from '../config';
 import logger from '../utils/logger';
 import { MookmeUI } from '../ui';
-import { PackageRunner } from '../runner/package-runner';
+import { PackageExecutor } from '../executor/package-executor';
 
 interface Options {
   type: HookType;
@@ -56,11 +56,11 @@ export async function run(opts: Options): Promise<void> {
     return;
   }
 
-  // Instanciate the package runners
-  const packageRunners = packagesToHook.map((pkg) => new PackageRunner(pkg));
+  // Instanciate the package executors
+  const packageExecutors = packagesToHook.map((pkg) => new PackageExecutor(pkg));
 
   // Run them concurrently and await the results
-  const executions = packageRunners.map((runner) => runner.runPackageSteps());
+  const executions = packageExecutors.map((executor) => executor.executePackageSteps());
   const packagesErrors = await Promise.all(executions).catch((err) => {
     logger.failure(' Unexpected error ! ');
     console.error(err);

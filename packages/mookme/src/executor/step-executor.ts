@@ -8,7 +8,7 @@ import { ExecutionStatus } from '../types/status.types';
 import { StepCommand } from '../types/step.types';
 import { getMatchedFiles } from '../utils/run-helpers';
 
-export interface RunStepOptions {
+export interface ExecuteStepOptions {
   /**
    * The name of the package using this step
    */
@@ -24,36 +24,36 @@ export interface RunStepOptions {
 }
 
 /**
- * A class responsible for running a step in a separate child process.
+ * A class responsible for executing a step in a separate child process.
  *
  * It handles eventual error from the child process and return the exit code
  */
-export class StepRunner {
+export class StepExecutor {
   /**
    * The step object representing the task to run
    */
   step: StepCommand;
   /**
-   * Runner options, see {@link RunStepOptions}
+   * Executor options, see {@link ExecuteStepOptions}
    */
-  options: RunStepOptions;
+  options: ExecuteStepOptions;
   /**
    * The absolute path to the step's package
    */
   packagePath: string;
   /**
-   * A boolean denoting if the step should be skipped. Computed during instanciation or with {@link StepRunner.isSkipped}
+   * A boolean denoting if the step should be skipped. Computed during instanciation or with {@link StepExecutor.isSkipped}
    */
   skipped = false;
 
   /**
    *
    * @param step - The step object representing the task to run
-   * @param options - Runner options, see {@link RunStepOptions}
+   * @param options - Executor options, see {@link ExecuteStepOptions}
    * @param config - A config object, the global Mookme config by default. Can be replaced for testing purposes
    * @param bus - An event bus object, the global Mookme event bus by default. Can be replaced for testing purposes
    */
-  constructor(step: StepCommand, options: RunStepOptions) {
+  constructor(step: StepCommand, options: ExecuteStepOptions) {
     this.step = step;
     this.options = options;
 

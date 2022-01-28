@@ -28,7 +28,7 @@ export interface StepCommand {
 }
 
 /**
- * An interface describing eventual errors throws in the step runner
+ * An interface describing eventual errors throws in the step executor
  *
  */
 export interface StepError {
