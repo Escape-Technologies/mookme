@@ -1,3 +1,11 @@
+# [1.3.0-beta.1](https://github.com/Escape-Technologies/mookme/compare/v1.2.0...v1.3.0-beta.1) (2022-01-28)
+
+
+### Features
+
+* **mooke:** rewrite UI module for an event-based architecture ([49e9650](https://github.com/Escape-Technologies/mookme/commit/49e9650c27cd74bb21306d24648d1b3b7d2dd21f))
+* **mookme:** improve event-based rendering by removing the loop ([39d659a](https://github.com/Escape-Technologies/mookme/commit/39d659ac8f81f2232a41fa0757a282db1916f4aa))
+
 # [1.2.0](https://github.com/Escape-Technologies/mookme/compare/v1.1.0...v1.2.0) (2022-01-14)
 
 ### Bug Fixes
