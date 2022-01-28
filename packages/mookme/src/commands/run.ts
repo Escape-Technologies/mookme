@@ -2,7 +2,7 @@ import commander from 'commander';
 
 import { HookType, VCSSensitiveHook } from '../types/hook.types';
 import { processResults } from '../utils/run-helpers';
-import { getNotStagedFiles, detectAndProcessModifiedFiles, getStagedFiles } from '../utils/git';
+import { GitToolkit } from '../utils/git';
 import { loadPackagesToHook, setupPATH } from '../loaders/load-hooks';
 import config from '../config';
 import logger from '../utils/logger';
@@ -31,9 +31,14 @@ export async function run(opts: Options): Promise<void> {
   // Load the different config files
   config.init();
 
+  // Initialize the UI
+  const ui = new MookmeUI(true);
+
+  const git = new GitToolkit();
+
   // Load the VCS state
-  const initialNotStagedFiles = getNotStagedFiles();
-  const stagedFiles = getStagedFiles();
+  const initialNotStagedFiles = git.getNotStagedFiles();
+  const stagedFiles = git.getStagedFiles();
 
   const { type: hookType, args: hookArgs } = opts;
   config.updateExecutionContext({
@@ -50,10 +55,6 @@ export async function run(opts: Options): Promise<void> {
   if (packagesToHook.length === 0) {
     return;
   }
-
-  // Initialize the UI
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const ui = new MookmeUI(true);
 
   // Instanciate the package runners
   const packageRunners = packagesToHook.map((pkg) => new PackageRunner(pkg));
@@ -74,6 +75,6 @@ export async function run(opts: Options): Promise<void> {
 
   // Do not start modified files procedure, unless we are about to commit
   if (VCSSensitiveHook.includes(opts.type)) {
-    detectAndProcessModifiedFiles(initialNotStagedFiles, config.project.addedBehavior);
+    git.detectAndProcessModifiedFiles(initialNotStagedFiles, config.project.addedBehavior);
   }
 }

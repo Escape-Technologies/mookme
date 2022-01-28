@@ -7,7 +7,6 @@ export enum EventType {
   StepRegistered = 'stepRegistered',
   StepStatusChanged = 'stepStatusChanged',
   PackageRegistered = 'packageRegistered',
-  PackageStatusChanged = 'packageStatusChanged',
 }
 
 interface StepRegisteredPayload {
