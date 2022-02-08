@@ -39,7 +39,7 @@ export enum PackageType {
 }
 export interface PackageHook {
   /**
-   *
+   * The displayed name of the package
    */
   name: string;
   /**

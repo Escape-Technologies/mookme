@@ -1,6 +1,6 @@
 import { Config } from '../config';
 import { PackageExecutor } from '../executor/package-executor';
-import { loadPackagesToHook, setupPATH } from '../loaders/load-hooks';
+import { HooksResolver } from '../loaders/hooks-resolver';
 import { HookType, VCSSensitiveHook } from '../types/hook.types';
 import { MookmeUI } from '../ui';
 import { GitToolkit } from '../utils/git';
@@ -32,6 +32,7 @@ export class RunRunner {
   ui: MookmeUI;
   config: Config;
   gitToolkit: GitToolkit;
+  hooksResolver: HooksResolver;
 
   /**
    * A class holding the code executed in the `run` command of Mookme.
@@ -39,11 +40,13 @@ export class RunRunner {
    * @param ui - the {@link MookmeUI} instance of Mookme to use to output the command execution
    * @param config - the {@link Config} instance to use to parametrize the execution
    * @param gitToolkit - the {@link GitToolkit} instance to use to manage the VCS state
+   * * @param gitToolkit - the {@link HooksResolver} instance to use to load the hooks to run
    */
-  constructor(ui: MookmeUI, config: Config, gitToolkit: GitToolkit) {
+  constructor(ui: MookmeUI, config: Config, gitToolkit: GitToolkit, hooksResolver: HooksResolver) {
     this.ui = ui;
     this.config = config;
     this.gitToolkit = gitToolkit;
+    this.hooksResolver = hooksResolver;
   }
 
   /**
@@ -65,17 +68,17 @@ export class RunRunner {
       stagedFiles,
     });
 
+    // @TODO replace this with the git-folder-based root inference
+    const root = this.config.project.rootDir;
+
     // Extend the path with partial commands
-    setupPATH(this.config.project.rootDir);
+    this.hooksResolver.setupPATH(root);
 
     // Load packages hooks to run
-    const packagesToHook = loadPackagesToHook(hookType, { all: opts.all });
-    if (packagesToHook.length === 0) {
-      return;
-    }
+    const hooks = this.hooksResolver.getPreparedHooks(root, hookType);
 
     // Instanciate the package executors
-    const packageExecutors = packagesToHook.map((pkg) => new PackageExecutor(pkg));
+    const packageExecutors = hooks.map((pkg) => new PackageExecutor(pkg));
 
     // Run them concurrently and await the results
     const executions = packageExecutors.map((executor) => executor.executePackageSteps());
