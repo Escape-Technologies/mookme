@@ -92,7 +92,7 @@ One can declare a script in flake8 (don't forget to `chmod+x`) and then re-use i
 
 Mookme steps are shared by default. The point of the tool is to provide a shared git hooks configuration. However we understand that sometimes, one would like to have a custom mookme configuration.
 
-You can use {hook-type}.local.json files that are located and formatted in the very same way that current hook files are.
+You can use {hook-type}.local.json` files that are located and formatted in the very same way that shared hook files are.
 
 For instance, with the following configuration:
 
