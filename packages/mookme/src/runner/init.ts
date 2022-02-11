@@ -1,13 +1,8 @@
 import fs from 'fs';
 import inquirer from 'inquirer';
+import path from 'path';
 import { ADDED_BEHAVIORS } from '../config/types';
-import {
-  addedBehaviorQuestion,
-  choiceQuestion,
-  confirmQuestion,
-  folderQuestion,
-  selectHookTypes,
-} from '../prompts/init';
+import { addedBehaviorQuestion, selectHookTypes } from '../prompts/init';
 import { GitToolkit } from '../utils/git';
 import logger from '../utils/logger';
 
@@ -30,15 +25,7 @@ export interface InitOptions {
   /**
    * Provide packages list and skip the associated prompter
    */
-  packages?: string[];
-  /**
-   * Provide added behaviour and skip the associated prompter
-   */
   addedBehaviour?: ADDED_BEHAVIORS;
-  /**
-   * Provide packages path and skip the associated prompter
-   */
-  packagesPath?: string;
   /**
    * Skip hook types selection
    */
@@ -57,61 +44,12 @@ export class InitRunner {
   }
 
   async run(opts: InitOptions): Promise<void> {
+    const root = this.gitToolkit.rootDir;
+
     if (opts.onlyHook) {
       const hookTypes = await selectHookTypes(opts.skipTypesSelection);
       this.gitToolkit.writeGitHooksFiles(hookTypes);
       process.exit(0);
-    }
-
-    let packagesPath: string;
-    if (typeof opts.packagesPath !== 'undefined') {
-      packagesPath = opts.packagesPath;
-    } else {
-      packagesPath = (await inquirer.prompt([folderQuestion('packagesPath')])).packagesPath;
-    }
-
-    let selectedPackages: string[] = [];
-    if (opts.packages) {
-      selectedPackages = opts.packages;
-    } else {
-      clear();
-      const moduleDirs = fs
-        .readdirSync(`./${packagesPath}`, { withFileTypes: true })
-        .filter((dirent) => dirent.isDirectory() && !dirent.name.startsWith('.'))
-        .map((dirent) => dirent.name);
-
-      clear();
-      const { packages } = (await inquirer.prompt([
-        choiceQuestion('packages', 'Select folders to hook :\n', moduleDirs),
-      ])) as { packages: string[] };
-      selectedPackages = selectedPackages.concat(packages);
-
-      let { addSubFolder } = (await inquirer.prompt([
-        confirmQuestion('addSubFolder', 'Do you wanna add a subfolder for packages ?'),
-      ])) as { addSubFolder: boolean };
-
-      while (addSubFolder) {
-        const { subPath } = (await inquirer.prompt([folderQuestion('subPath', packagesPath)])) as { subPath: string };
-        const fullSubFolderPath = packagesPath ? `./${packagesPath}/${subPath}` : `./${subPath}`;
-        const moduleDirs = fs
-          .readdirSync(`./${fullSubFolderPath}`, { withFileTypes: true })
-          .filter((dirent) => dirent.isDirectory() && !dirent.name.startsWith('.'))
-          .map((dirent) => dirent.name);
-
-        clear();
-        const { packages } = (await inquirer.prompt([
-          choiceQuestion('packages', 'Select folders to hook :\n', moduleDirs),
-        ])) as { packages: string[] };
-        selectedPackages = selectedPackages.concat(
-          packages.map((subPackage) => `${packagesPath ? `${packagesPath}/` : ''}${subPath}/${subPackage}`),
-        );
-
-        addSubFolder = (
-          (await inquirer.prompt([confirmQuestion('addSubFolder', 'Do you wanna add a subfolder for packages ?')])) as {
-            addSubFolder: boolean;
-          }
-        ).addSubFolder;
-      }
     }
 
     clear();
@@ -123,33 +61,25 @@ export class InitRunner {
     }
 
     const mookMeConfig = {
-      packagesPath: `.${packagesPath ? `/${packagesPath}` : ''}`,
-      packages: selectedPackages,
       addedBehavior,
     };
-
-    const packagesHooksDirPaths = selectedPackages.map((mod) => `${mookMeConfig.packagesPath}/${mod}/.hooks`);
 
     const hookTypes = await selectHookTypes(opts.skipTypesSelection);
 
     clear();
-    logger.info('\nThe following configuration will be written into .mookme.json:');
+    logger.info(`The following configuration will be written into \`${root}/.mookme.json\`:`);
     logger.log(JSON.stringify(mookMeConfig, null, 2));
 
-    logger.info('\n The follwowing git hooks will be created:');
-    hookTypes.forEach((t) => logger.log(`./.git/hooks/${t}`));
+    logger.info('');
+    logger.info('The follwowing git hooks will be created:');
+    hookTypes.forEach((t) => logger.log(`${root}/.git/hooks/${t}`));
 
-    logger.info('\n`.hooks/*.local.env` will be appended into the following `.gitignore` files:');
-    selectedPackages
-      .map((mod) => `${mookMeConfig.packagesPath}/${mod}/.gitignore`)
-      .forEach((p) => logger.log(`- ${p}`));
-    logger.log(`- ./.gitignore`);
-
-    logger.info('\nThe following directories will also be created:');
-    packagesHooksDirPaths.forEach((hookDir) => logger.log(`- ${hookDir}`));
-    logger.log(`- ./.hooks`);
+    logger.info('');
+    logger.info(`The following entries will be added into \`${root}/.gitignore\`:`);
+    hookTypes.forEach((t) => logger.log(`.${t}.local.json`));
 
     let confirm;
+    logger.log('');
 
     if (opts.yes) {
       confirm = true;
@@ -167,44 +97,31 @@ export class InitRunner {
     }
 
     if (confirm) {
-      logger.warning('\nWriting configuration...');
+      logger.warning('');
+      logger.warning('Writing configuration...');
       fs.writeFileSync('.mookme.json', JSON.stringify(mookMeConfig, null, 2));
       logger.success('Done.');
 
       logger.warning('Initializing hooks folders...');
-      createDirIfNeeded('./.hooks');
-      createDirIfNeeded('./.hooks/shared');
-      fs.writeFileSync('./.hooks/shared/.gitkeep', '');
-      createDirIfNeeded('./.hooks/partials');
-      fs.writeFileSync('./.hooks/partials/.gitkeep', '');
-      fs.writeFileSync(
-        './.hooks/pre-commit.json',
-        JSON.stringify(
+      createDirIfNeeded(path.join(root, '.hooks'));
+      createDirIfNeeded(path.join(root, '.hooks', 'shared'));
+      fs.writeFileSync(path.join(root, '.hooks', 'shared', '.gitkeep'), '');
+      createDirIfNeeded(path.join(root, '.hooks', 'partials'));
+      fs.writeFileSync(path.join(root, '.hooks', 'partials', '.gitkeep'), '');
+      const example = {
+        steps: [
           {
-            steps: [
-              {
-                name: 'Example hook',
-                command: 'echo "Hello world!"',
-              },
-            ],
+            name: 'Example hook',
+            command: 'echo "Hello world!"',
           },
-          null,
-          2,
-        ),
-      );
+        ],
+      };
+      fs.writeFileSync('./.hooks/pre-commit.json', JSON.stringify(example, null, 2));
       logger.success('An example hook has been written in `./.hooks/pre-commit.json`');
-      packagesHooksDirPaths.forEach((hookDir) => {
-        createDirIfNeeded(hookDir);
-      });
 
       this.gitToolkit.writeGitHooksFiles(hookTypes);
-      const paths = mookMeConfig.packages.map((pkg) => `${mookMeConfig.packagesPath}/${pkg}`);
-      paths.push('./.gitignore');
-      this.gitToolkit.writeGitIgnoreFiles(mookMeConfig.packages.map((pkg) => `${mookMeConfig.packagesPath}/${pkg}`));
+      this.gitToolkit.writeGitIgnoreFiles(hookTypes);
     }
-
-    logger.warning('\nAdding local hooks to .gitignore');
-    fs.appendFileSync(`./.gitignore`, `\n**/.hooks/*.local.json\n`, { flag: 'a+' });
 
     logger.success('Your hooks are configured.');
   }

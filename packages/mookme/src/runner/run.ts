@@ -40,7 +40,7 @@ export class RunRunner {
    * @param ui - the {@link MookmeUI} instance of Mookme to use to output the command execution
    * @param config - the {@link Config} instance to use to parametrize the execution
    * @param gitToolkit - the {@link GitToolkit} instance to use to manage the VCS state
-   * * @param gitToolkit - the {@link HooksResolver} instance to use to load the hooks to run
+   * @param hooksResolver - the {@link HooksResolver} instance to use to load the hooks to run
    */
   constructor(ui: MookmeUI, config: Config, gitToolkit: GitToolkit, hooksResolver: HooksResolver) {
     this.ui = ui;
@@ -59,26 +59,26 @@ export class RunRunner {
     this.ui.start();
 
     // Load the VCS state
-    const { staged: stagedFiles, notStaged: initialNotStagedFiles } = this.gitToolkit.getVCSState();
+    const { staged: initialStagedFiles, notStaged: initialNotStagedFiles } = this.gitToolkit.getVCSState();
 
-    const { type: hookType, args: hookArgs } = opts;
-    this.config.updateExecutionContext({
-      hookArgs,
-      hookType,
-      stagedFiles,
-    });
-
-    // @TODO replace this with the git-folder-based root inference
-    const root = this.config.project.rootDir;
+    // Retrieve mookme command options
+    const { args: hookArguments } = opts;
 
     // Extend the path with partial commands
-    this.hooksResolver.setupPATH(root);
+    this.hooksResolver.setupPATH();
 
     // Load packages hooks to run
-    const hooks = this.hooksResolver.getPreparedHooks(root, hookType);
+    const hooks = this.hooksResolver.getPreparedHooks();
 
     // Instanciate the package executors
-    const packageExecutors = hooks.map((pkg) => new PackageExecutor(pkg));
+    const packageExecutors = hooks.map(
+      (pkg) =>
+        new PackageExecutor(pkg, {
+          hookArguments,
+          stagedFiles: initialStagedFiles,
+          rootDir: this.gitToolkit.rootDir,
+        }),
+    );
 
     // Run them concurrently and await the results
     const executions = packageExecutors.map((executor) => executor.executePackageSteps());
@@ -96,7 +96,7 @@ export class RunRunner {
 
     // Do not start modified files procedure, unless we are about to commit
     if (VCSSensitiveHook.includes(opts.type)) {
-      this.gitToolkit.detectAndProcessModifiedFiles(initialNotStagedFiles, this.config.project.addedBehavior);
+      this.gitToolkit.detectAndProcessModifiedFiles(initialNotStagedFiles, this.config.addedBehavior);
     }
   }
 }

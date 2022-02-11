@@ -56,7 +56,7 @@ export class GitToolkit {
       .map((file) => file.replace('\n', ''));
 
     const changedFiles = notStagedFiles.filter((file) => !initialNotStagedFiles.includes(file));
-    if (changedFiles.length) {
+    if (changedFiles.length > 0) {
       console.log();
       switch (behavior) {
         case ADDED_BEHAVIORS.ADD_AND_COMMIT:
@@ -84,16 +84,10 @@ export class GitToolkit {
 
     hookTypes.forEach((type) => {
       logger.info(`- ${gitFolderPath}/hooks/${type}`);
-      const mookmeLegacyCmd = `./node_modules/@escape.tech/mookme/bin/index.js run --type ${type} --args "$1"`;
       const mookmeCmd = `npx mookme run --type ${type} --args "$1"`;
       if (fs.existsSync(`${gitFolderPath}/hooks/${type}`)) {
         const hook = fs.readFileSync(`${gitFolderPath}/hooks/${type}`).toString();
-        if (hook.includes(mookmeLegacyCmd)) {
-          logger.log(`Legacy mookme invokation detected, updating it...`);
-          const newHook = hook.replace(mookmeLegacyCmd, mookmeCmd);
-          fs.writeFileSync(`${gitFolderPath}/hooks/${type}`, newHook);
-          execSync(`chmod +x ${gitFolderPath}/hooks/${type}`);
-        } else if (!hook.includes(mookmeCmd)) {
+        if (!hook.includes(mookmeCmd)) {
           fs.appendFileSync(`${gitFolderPath}/hooks/${type}`, `\n${mookmeCmd}`, { flag: 'a+' });
           execSync(`chmod +x ${gitFolderPath}/hooks/${type}`);
         } else {
@@ -107,19 +101,20 @@ export class GitToolkit {
     });
   }
 
-  writeGitIgnoreFiles(packagesPath: string[]): void {
+  writeGitIgnoreFiles(hookTypes: HookType[]): void {
     logger.info('Writing `.gitignore files`');
 
-    for (const pkgPath of packagesPath) {
-      logger.info(`- ${pkgPath}`);
-      if (!fs.existsSync(`${pkgPath}/.gitignore`)) {
-        logger.warning(`Package ${pkgPath} has no \`.gitignore\` file, creating it...`);
-        fs.writeFileSync(`${pkgPath}/.gitignore`, `.hooks/*.local.json\n`);
-      } else {
-        const line = '.hooks/*.local.json';
-        const gitignoreContent = fs.readFileSync(`${pkgPath}/.gitignore`).toString();
+    const root = this.rootDir;
+    const lines = hookTypes.map((t) => `.hooks/${t}.local.json`);
+
+    if (!fs.existsSync(`${root}/.gitignore`)) {
+      logger.warning(`Project root has no \`.gitignore\` file, creating it...`);
+      fs.writeFileSync(`${root}/.gitignore`, lines.join('\n'));
+    } else {
+      const gitignoreContent = fs.readFileSync(`${root}/.gitignore`).toString();
+      for (const line of lines) {
         if (gitignoreContent.includes(line)) {
-          fs.appendFileSync(`${pkgPath}/.gitignore`, `\n.hooks/*.local.json\n`, { flag: 'a+' });
+          fs.appendFileSync(`${root}/.gitignore`, `\n.${line}n\n`, { flag: 'a+' });
         }
       }
     }

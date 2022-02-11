@@ -6,9 +6,7 @@ export function addInit(program: commander.Command): void {
   program
     .command('init')
     .option('--only-hook', 'Skip packages definition and only write .git/hooks/${hook-type} files')
-    .option('--packages [packages...]', 'Provide packages list and skip the associated prompter')
     .option('--added-behaviour <added-behaviour>', 'Provide added behaviour and skip the associated prompter')
-    .option('--packages-path <packages-path>', 'Provide packages path and skip the associated prompter')
     .option('--skip-types-selection', 'Skip hook types selection')
     .option('--yes', 'Skip confirmation prompter')
     .action(async (opts: InitOptions) => {

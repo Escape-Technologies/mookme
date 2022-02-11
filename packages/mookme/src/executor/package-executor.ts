@@ -1,8 +1,23 @@
 import { PackageHook } from '../types/hook.types';
-import { ExecuteStepOptions, StepExecutor } from './step-executor';
+import { StepExecutor } from './step-executor';
 import { StepCommand, StepError } from '../types/step.types';
 import { bus, EventType } from '../events';
 import { ExecutionStatus } from '../types/status.types';
+
+export interface PackageExecutorOptions {
+  /**
+   * The arguments provided to the git hooks command
+   */
+  hookArguments: string;
+  /**
+   * The list of staged files in the current copy
+   */
+  stagedFiles: string[];
+  /**
+   * The absolute path pointing towards the root directory
+   */
+  rootDir: string;
+}
 
 /**
  * A class for handling the hook execution for a package. It runs it's steps and process their results
@@ -13,22 +28,27 @@ export class PackageExecutor {
    */
   package: PackageHook;
   /**
-   * The set of options retrieved from the package, and being passed to the step for their own execution
-   */
-  options: ExecuteStepOptions;
-  /**
    * The list of step executors attached to this package's steps
    */
   stepExecutors: StepExecutor[];
 
-  constructor(pkg: PackageHook) {
+  options: PackageExecutorOptions;
+
+  constructor(pkg: PackageHook, options: PackageExecutorOptions) {
     this.package = pkg;
-    this.options = {
-      packageName: pkg.name,
-      type: pkg.type,
-      venvActivate: pkg.venvActivate,
-    };
-    this.stepExecutors = pkg.steps.map((step) => new StepExecutor(step, this.options));
+    this.options = options;
+    this.stepExecutors = pkg.steps.map(
+      (step) =>
+        new StepExecutor(step, {
+          packageName: pkg.name,
+          packagePath: pkg.cwd,
+          type: pkg.type,
+          venvActivate: pkg.venvActivate,
+          hookArguments: options.hookArguments,
+          stagedFiles: options.stagedFiles,
+          rootDir: options.rootDir,
+        }),
+    );
 
     // Notify the application that this package is being hooked
     bus.emit(EventType.PackageRegistered, {
