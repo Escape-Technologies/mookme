@@ -9,26 +9,20 @@
 Mookme is a Git hook manager. It's sole purpose is to execute some scripts when you want to commit or do other git stuff. It could be a
 linter, tests, your favorite commit message checker.
 
+::: tip
 **Everything that is invoked through a cli can be used with Mookme!**
-
-Despite being a very young project, it is ready to use, even if it remains a beta under active development.
+:::
 
 You are welcome to use it and enjoy it's simplicity.
 **If you encounter any bug or weird behavior, don't be afraid to open an [issue](https://github.com/Escape-Technologies/mookme/issues) :)**
 
-<img src="demo.gif" alt="A fresh look at your new git hooks ;)" width="600"/>
-
 ## How does it work ?
 
-- You initialize a tiny bit of configuration, essentially describing the structure of your monorepo, especially :
-  - What is the root folder where the packages of the repo are stored
-  - What are the paths to these packages.
-
-**Don't worry**, we provide a CLI tool let you easily enter this configuration: Just run `npx mookme init`
-
-- You write your hooks in JSON files (see writing hooks)
-- You do your stuff & commit, `Mookme` will evaluate which packages have staged changes, and will run hooks defined in
-the folder `.hooks` of these folders.
+1. Mookme is invoked by a git hook script
+2. Mookme looks for `.hooks` folders across your repository
+3. For each detected folders, Mookme detects if there are any hooks defined for the git hook currently being executed
+4. For each detected folders, Mookme detects if there are git-staged changes in this folder (only for pre-commit hooks)
+5. If both conditions above are valid, Mookme runs concurrently (or not) the different commands provided in the hook file.
 
 ## Why not ... ?
 

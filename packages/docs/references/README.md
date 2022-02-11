@@ -4,15 +4,14 @@
 
 The main initialization command. It :
 
-- prompts for one or multiple packages folder path
-- asks you to select one or multiple package at each path
-- asks you to selec one or multiple git event to hook
-- creates the `.hooks` folder in each package where you can write **dedicated hooks!** that will be triggered only
+- **asks** you to select a behavior to observe when the staged files are updated by your git hooks
+- **asks** you to select one or multiple git event to hook
+- **creates** the `.hooks` folder in each package where you can write **dedicated hooks!** that will be triggered only
 when changes in this package occur
-- creates a `.hooks` folder at the root of your project where you can write **project-wide hooks** that will be
+- **creates** a `.hooks` folder at the root of your project where you can write **project-wide hooks** that will be
 triggered on every commit
-- writes `.git/hooks` files
-- writes into the `.gitignore` files of your root project and specified packages to ignore [local steps](/features/#uncommited-steps-gitignore)
+- **writes** `.git/hooks` files
+- **writes** into the `.gitignore` files of your root project and specified packages to ignore [local steps](/features/#uncommited-steps-gitignore)
 
 ### Options
 
@@ -24,37 +23,11 @@ Skip prompters and only write `.git/hooks` files. This is for installation in an
 
 Skip hook types selection and hook every git event.
 
-## `mookme add-pkg`
-
-A helper for adding a new package to an existing configuration. It takes a required option `-p --pkg` which is the
-package to add.
-
-This will:
-
-- push the new package in the package.json file
-- create a `.hooks` folder in this package if needed
-
-### Options
-
-- `-p --pkg <pkg>` (required)
-
-The relative path from the packages root to the package to add to the configuration
-
-### Examples
-
-````bash
-# This will add the package at path $PROJECT_ROOT/$PACKAGES_ROOT/new-package
-# Where $PROJECT_ROOT is where your package.json is
-# $PACKAGES_ROOT is the packagesPath value in the mookme configuration
-
-mookme add-pkg -p new-package
-````
-
 ## `mookme run`
 
 Mainly used for debugging and dry run :
 
-`mookme run --type pre-commit -a "test arguments"`
+`mookme run --type pre-commit --args "test arguments"`
 
 ### Options
 

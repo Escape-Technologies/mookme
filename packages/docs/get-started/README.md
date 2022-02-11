@@ -6,11 +6,15 @@
 npm install @escape.tech/mookme
 ```
 
-## Configuration
-
 ### Requirements
 
 `Mookme` requires Node.js to work properly.
+
+## Configuration
+
+Mookme will look automatically detect the `.hooks` folder across your repository and trigger the command related to your current VCS state.
+
+Hence it only requires a very minimal configuration, as most of this is defined by where you place your `.hooks` folders, and what you put in them.
 
 ### First configuration
 
@@ -20,9 +24,7 @@ npm install @escape.tech/mookme
 npx mookme init
 ```
 
-This will display a prompter to let you define **where you packages are located**, how you want the hooks to behave
-when a file is changed during commit hooks, write the corresponding documentation in your `package.json`, and write
-your `.git/hooks` scripts.
+This will display a prompter to let you define how you want the hooks to behave when a file is changed during commit hooks, write the corresponding documentation in your `package.json`, and write your `.git/hooks` scripts.
 
 Every step of this process is clearly shown and nothing will be written without asking you if you're okay with it :)
 
@@ -44,7 +46,7 @@ npx mookme init --only-hook
 and multiple packages where you can define per-package hook.
 
 ::: tip
-Hook are written in a folder `.hooks` located at the root of your project and at the root of you packages' folders.
+Hooks are written in a folder `.hooks` located at the root of your project and at the root of your packages' folders.
 
 **When using `Mookme` in a monorepo, you will have a project structure following this :**
 
@@ -75,11 +77,11 @@ available git hooks, eg :
 - `prepare-commit-msg`
 - `commit-msg`
 - `post-commit`
-- `post-merge`,
-- `post-rewrite`,
-- `pre-rebase`,
-- `post-checkout`,
-- `pre-push`,
+- `post-merge`
+- `post-rewrite`
+- `pre-rebase`
+- `post-checkout`
+- `pre-push`
 
 ::: warning
 The exit behavior is only applied on pre-commit hook types: `pre-commit`, `prepare-commit-msg`, `commit-msg`, `post-commit`
