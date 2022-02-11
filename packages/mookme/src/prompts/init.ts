@@ -1,28 +1,7 @@
 import chalk from 'chalk';
-import fs from 'fs';
 import inquirer from 'inquirer';
 import { ADDED_BEHAVIORS } from '../config/types';
 import { HookType, hookTypes } from '../types/hook.types';
-
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const folderQuestion = (name: string, from = '') => ({
-  type: 'input',
-  name,
-  message: 'Please enter the path of the folder containing the packages:\n',
-  validate(rpath: string) {
-    let pass;
-    try {
-      pass = fs.lstatSync(from ? `./${from}/${rpath}` : `./${rpath}`).isDirectory();
-    } catch (err) {
-      pass = false;
-    }
-    if (pass) {
-      return true;
-    }
-    return `Path ./${rpath} is not a valid folder path`;
-  },
-  transformer: (val: string) => (from ? `./${from}/${val}` : `./${val}`),
-});
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const choiceQuestion = (name: string, message: string, choices: string[]) => ({

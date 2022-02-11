@@ -1,7 +1,7 @@
 import commander from 'commander';
 
 import { GitToolkit } from '../utils/git';
-import config from '../config';
+import { Config } from '../config';
 import { MookmeUI } from '../ui';
 import { RunOptions, RunRunner } from '../runner/run';
 import { HooksResolver } from '../loaders/hooks-resolver';
@@ -21,13 +21,13 @@ export function addRun(program: commander.Command): void {
     .option('-a, --all <all>', 'Run hooks for all packages', '')
     .option('--args <args>', 'The arguments being passed to the hooks', '')
     .action(async (opts: RunOptions) => {
-      // Load the different config files
-      config.init();
-
       // Initialize the UI
       const ui = new MookmeUI(false);
       const git = new GitToolkit();
-      const resolver = new HooksResolver(git);
+      const resolver = new HooksResolver(git, opts.type);
+
+      // Load the different config files
+      const config = new Config(git.rootDir);
 
       // Instanciate a runner instance for the run command, and start it against the provided options
       const runner = new RunRunner(ui, config, git, resolver);

@@ -1,7 +1,5 @@
 import chalk from 'chalk';
 import { exec } from 'child_process';
-import path from 'path';
-import config from '../config';
 import { bus, EventType } from '../events';
 import { PackageType } from '../types/hook.types';
 import { ExecutionStatus } from '../types/status.types';
@@ -14,13 +12,29 @@ export interface ExecuteStepOptions {
    */
   packageName: string;
   /**
+   * The absolute path pointing towards the loacation of the package holding this step
+   */
+  packagePath: string;
+  /**
+   * The absolute path pointing towards the root directory
+   */
+  rootDir: string;
+  /**
    * The type of the step to run.
    */
   type?: PackageType;
   /**
-   * An optional to a virtualenv to use (only used if type is {@link PackageType.PYTHON}
+   * An optional path to a virtualenv to use (only used if type is {@link PackageType.PYTHON})
    */
   venvActivate?: string;
+  /**
+   * A string containing the arguments passed to the git hook. See
+   */
+  hookArguments: string;
+  /**
+   * The list of files added to the VCS state
+   */
+  stagedFiles: string[];
 }
 
 /**
@@ -38,10 +52,6 @@ export class StepExecutor {
    */
   options: ExecuteStepOptions;
   /**
-   * The absolute path to the step's package
-   */
-  packagePath: string;
-  /**
    * A boolean denoting if the step should be skipped. Computed during instanciation or with {@link StepExecutor.isSkipped}
    */
   skipped = false;
@@ -50,17 +60,10 @@ export class StepExecutor {
    *
    * @param step - The step object representing the task to run
    * @param options - Executor options, see {@link ExecuteStepOptions}
-   * @param config - A config object, the global Mookme config by default. Can be replaced for testing purposes
-   * @param bus - An event bus object, the global Mookme event bus by default. Can be replaced for testing purposes
    */
   constructor(step: StepCommand, options: ExecuteStepOptions) {
     this.step = step;
     this.options = options;
-
-    // Compute the absolute path to the package. Defaults to rootDir for global steps
-    const { rootDir, packagesPath } = config.project;
-    const { packageName } = this.options;
-    this.packagePath = packageName === '__global' ? rootDir : path.join(packagesPath, packageName);
 
     // Determine if step is skipped
     this.skipped = this.isSkipped();
@@ -72,13 +75,9 @@ export class StepExecutor {
    */
   isSkipped(): boolean {
     if (this.step.onlyOn) {
+      const { packagePath, stagedFiles, rootDir } = this.options;
       try {
-        const matchedFiles = getMatchedFiles(
-          this.step.onlyOn,
-          this.packagePath,
-          config.executionContext.stagedFiles,
-          config.project.rootDir,
-        );
+        const matchedFiles = getMatchedFiles(this.step.onlyOn, packagePath, stagedFiles, rootDir);
         if (matchedFiles.length === 0) {
           return true;
         }
@@ -112,12 +111,12 @@ export class StepExecutor {
     // Add eventual virtual env to activate before the command
     const { type, venvActivate } = this.options;
     const { command } = this.step;
-    const execute = type === 'python' && venvActivate ? `source ${venvActivate} && ${command} && deactivate` : command;
+    let execute = type === 'python' && venvActivate ? `source ${venvActivate} && ${command} && deactivate` : command;
 
     // Perform the args interpolation
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const args = config.executionContext.hookArgs!.split(' ').filter((arg) => arg !== '');
-    execute.replace('{args}', `"${args.join(' ')}"`);
+    const args = this.options.hookArguments.split(' ').filter((arg) => arg !== '');
+    execute = execute.replace('{args}', `"${args.join(' ')}"`);
+
     return execute;
   }
 
@@ -136,7 +135,7 @@ export class StepExecutor {
 
     return new Promise((resolve) => {
       const command = this.computeExecutedCommand();
-      const cp = exec(command, { cwd: this.packagePath });
+      const cp = exec(command, { cwd: this.options.packagePath });
 
       /* handle command outputs */
       let out = '';
