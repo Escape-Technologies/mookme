@@ -43,6 +43,20 @@ The arguments that would be normally passed by git to the hook
 
 Skip the selection of hooks to run based on git-staged files, and run hooks of every package for this type
 
+## `mookme inspect`
+
+Manually test wich packages are discovered and assess if your hooks are properly configured.
+
+`mookme inspect --type pre-commit`
+
+<img src="/inspect-results.png" alt="inspect-results"/>
+
+### Options
+
+- `-t --type` (required)
+
+The type of hook to inspect, has to be one of `pre-commit`, `prepare-commit-msg`, `commit-msg`, `post-commit`.
+
 ## Hook files
 
 ### General description

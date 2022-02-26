@@ -25,11 +25,9 @@ export class Config {
       // Load the file and add it's content to the correct attributes
       // @TODO: verify the content of the config file
       const configFromFile = JSON.parse(fs.readFileSync(configFilePath).toString());
-      if (configFromFile.addedBehavior) {
-        this.addedBehavior = configFromFile.addedBehavior as ADDED_BEHAVIORS;
-      } else {
-        this.addedBehavior = ADDED_BEHAVIORS.ADD_AND_COMMIT;
-      }
+      this.addedBehavior = configFromFile.addedBehavior
+        ? (configFromFile.addedBehavior as ADDED_BEHAVIORS)
+        : ADDED_BEHAVIORS.ADD_AND_COMMIT;
     }
   }
 }
