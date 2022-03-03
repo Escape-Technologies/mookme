@@ -47,7 +47,7 @@ export function runStep(
     }
 
     const command = computeExecutedCommand(step.command, options.type, options.venvActivate);
-    const cp = exec(command.replace('{args}', `"${args.join(' ')}"`), { cwd: packagePath, shell: '/bin/bash' });
+    const cp = exec(command.replace('{args}', `"${args.join(' ')}"`), { cwd: packagePath });
 
     /* handle command outputs */
     let out = '';
