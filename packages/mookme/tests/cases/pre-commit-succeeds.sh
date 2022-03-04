@@ -12,13 +12,12 @@ git init
 mkdir -p package1
 mkdir -p parent1/package2
 mkdir -p parent1/package3
+mkdir -p parent1/package3/.hooks
 
 node $ROOT_FOLDER/dist/index.js init \
     --yes \
-    --packages package1 "parent1/package2" "parent1/package3" \
     --added-behaviour exit \
-    --skip-types-selection \
-    --packages-path ""
+    --skip-types-selection
 
 {
   echo '#!/usr/bin/env bash'
