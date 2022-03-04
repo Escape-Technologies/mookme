@@ -136,7 +136,7 @@ export class StepExecutor {
 
     return new Promise((resolve) => {
       const command = this.computeExecutedCommand();
-      const cp = exec(command, { cwd: this.packagePath, shell: '/bin/bash' });
+      const cp = exec(command, { cwd: this.packagePath });
 
       /* handle command outputs */
       let out = '';
