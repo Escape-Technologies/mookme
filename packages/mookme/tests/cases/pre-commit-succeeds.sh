@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 TESTS_DIR=$(mktemp -d)
 
@@ -8,7 +9,7 @@ npm run build &> /dev/null
 # create and cd in tmp folder
 cd $TESTS_DIR
 
-git init
+git init -q
 mkdir -p package1
 mkdir -p parent1/package2
 mkdir -p parent1/package3

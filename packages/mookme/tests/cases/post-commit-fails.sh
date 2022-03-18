@@ -10,14 +10,15 @@ npm run build &> /dev/null
 cd $TESTS_DIR
 
 git init -q
-mkdir -p package1
-mkdir -p package1/.hooks
+
+mkdir -p .hooks
+echo '{"steps": [{"name": "Oups", "command": "exit 1"}]}' > .hooks/post-commit.json
+git add .
+git commit -m "Set up hooks"
 
 node $ROOT_FOLDER/dist/index.js init \
     --yes \
     --added-behaviour exit \
-    --skip-types-selection \
+    --skip-types-selection
 
-echo '{"steps": [{"name": "Custom Command", "command": "get-dir-name"}]}' > package1/.hooks/pre-commit.json
-git add .
-! node $ROOT_FOLDER/dist/index.js run -t pre-commit
+! node $ROOT_FOLDER/dist/index.js run -t post-commit

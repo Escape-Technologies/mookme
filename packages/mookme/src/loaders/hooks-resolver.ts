@@ -18,9 +18,10 @@ function matchExactPath(filePath: string, to_match: string): boolean {
  * A class defining several utilitaries used to load and prepare packages hooks to be executed
  */
 export class HooksResolver {
-  gitToolkit: GitToolkit;
-  root: string;
-  hookType: string;
+  private static readonly stagingHooks = ['pre-commit'];
+  private readonly gitToolkit: GitToolkit;
+  private readonly root: string;
+  private readonly hookType: string;
 
   /**
    * A class defining several utilitaries used to load and prepare packages hooks to be executed
@@ -200,6 +201,10 @@ export class HooksResolver {
    * @returns the filtered list of {@link PackageHook} based on their consistency with the files staged in VCS.
    */
   filterWithVCS(hooks: PackageHook[]): PackageHook[] {
+    if (!HooksResolver.stagingHooks.includes(this.hookType)) {
+      return hooks;
+    }
+
     const { staged: stagedFiles } = this.gitToolkit.getVCSState();
 
     const filtered = hooks.filter((hook) => {
@@ -244,5 +249,9 @@ export class HooksResolver {
     hooks = this.filterWithVCS(hooks);
 
     return hooks;
+  }
+
+  getHookType(): string {
+    return this.hookType;
   }
 }

@@ -14,7 +14,7 @@ export class InspectRunner {
 
   async run(): Promise<void> {
     const root = process.cwd();
-    const hookType = this.resolver.hookType;
+    const hookType = this.resolver.getHookType();
 
     logger.info('');
     logger.info(`Step 1: Looking for packages under the folder '${root}'`);

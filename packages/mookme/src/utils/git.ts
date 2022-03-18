@@ -28,17 +28,18 @@ export class GitToolkit {
   }
 
   getNotStagedFiles(): string[] {
-    return execSync('echo $(git diff --name-only)')
-      .toString()
-      .split(' ')
-      .map((pth) => pth.replace('\n', ''));
+    return GitToolkit.gitFileList('git diff --name-only -z');
   }
 
   getStagedFiles(): string[] {
-    return execSync('echo $(git diff --cached --name-only)')
+    return GitToolkit.gitFileList('git diff --cached --name-only -z');
+  }
+
+  private static gitFileList(command: string): string[] {
+    return execSync(command)
       .toString()
-      .split(' ')
-      .map((pth) => pth.replace('\n', ''));
+      .split('\0')
+      .filter((p) => p !== '');
   }
 
   getVCSState(): { staged: string[]; notStaged: string[] } {
@@ -49,10 +50,7 @@ export class GitToolkit {
   }
 
   detectAndProcessModifiedFiles(initialNotStagedFiles: string[], behavior: ADDED_BEHAVIORS): void {
-    const notStagedFiles = execSync('echo $(git diff --name-only)')
-      .toString()
-      .split(' ')
-      .map((file) => file.replace('\n', ''));
+    const notStagedFiles = this.getNotStagedFiles();
 
     const changedFiles = notStagedFiles.filter((file) => !initialNotStagedFiles.includes(file));
     if (changedFiles.length > 0) {
