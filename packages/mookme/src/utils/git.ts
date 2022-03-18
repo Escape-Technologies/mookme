@@ -24,7 +24,6 @@ export class GitToolkit {
       logger.failure('Could not find a git project');
       process.exit(0);
     }
-    logger.success(`Git folder found at path ${rootDir}`);
     this.rootDir = rootDir;
   }
 

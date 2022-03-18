@@ -53,6 +53,10 @@ export class HooksResolver {
 
     // Otherwise, scan it's content for eventual nested directories if the max depth is not reached
     for (const folder of folders) {
+      // Skip vendor folders. This needs to be improved along usage
+      if (['node_modules', '.venv'].includes(folder.name)) {
+        continue;
+      }
       if (depth < maxDepth) {
         paths.push(...this.extractPackagesPaths(depth + 1, maxDepth, path.join(root, folder.name)));
       }
