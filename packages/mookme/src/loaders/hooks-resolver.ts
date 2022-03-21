@@ -4,15 +4,9 @@ import { HookType, PackageHook } from '../types/hook.types';
 import { StepCommand } from '../types/step.types';
 import { GitToolkit } from '../utils/git';
 import logger from '../utils/logger';
-
-function matchExactPath(filePath: string, to_match: string): boolean {
-  const position = filePath.indexOf(to_match);
-  if (position === -1) {
-    return false;
-  }
-  const remainingPath = filePath.slice(position + to_match.length);
-  return remainingPath.length > 0 ? remainingPath.startsWith('/') : true;
-}
+import { FilterStrategy } from './filter-strategies/base-filter';
+import { CurrentCommitFilterStrategy } from './filter-strategies/current-commit-filter';
+import { PreviousCommitFilterStrategy } from './filter-strategies/previous-commit-filter';
 
 /**
  * A class defining several utilitaries used to load and prepare packages hooks to be executed
@@ -194,22 +188,6 @@ export class HooksResolver {
   }
 
   /**
-   * Filter a list of packages based on the VCS state, and the staged files it holds.
-   * @param root - the absolute path to the root directory of the project
-   * @param hooks - the list of {@link PackageHook} to filter
-   * @returns the filtered list of {@link PackageHook} based on their consistency with the files staged in VCS.
-   */
-  filterWithVCS(hooks: PackageHook[]): PackageHook[] {
-    const { staged: stagedFiles } = this.gitToolkit.getVCSState();
-
-    const filtered = hooks.filter((hook) => {
-      return !!stagedFiles.find((file) => matchExactPath(path.join(this.root, file), hook.cwd));
-    });
-
-    return filtered;
-  }
-
-  /**
    * Extend the $PATH shell variable with the scripts defined in <rootDir>/.hooks/partials
    *
    * @param root - the absolute path of the folder holding the `.mookme.json` file, where the global .hooks folder lives
@@ -223,11 +201,10 @@ export class HooksResolver {
 
   /**
    * A wrapper for executing the packages-retrieval flow.
-   * @param root - the absolute path to the root directory of the project
    * @param hookType - the hook type to retrieve the steps for. See {@link HookType}
    * @returns the list of prepared packages to hook, filtered based on the VCS state and including interpolated shared steps.
    */
-  getPreparedHooks(): PackageHook[] {
+  async getPreparedHooks(hookType: HookType): Promise<PackageHook[]> {
     // Retrieve every hookable package
     const allPackages: string[] = this.extractPackagesPaths();
 
@@ -240,9 +217,19 @@ export class HooksResolver {
     // Perform shared steps interpolation if needed
     hooks = this.interpolateSharedSteps(hooks);
 
-    // Perform VCS-based filtering
-    hooks = this.filterWithVCS(hooks);
+    // Perform filtering based on a selected strategy
+    // @TODO: Enhance this part by adding multiple strategies, and rule to select them
+    let strategy: FilterStrategy;
 
-    return hooks;
+    switch (hookType) {
+      case HookType.POST_COMMIT:
+        strategy = new PreviousCommitFilterStrategy();
+        break;
+      default:
+        strategy = new CurrentCommitFilterStrategy(this.gitToolkit);
+        break;
+    }
+
+    return await strategy.filter(hooks);
   }
 }

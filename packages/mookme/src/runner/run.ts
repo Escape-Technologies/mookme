@@ -68,7 +68,7 @@ export class RunRunner {
     this.hooksResolver.setupPATH();
 
     // Load packages hooks to run
-    const hooks = this.hooksResolver.getPreparedHooks();
+    const hooks = await this.hooksResolver.getPreparedHooks(opts.type);
 
     // Instanciate the package executors
     const packageExecutors = hooks.map(
