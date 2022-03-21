@@ -5,6 +5,9 @@ import { ADDED_BEHAVIORS } from '../config/types';
 import logger from './logger';
 import { getRootDir } from './root-dir';
 
+import Debug from 'debug';
+const debug = Debug('mookme:git');
+
 /**
  * A helper class for performing git operations
  */
@@ -19,7 +22,10 @@ export class GitToolkit {
    *
    */
   constructor() {
+    debug('Initializing git toolkit');
     const rootDir = getRootDir('.git');
+    debug(`Found root at path ${rootDir}`);
+
     if (!rootDir) {
       logger.failure('Could not find a git project');
       process.exit(0);

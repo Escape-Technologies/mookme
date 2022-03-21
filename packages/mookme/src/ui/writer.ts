@@ -1,5 +1,8 @@
 import chalk from 'chalk';
 
+import Debug from 'debug';
+const debug = Debug('mookme:writer');
+
 /**
  * A small wrapper around process.stdout.write, ensuring
  * we do not log below the console, making it scroll.
@@ -10,10 +13,19 @@ export class ConsoleCanvas {
   private _currentRow = 0;
   private _warningWritten = false;
 
+  private debugMode: boolean;
+
+  constructor() {
+    this.debugMode = process.env.DEBUG ? process.env.DEBUG.includes('mookme') : false;
+  }
+
   /**
    * Clear the console, and reset the lines count
    */
   clear(): void {
+    if (this.debugMode) {
+      return;
+    }
     this._currentRow = 0;
     this._warningWritten = false;
     console.clear();
@@ -25,6 +37,10 @@ export class ConsoleCanvas {
    * @param line - the line to write
    */
   write(line = ''): void {
+    if (this.debugMode) {
+      debug(`Line to write with value "${line}"`);
+      return;
+    }
     if (this._currentRow + 1 < process.stdout.rows - 1) {
       process.stdout.write(line);
       process.stdout.write('\n');
