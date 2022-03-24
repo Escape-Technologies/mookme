@@ -110,7 +110,7 @@ export class MookmeUI {
    * @see {@link Events} for payload's description
    */
   onPackageRegistered(data: Events[EventType.PackageRegistered]): void {
-    debug(`Received event "PackageRegistered" with payload ${data}`);
+    debug(`Received event "PackageRegistered" with payload ${JSON.stringify(data)}`);
     this.packages.push({
       name: data.name,
       status: ExecutionStatus.CREATED,
@@ -128,7 +128,7 @@ export class MookmeUI {
    * @see {@link Events} for payload's description
    */
   onStepRegistered(data: Events[EventType.StepRegistered]): void {
-    debug(`Received event "StepRegistered" with payload ${data}`);
+    debug(`Received event "StepRegistered" with payload ${JSON.stringify(data)}`);
     const pkg = this.packages.find((pkg) => pkg.name === data.packageName);
     if (pkg) {
       pkg.steps.push({
@@ -147,7 +147,7 @@ export class MookmeUI {
    * @see {@link Events} for payload's description
    */
   onStepStatusChange(data: Events[EventType.StepStatusChanged]): void {
-    debug(`Received event "StepStatusChange" with payload ${data}`);
+    debug(`Received event "StepStatusChange" with payload ${JSON.stringify(data)}`);
     const pkg = this.packages.find((pkg) => pkg.name === data.packageName);
     if (pkg) {
       const step = pkg.steps.find((step) => step.name === data.stepName);

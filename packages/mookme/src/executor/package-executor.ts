@@ -6,10 +6,6 @@ import { ExecutionStatus } from '../types/status.types';
 
 export interface PackageExecutorOptions {
   /**
-   * The arguments provided to the git hooks command
-   */
-  hookArguments: string;
-  /**
    * The list of staged files in the current copy
    */
   stagedFiles: string[];
@@ -44,7 +40,6 @@ export class PackageExecutor {
           packagePath: pkg.cwd,
           type: pkg.type,
           venvActivate: pkg.venvActivate,
-          hookArguments: options.hookArguments,
           stagedFiles: options.stagedFiles,
           rootDir: options.rootDir,
         }),

@@ -68,13 +68,14 @@ export class RunRunner {
     this.hooksResolver.setupPATH();
 
     // Load packages hooks to run
-    const hooks = await this.hooksResolver.getPreparedHooks(opts.type);
+    let hooks = await this.hooksResolver.getPreparedHooks();
+    hooks = this.hooksResolver.applyOnlyOn(hooks);
+    hooks = this.hooksResolver.hydrateArguments(hooks, hookArguments);
 
     // Instanciate the package executors
     const packageExecutors = hooks.map(
       (pkg) =>
         new PackageExecutor(pkg, {
-          hookArguments,
           stagedFiles: initialStagedFiles,
           rootDir: this.gitToolkit.rootDir,
         }),

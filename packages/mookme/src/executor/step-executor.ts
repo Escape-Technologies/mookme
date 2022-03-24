@@ -4,7 +4,6 @@ import { bus, EventType } from '../events';
 import { PackageType } from '../types/hook.types';
 import { ExecutionStatus } from '../types/status.types';
 import { StepCommand } from '../types/step.types';
-import { getMatchedFiles } from '../utils/run-helpers';
 
 export interface ExecuteStepOptions {
   /**
@@ -27,10 +26,6 @@ export interface ExecuteStepOptions {
    * An optional path to a virtualenv to use (only used if type is {@link PackageType.PYTHON})
    */
   venvActivate?: string;
-  /**
-   * A string containing the arguments passed to the git hook. See
-   */
-  hookArguments: string;
   /**
    * The list of files added to the VCS state
    */
@@ -74,19 +69,7 @@ export class StepExecutor {
    * @returns true if {@link StepCommand.onlyOn} is not set, otherwise true is a changed file of the package matches the pattern, otherwise false
    */
   isSkipped(): boolean {
-    if (this.step.onlyOn) {
-      const { packagePath, stagedFiles, rootDir } = this.options;
-      try {
-        const matchedFiles = getMatchedFiles(this.step.onlyOn, packagePath, stagedFiles, rootDir);
-        if (matchedFiles.length === 0) {
-          return true;
-        }
-        return false;
-      } catch (err) {
-        throw new Error(`Invalid \`onlyOn\` pattern: ${this.step.onlyOn}\n${err}`);
-      }
-    }
-    return false;
+    return this.step.matchedFiles.length === 0;
   }
 
   /**
@@ -111,11 +94,7 @@ export class StepExecutor {
     // Add eventual virtual env to activate before the command
     const { type, venvActivate } = this.options;
     const { command } = this.step;
-    let execute = type === 'python' && venvActivate ? `source ${venvActivate} && ${command} && deactivate` : command;
-
-    // Perform the args interpolation
-    const args = this.options.hookArguments.split(' ').filter((arg) => arg !== '');
-    execute = execute.replace('{args}', `"${args.join(' ')}"`);
+    const execute = type === 'python' && venvActivate ? `source ${venvActivate} && ${command} && deactivate` : command;
 
     return execute;
   }
