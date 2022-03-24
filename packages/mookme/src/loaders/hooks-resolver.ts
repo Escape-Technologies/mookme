@@ -1,12 +1,16 @@
+import Debug from 'debug';
 import fs from 'fs';
 import path from 'path';
-import { HookType, PackageHook } from '../types/hook.types';
+import { HookType, PackageHook, UnprocessedPackageHook } from '../types/hook.types';
 import { StepCommand } from '../types/step.types';
 import { GitToolkit } from '../utils/git';
 import logger from '../utils/logger';
 import { FilterStrategy } from './filter-strategies/base-filter';
 import { CurrentCommitFilterStrategy } from './filter-strategies/current-commit-filter';
 import { PreviousCommitFilterStrategy } from './filter-strategies/previous-commit-filter';
+import wcmatch from 'wildcard-match';
+
+const debug = Debug('mookme:hooks-resolver');
 
 /**
  * A class defining several utilitaries used to load and prepare packages hooks to be executed
@@ -33,7 +37,7 @@ export class HooksResolver {
    * @param maxDepth - the max value accepted for the depth parameter before stopping the future recursions
    * @returns a list of strings denoting the absolute paths of the detected pakcages
    */
-  extractPackagesPaths(depth = 0, maxDepth = 5, source?: string): string[] {
+  extractPackagesPaths(depth = 0, maxDepth = 3, source?: string): string[] {
     const paths: string[] = [];
     const root = source || this.root;
 
@@ -42,13 +46,14 @@ export class HooksResolver {
 
     // For each directory, if it has a `.hooks` folder in it, add it's path to the list of packages path
     if (folders.find((folder) => folder.name === '.hooks')) {
+      debug(`.hooks folder found in ${root}`);
       paths.push(root);
     }
 
     // Otherwise, scan it's content for eventual nested directories if the max depth is not reached
     for (const folder of folders) {
       // Skip vendor folders. This needs to be improved along usage
-      if (['node_modules', '.venv'].includes(folder.name)) {
+      if (['node_modules', '.venv', '.git', '.hooks'].includes(folder.name)) {
         continue;
       }
       if (depth < maxDepth) {
@@ -72,12 +77,12 @@ export class HooksResolver {
   }
 
   /**
-   * Load a {@link PackageHook} object from the absolute path of the package's folder.
+   * Load a {@link UnprocessedPackageHook} object from the absolute path of the package's folder.
    * @param packagePath - the absolute path to this package
    * @param name - the displayed name of this package
    * @returns the created package hook instance
    */
-  loadPackage(packagePath: string, name: string): PackageHook {
+  loadPackage(packagePath: string, name: string): UnprocessedPackageHook {
     const hooksFilePath = path.join(packagePath, '.hooks', `${this.hookType}.json`);
     const locallHooksFilePath = path.join(packagePath, '.hooks', `${this.hookType}.local.json`);
 
@@ -86,7 +91,7 @@ export class HooksResolver {
 
     // @TODO: add data validation on the parsed object
     // @TODO: retrieve the type of the package from a separate file to ensure consistency between the local and shared steps
-    const packageHook: PackageHook = {
+    const unprocessedPackageHook: UnprocessedPackageHook = {
       name,
       cwd: packagePath,
       type: hooksDefinition.type,
@@ -102,19 +107,19 @@ export class HooksResolver {
         ...step,
         name: `${step.name} (local)`,
       }));
-      packageHook.steps.push(...localSteps);
+      unprocessedPackageHook.steps.push(...localSteps);
     }
 
-    return packageHook;
+    return unprocessedPackageHook;
   }
 
   /**
    * Load packages associated to a list of folder absolute paths
    * @param packagesPath - the list of absolute paths to the packages to load
-   * @returns the list of loaded {@link PackageHook}
+   * @returns the list of loaded {@link UnprocessedPackageHook}
    */
-  loadPackages(packagesPath: string[]): PackageHook[] {
-    const packages: PackageHook[] = [];
+  loadPackages(packagesPath: string[]): UnprocessedPackageHook[] {
+    const unprocessedPackages: UnprocessedPackageHook[] = [];
     for (const packagePath of packagesPath) {
       // Properly format the package's name: Turn the absolute path into a relative path from the project's root
       let packageName = packagePath.replace(`${this.root}`, '');
@@ -124,9 +129,9 @@ export class HooksResolver {
       // The only path leading to an empty string here is the package located at the project's root path, ie the global steps.
       packageName = packageName || 'global';
       // Load the package and add it to the list
-      packages.push(this.loadPackage(packagePath, packageName));
+      unprocessedPackages.push(this.loadPackage(packagePath, packageName));
     }
-    return packages;
+    return unprocessedPackages;
   }
 
   /**
@@ -165,7 +170,7 @@ export class HooksResolver {
    * @param sharedFolderPath - the absolute path to the folder holding the shared steps.
    * @returns the list of {@link PackageHook} with interpolated steps
    */
-  interpolateSharedSteps(hooks: PackageHook[]): PackageHook[] {
+  interpolateSharedSteps(hooks: UnprocessedPackageHook[]): UnprocessedPackageHook[] {
     const sharedSteps = this.loadSharedSteps();
 
     for (const hook of hooks) {
@@ -199,37 +204,93 @@ export class HooksResolver {
     }
   }
 
+  applyOnlyOn(hooks: PackageHook[]): PackageHook[] {
+    for (const hook of hooks) {
+      debug(`Looking for steps with onlyOn in package ${hook.name}`);
+      hook.steps = hook.steps.map((step) => {
+        if (step.onlyOn) {
+          debug(`Filtering matched files for step ${step.name} against pattern ${step.onlyOn}`);
+          try {
+            const matcher = wcmatch(step.onlyOn);
+            step.matchedFiles = step.matchedFiles.filter((rPath: string) => {
+              const match = matcher(rPath);
+              debug(`Testing path ${rPath} -> ${match}`);
+              return match;
+            });
+          } catch (err) {
+            throw new Error(`Invalid \`onlyOn\` pattern: ${step.onlyOn}\n${err}`);
+          }
+        } else {
+          debug(`Skipping step ${step.name} because it has no onlyOn attribute`);
+        }
+        return step;
+      });
+    }
+    return hooks;
+  }
+
+  hydrateArguments(hooks: PackageHook[], hookArguments: string): PackageHook[] {
+    debug('Performing command arguments replacements');
+    const args = hookArguments
+      .split(' ')
+      .filter((arg) => arg !== '')
+      .join(' ');
+    debug(`{args} will become ${args}`);
+    for (const hook of hooks) {
+      for (const step of hook.steps) {
+        if (step.command.includes('{args}')) {
+          debug(`matched {args} for step ${hook.name} -> ${step.name}`);
+          const oldCommand = step.command;
+          step.command = step.command.replace('{args}', `"${args}"`);
+          debug(`${oldCommand} -> ${step.command}`);
+        }
+      }
+    }
+
+    return hooks;
+  }
+
   /**
    * A wrapper for executing the packages-retrieval flow.
-   * @param hookType - the hook type to retrieve the steps for. See {@link HookType}
    * @returns the list of prepared packages to hook, filtered based on the VCS state and including interpolated shared steps.
    */
-  async getPreparedHooks(hookType: HookType): Promise<PackageHook[]> {
+  async getPreparedHooks(): Promise<PackageHook[]> {
     // Retrieve every hookable package
     const allPackages: string[] = this.extractPackagesPaths();
+    debug(`Identified the following packages: ${allPackages}`);
 
     // Filter them to keep only the ones with hooks of the target hook type
     const packagesPathsForHookType: string[] = this.filterPackageForHookType(allPackages);
+    debug(
+      `Identified the following packages with hooks matching hook type ${this.hookType} ${packagesPathsForHookType}`,
+    );
 
-    // Build the list of available steps, including local ones. Also load the package information
-    let hooks: PackageHook[] = this.loadPackages(packagesPathsForHookType);
+    debug('Loading unprocessed hooks');
+    // Build the list of all the available steps for this hook type, including local ones.
+    // Also load the package information
+    let unprocessedHooks: UnprocessedPackageHook[] = this.loadPackages(packagesPathsForHookType);
 
     // Perform shared steps interpolation if needed
-    hooks = this.interpolateSharedSteps(hooks);
+    unprocessedHooks = this.interpolateSharedSteps(unprocessedHooks);
+    debug(`Done loading ${unprocessedHooks.length} hooks`);
 
     // Perform filtering based on a selected strategy
     // @TODO: Enhance this part by adding multiple strategies, and rule to select them
     let strategy: FilterStrategy;
 
-    switch (hookType) {
+    switch (this.hookType) {
       case HookType.POST_COMMIT:
+        debug(`Using strategy PreviousCommitFilterStrategy`);
         strategy = new PreviousCommitFilterStrategy();
         break;
       default:
+        debug(`Using strategy CurrentCommitFilterStrategy`);
         strategy = new CurrentCommitFilterStrategy(this.gitToolkit);
         break;
     }
 
-    return await strategy.filter(hooks);
+    const hooks: PackageHook[] = await strategy.filter(unprocessedHooks);
+
+    return hooks;
   }
 }

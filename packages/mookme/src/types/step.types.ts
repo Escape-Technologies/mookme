@@ -4,7 +4,7 @@ import { PackageHook } from './hook.types';
  * An interface describing the step object used across the codebase
  *
  */
-export interface StepCommand {
+export interface UnprocessedStepCommand {
   /**
    *  The named of the step. Displayed in the UI and used in it to index steps and hooks
    */
@@ -22,9 +22,13 @@ export interface StepCommand {
    */
   serial?: boolean;
   /**
-   *  Does this step extend a partial
+   *  Does this step extend a shared step
    */
   from?: string;
+}
+
+export interface StepCommand extends UnprocessedStepCommand {
+  matchedFiles: string[];
 }
 
 /**

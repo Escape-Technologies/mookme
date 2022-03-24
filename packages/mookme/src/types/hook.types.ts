@@ -1,4 +1,4 @@
-import { StepCommand } from './step.types';
+import { StepCommand, UnprocessedStepCommand } from './step.types';
 
 /**
  * An enum of supported git hook types
@@ -37,7 +37,7 @@ export enum PackageType {
   PYTHON = 'python',
   JS = 'js',
 }
-export interface PackageHook {
+export interface UnprocessedPackageHook {
   /**
    * The displayed name of the package
    */
@@ -45,7 +45,7 @@ export interface PackageHook {
   /**
    * The list of step descriptors executed with the hook
    */
-  steps: StepCommand[];
+  steps: UnprocessedStepCommand[];
   /**
    * The directory where the package is stored
    */
@@ -58,4 +58,9 @@ export interface PackageHook {
    * A boolean denoting whether a virtualenv is started of not for this hook (eg for Python)
    */
   venvActivate?: string;
+}
+
+export interface PackageHook extends UnprocessedPackageHook {
+  matchedFiles: string[];
+  steps: StepCommand[];
 }
