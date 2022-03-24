@@ -34,20 +34,27 @@ export class GitToolkit {
   }
 
   getNotStagedFiles(): string[] {
-    return execSync('echo $(git diff --name-only)')
+    debug(`getNotStagedFiles called`);
+    const notStagedFiles = execSync('echo $(git diff --name-only)')
       .toString()
       .split(' ')
       .map((pth) => pth.replace('\n', ''));
+    debug(`Retrieved the following files not staged: ${notStagedFiles}`);
+    return notStagedFiles;
   }
 
   getStagedFiles(): string[] {
-    return execSync('echo $(git diff --cached --name-only)')
+    debug(`getStagedFiles called`);
+    const stagedFiles = execSync('echo $(git diff --cached --name-only)')
       .toString()
       .split(' ')
       .map((pth) => pth.replace('\n', ''));
+    debug(`Retrieved the following files staged: ${stagedFiles}`);
+    return stagedFiles;
   }
 
   getVCSState(): { staged: string[]; notStaged: string[] } {
+    debug(`getVCSState called`);
     return {
       staged: this.getStagedFiles(),
       notStaged: this.getNotStagedFiles(),

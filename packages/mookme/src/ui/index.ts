@@ -3,6 +3,9 @@ import { ExecutionStatus } from '../types/status.types';
 import { Renderer } from './renderer';
 import { UIPackageItem } from './types';
 
+import Debug from 'debug';
+const debug = Debug('mookme:ui');
+
 /**
  * A class for managing the UI of Mookme. It provides a logical abstraction of the state of the application.
  *
@@ -53,6 +56,7 @@ export class MookmeUI {
    * Start the UI watchers for rendering
    */
   start(): void {
+    debug('Starting UI');
     this.started = true;
   }
 
@@ -60,6 +64,7 @@ export class MookmeUI {
    * Stop the UI watchers for rendering
    */
   stop(): void {
+    debug('Stopping UI');
     this.started = false;
   }
 
@@ -69,22 +74,31 @@ export class MookmeUI {
    * @param name - the name of the package
    */
   updatePackageStatus(name: string): void {
+    debug(`Updating status of package ${name}`);
     const pkg = this.packages.find((pkg) => pkg.name === name);
     if (pkg) {
       if (
         pkg.steps.every((step) => step.status === ExecutionStatus.SKIPPED || step.status === ExecutionStatus.SUCCESS)
       ) {
+        debug(
+          `Package has only steps in ${ExecutionStatus.SKIPPED} or ${ExecutionStatus.SUCCESS} => marking it as success`,
+        );
         pkg.status = ExecutionStatus.SUCCESS;
         return;
       }
       if (pkg.steps.some((step) => step.status === ExecutionStatus.FAILURE)) {
+        debug(`Package has at least one step in ${ExecutionStatus.FAILURE} => marking it as failure`);
         pkg.status = ExecutionStatus.FAILURE;
         return;
       }
       if (pkg.steps.some((step) => step.status === ExecutionStatus.RUNNING)) {
+        debug(
+          `Package has at least one step in ${ExecutionStatus.RUNNING} and no step in ${ExecutionStatus.FAILURE} => marking it as running`,
+        );
         pkg.status = ExecutionStatus.RUNNING;
         return;
       }
+      debug('Marking package as created (default)');
       pkg.status = ExecutionStatus.CREATED;
     }
   }
@@ -96,6 +110,7 @@ export class MookmeUI {
    * @see {@link Events} for payload's description
    */
   onPackageRegistered(data: Events[EventType.PackageRegistered]): void {
+    debug(`Received event "PackageRegistered" with payload ${data}`);
     this.packages.push({
       name: data.name,
       status: ExecutionStatus.CREATED,
@@ -113,6 +128,7 @@ export class MookmeUI {
    * @see {@link Events} for payload's description
    */
   onStepRegistered(data: Events[EventType.StepRegistered]): void {
+    debug(`Received event "StepRegistered" with payload ${data}`);
     const pkg = this.packages.find((pkg) => pkg.name === data.packageName);
     if (pkg) {
       pkg.steps.push({
@@ -131,6 +147,7 @@ export class MookmeUI {
    * @see {@link Events} for payload's description
    */
   onStepStatusChange(data: Events[EventType.StepStatusChanged]): void {
+    debug(`Received event "StepStatusChange" with payload ${data}`);
     const pkg = this.packages.find((pkg) => pkg.name === data.packageName);
     if (pkg) {
       const step = pkg.steps.find((step) => step.name === data.stepName);

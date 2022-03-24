@@ -5,6 +5,9 @@ import { Config } from '../config';
 import { MookmeUI } from '../ui';
 import { RunOptions, RunRunner } from '../runner/run';
 import { HooksResolver } from '../loaders/hooks-resolver';
+import Debug from 'debug';
+
+const debug = Debug('mookme');
 
 /**
  * Extend an existing commander program instance with the `run` command of Mookme
@@ -21,6 +24,7 @@ export function addRun(program: commander.Command): void {
     .option('-a, --all <all>', 'Run hooks for all packages', '')
     .option('--args <args>', 'The arguments being passed to the hooks', '')
     .action(async (opts: RunOptions) => {
+      debug('Running run command with options', opts);
       // Initialize the UI
       const ui = new MookmeUI(false);
       const git = new GitToolkit();
