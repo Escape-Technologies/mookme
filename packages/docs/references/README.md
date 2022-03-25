@@ -83,6 +83,10 @@ The list of steps (commands) being executed by this hook. In a step you can defi
 A serial step that fails will not prevent the execution of the following steps
 :::
 
+::: warning
+The pattern provided in `onlyOn` will be matched agains the relative path of matched files of the execution, from the package folder, not from the repository root.
+:::
+
 - `type`
 
 A flag used mainly to tell `mookme` this is a python hook, and might need a virtual environment to be activated. Possible values are `python, js, script`
