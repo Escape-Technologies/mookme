@@ -12,7 +12,7 @@ npm install @escape.tech/mookme
 
 ## Configuration
 
-Mookme will look automatically detect the `.hooks` folder across your repository and trigger the command related to your current VCS state.
+Mookme will automatically detect the `.hooks` folder across your repository and trigger the command related to your current VCS state.
 
 Hence it only requires a very minimal configuration, as most of this is defined by where you place your `.hooks` folders, and what you put in them.
 
@@ -90,6 +90,20 @@ The exit behavior is only applied on pre-commit hook types: `pre-commit`, `prepa
 ::: warning
 If the command executed by a hook fails, it will prevent the git command to be executed. We recommend you to use the pre-receive hooks carefully, with relatively safe commands, otherwise you might prevent your team for doign stuff like `git pull` or `git fetch`.
 :::
+
+### How will Mookme decide which hooks to run ?
+
+1. Based on the hook type being executed, Mookme will pick a strategy for selecting files concerned by an execution. For instance:
+
+- When running a `pre-commit` hook, Mookme will select the current staged files in the repository
+- When running a `post-commit` hook, Mookme will select the files commited in the last commit
+The result of this step is a list of relative paths from the root of the repository.
+
+<!-- markdownlint-disable MD001 MD029 -->
+2. For each folder where a `.hooks` folder is found, Mookme will assess if there are file paths in the previous list matching the relative path to this folder from the root of the repository. For each matched package, the list of matched paths is attached to it, and the same paths, but relative from the package itself (where the `.hooks` folder is located) are attached to the step objects.
+
+<!-- markdownlint-disable MD001 MD029 -->
+3. Other selections (`onlyOn` for instance) are applied on each step of each package, based on the list of paths attached to the package and it's steps.
 
 ### Example of hook file
 
