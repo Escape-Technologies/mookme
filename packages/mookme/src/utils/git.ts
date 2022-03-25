@@ -61,6 +61,11 @@ export class GitToolkit {
     };
   }
 
+  getAllTrackedFiles(): string[] {
+    debug(`getAllTrackedFiles called`);
+    return execSync('git ls-tree -r HEAD --name-only').toString().split('\n');
+  }
+
   detectAndProcessModifiedFiles(initialNotStagedFiles: string[], behavior: ADDED_BEHAVIORS): void {
     const notStagedFiles = execSync('echo $(git diff --name-only)')
       .toString()

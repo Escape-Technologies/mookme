@@ -21,7 +21,7 @@ export function addRun(program: commander.Command): void {
       '-t, --type <type>',
       'A valid git hook type ("pre-commit", "prepare-commit", "commit-msg", "post-commit")',
     )
-    .option('-a, --all <all>', 'Run hooks for all packages', '')
+    .option('-a, --all', 'Run hooks for all packages', '')
     .option('--args <args>', 'The arguments being passed to the hooks', '')
     .action(async (opts: RunOptions) => {
       debug('Running run command with options', opts);
