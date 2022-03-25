@@ -94,3 +94,33 @@ A flag used mainly to tell `mookme` this is a python hook, and might need a virt
 - `venvActivate`
 
 A path to a `<venv>/bin/activate` script to execute before the command if the hook type is `python`
+
+### Available arguments
+
+A set of arguments is provided by Mookme, that can be directly used in the hooks command definitions using the following syntax in the step definition:
+
+````json
+{
+    "command": "run-something {args}" // Will be replaced with the value of `args`
+}
+````
+
+- `args`
+
+The argument being passed by git to the hook file. See [the Git documentation on the hooks](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks) for more details about what it contains depending on the hook type being executed.
+
+- `stagedFiles`
+
+The list of files being matched by the package filtering strategy, and responsible for it being ran in this execution. The files are separated by a blank space (" "). See [the section about how Mookme selects packages to run](/get-started/#how-will-mookme-decide-which-hooks-to-run) for more details on how the files passed in this are selected.
+
+::: warning
+The paths are relative from the repository root folder
+:::
+
+- `matchedFiles`
+
+The list of files being matched by the step filtering strategy, and responsible for it being ran in this execution. The files are separated by a blank space (" "). See [the section about how Mookme selects packages to run](/get-started/#how-will-mookme-decide-which-hooks-to-run) for more details on how the files passed in this are selected.
+
+::: warning
+The paths are relative from the package folder (eg, the folder where the `.hooks` folder was detected)
+:::
