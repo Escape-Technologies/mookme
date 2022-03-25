@@ -204,6 +204,12 @@ export class HooksResolver {
     }
   }
 
+  /**
+   * Apply onlyOn pattern to a list of steps
+   *
+   * @param hooks - the list of {@link PackageHook} to perform the filtering on
+   * @returns the list of package hooks, where each step of each hook has a `matchedFiles` attribute corresponding to an eventual `onlyOn` pattern
+   */
   applyOnlyOn(hooks: PackageHook[]): PackageHook[] {
     for (const hook of hooks) {
       debug(`Looking for steps with onlyOn in package ${hook.name}`);
@@ -236,13 +242,26 @@ export class HooksResolver {
       .filter((arg) => arg !== '')
       .join(' ');
     debug(`{args} will become ${args}`);
+
     for (const hook of hooks) {
       for (const step of hook.steps) {
         if (step.command.includes('{args}')) {
           debug(`matched {args} for step ${hook.name} -> ${step.name}`);
           const oldCommand = step.command;
           step.command = step.command.replace('{args}', `"${args}"`);
-          debug(`${oldCommand} -> ${step.command}`);
+          debug(`"${oldCommand}" -> "${step.command}"`);
+        }
+        if (step.command.includes('{matchedFiles}')) {
+          debug(`matched {matchedFiles} for step ${hook.name} -> ${step.name}`);
+          const oldCommand = step.command;
+          step.command = step.command.replace('{matchedFiles}', step.matchedFiles.join(' '));
+          debug(`"${oldCommand}" -> "${step.command}"`);
+        }
+        if (step.command.includes('{packageFiles}')) {
+          debug(`matched {packageFiles} for step ${hook.name} -> ${step.name}`);
+          const oldCommand = step.command;
+          step.command = step.command.replace('{matchedFiles}', hook.matchedFiles.join(','));
+          debug(`"${oldCommand}" -> "${step.command}"`);
         }
       }
     }
@@ -254,7 +273,7 @@ export class HooksResolver {
    * A wrapper for executing the packages-retrieval flow.
    * @returns the list of prepared packages to hook, filtered based on the VCS state and including interpolated shared steps.
    */
-  async getPreparedHooks(): Promise<PackageHook[]> {
+  async getPreparedHooks(all: boolean): Promise<PackageHook[]> {
     // Retrieve every hookable package
     const allPackages: string[] = this.extractPackagesPaths();
     debug(`Identified the following packages: ${allPackages}`);
@@ -285,7 +304,7 @@ export class HooksResolver {
         break;
       default:
         debug(`Using strategy CurrentCommitFilterStrategy`);
-        strategy = new CurrentCommitFilterStrategy(this.gitToolkit);
+        strategy = new CurrentCommitFilterStrategy(this.gitToolkit, all);
         break;
     }
 

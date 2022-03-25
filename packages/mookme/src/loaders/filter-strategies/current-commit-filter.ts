@@ -11,13 +11,15 @@ const debug = Debug('mookme:filtering-strategy');
  */
 export class CurrentCommitFilterStrategy extends FilterStrategy {
   gitToolkit: GitToolkit;
+  useAllFiles: boolean;
 
   /**
    * @param gitToolkit - the {@link GitToolkit} instance to use to manage the VCS state
    */
-  constructor(gitToolkit: GitToolkit) {
+  constructor(gitToolkit: GitToolkit, useAllFiles = false) {
     super();
     this.gitToolkit = gitToolkit;
+    this.useAllFiles = useAllFiles;
   }
 
   matchExactPath(filePath: string, to_match: string): boolean {
@@ -35,7 +37,7 @@ export class CurrentCommitFilterStrategy extends FilterStrategy {
    * @returns the filtered list of {@link PackageHook} based on their consistency with the files staged in VCS.
    */
   async filter(hooks: UnprocessedPackageHook[]): Promise<PackageHook[]> {
-    const { staged: stagedFiles } = this.gitToolkit.getVCSState();
+    const stagedFiles = this.useAllFiles ? this.gitToolkit.getAllTrackedFiles() : this.gitToolkit.getVCSState().staged;
 
     const filtered: PackageHook[] = [];
 
