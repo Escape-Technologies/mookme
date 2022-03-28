@@ -260,7 +260,7 @@ export class HooksResolver {
         if (step.command.includes('{packageFiles}')) {
           debug(`matched {packageFiles} for step ${hook.name} -> ${step.name}`);
           const oldCommand = step.command;
-          step.command = step.command.replace('{matchedFiles}', hook.matchedFiles.join(','));
+          step.command = step.command.replace('{packageFiles}', hook.matchedFiles.join(' '));
           debug(`"${oldCommand}" -> "${step.command}"`);
         }
       }
