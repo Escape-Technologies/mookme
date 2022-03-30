@@ -1,9 +1,10 @@
 import chalk from 'chalk';
-import { exec } from 'child_process';
+import { exec, type ExecOptions } from 'child_process';
 import { bus, EventType } from '../events';
 import { PackageType } from '../types/hook.types';
 import { ExecutionStatus } from '../types/status.types';
 import { StepCommand } from '../types/step.types';
+import os from 'os';
 
 export interface ExecuteStepOptions {
   /**
@@ -114,7 +115,11 @@ export class StepExecutor {
 
     return new Promise((resolve) => {
       const command = this.computeExecutedCommand();
-      const cp = exec(command, { cwd: this.options.packagePath });
+      const options: ExecOptions = { cwd: this.options.packagePath };
+      if (os.platform() === 'linux') {
+        options.shell = '/bin/bash';
+      }
+      const cp = exec(command, options);
 
       /* handle command outputs */
       let out = '';
