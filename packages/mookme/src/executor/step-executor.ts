@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { exec, type ExecOptions } from 'child_process';
+import { exec, ExecOptions } from 'child_process';
 import { bus, EventType } from '../events';
 import { PackageType } from '../types/hook.types';
 import { ExecutionStatus } from '../types/status.types';
