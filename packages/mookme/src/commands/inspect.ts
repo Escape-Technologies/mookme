@@ -13,7 +13,7 @@ export function addInspect(program: commander.Command): void {
     .description('Manually test wich packages are discovered and assess if your hooks are properly configured.')
     .action(async (opts) => {
       const git = new GitToolkit();
-      const resolver = new HooksResolver(git, opts.type);
+      const resolver = new HooksResolver(git, opts.type, false);
       const inspect = new InspectRunner(resolver);
       await inspect.run();
     });

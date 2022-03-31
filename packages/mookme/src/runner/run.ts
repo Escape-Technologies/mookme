@@ -23,6 +23,14 @@ export interface RunOptions {
    * A boolean parameter to detect if the whole hook suite should be ran, regardless of the VCS state
    */
   all: boolean;
+  /**
+   * A boolean parameter to detect if the whole hook suite should be ran, regardless of the VCS state
+   */
+  from: string;
+  /**
+   * A boolean parameter to detect if the whole hook suite should be ran, regardless of the VCS state
+   */
+  to: string;
 }
 
 /**
@@ -59,7 +67,7 @@ export class RunRunner {
     this.ui.start();
 
     // Load the VCS state
-    const { staged: initialStagedFiles, notStaged: initialNotStagedFiles } = this.gitToolkit.getVCSState();
+    const initialNotStagedFiles = this.gitToolkit.getNotStagedFiles();
 
     // Retrieve mookme command options
     const { args: hookArguments } = opts;
@@ -68,7 +76,7 @@ export class RunRunner {
     this.hooksResolver.setupPATH();
 
     // Load packages hooks to run
-    let hooks = await this.hooksResolver.getPreparedHooks(opts.all);
+    let hooks = await this.hooksResolver.getPreparedHooks();
     hooks = this.hooksResolver.applyOnlyOn(hooks);
     hooks = this.hooksResolver.hydrateArguments(hooks, hookArguments);
 
@@ -76,7 +84,6 @@ export class RunRunner {
     const packageExecutors = hooks.map(
       (pkg) =>
         new PackageExecutor(pkg, {
-          stagedFiles: initialStagedFiles,
           rootDir: this.gitToolkit.rootDir,
         }),
     );

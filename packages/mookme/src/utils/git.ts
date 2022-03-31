@@ -62,6 +62,17 @@ export class GitToolkit {
     return commitedFiles;
   }
 
+  getFilesChangedBetweenRefs(from: string, to: string): string[] {
+    debug(`getFilesChangedBetweenRefs(${from}, ${to}) called`);
+    const changedFiles = execSync(`echo $(git diff ${from} ${to} --name-only)`)
+      .toString()
+      .split(' ')
+      .map((pth) => pth.replace('\n', ''));
+
+    debug(`Retrieved the following files commited: ${changedFiles}`);
+    return changedFiles;
+  }
+
   getVCSState(): { staged: string[]; notStaged: string[] } {
     debug(`getVCSState called`);
     return {
@@ -72,7 +83,7 @@ export class GitToolkit {
 
   getAllTrackedFiles(): string[] {
     debug(`getAllTrackedFiles called`);
-    return execSync('git ls-tree -r HEAD --name-only').toString().split('\n');
+    return execSync('git ls-tree -r HEAD --name-only', { cwd: this.rootDir }).toString().split('\n');
   }
 
   detectAndProcessModifiedFiles(initialNotStagedFiles: string[], behavior: ADDED_BEHAVIORS): void {
