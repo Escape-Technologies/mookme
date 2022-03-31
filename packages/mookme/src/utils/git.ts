@@ -53,6 +53,15 @@ export class GitToolkit {
     return stagedFiles;
   }
 
+  getPreviouslyCommitedFiles(nCommitsBeforeHead = 1): string[] {
+    debug(`getPreviouslyCommitedFiles(${nCommitsBeforeHead}) called`);
+    const commitedFiles = execSync(`git diff-tree --no-commit-id --name-only -r HEAD~${nCommitsBeforeHead}`)
+      .toString()
+      .split('\n');
+    debug(`Retrieved the following files commited: ${commitedFiles}`);
+    return commitedFiles;
+  }
+
   getVCSState(): { staged: string[]; notStaged: string[] } {
     debug(`getVCSState called`);
     return {

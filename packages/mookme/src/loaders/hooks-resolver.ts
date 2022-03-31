@@ -300,7 +300,7 @@ export class HooksResolver {
     switch (this.hookType) {
       case HookType.POST_COMMIT:
         debug(`Using strategy PreviousCommitFilterStrategy`);
-        strategy = new PreviousCommitFilterStrategy();
+        strategy = new PreviousCommitFilterStrategy(this.gitToolkit, all);
         break;
       default:
         debug(`Using strategy CurrentCommitFilterStrategy`);
