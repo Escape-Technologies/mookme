@@ -9,6 +9,7 @@ import { FilterStrategy } from './filter-strategies/base-filter';
 import { CurrentCommitFilterStrategy } from './filter-strategies/current-commit-filter';
 import { PreviousCommitFilterStrategy } from './filter-strategies/previous-commit-filter';
 import wcmatch from 'wildcard-match';
+import { FromToFilterStrategy } from './filter-strategies/from-to.filter';
 
 const debug = Debug('mookme:hooks-resolver');
 
@@ -19,16 +20,35 @@ export class HooksResolver {
   gitToolkit: GitToolkit;
   root: string;
   hookType: string;
+  strategy: FilterStrategy;
 
   /**
    * A class defining several utilitaries used to load and prepare packages hooks to be executed
    *
    * @param gitToolkit - the {@link GitToolkit} instance to use to manage the VCS state
    */
-  constructor(gitToolkit: GitToolkit, hookType: HookType) {
+  constructor(gitToolkit: GitToolkit, hookType: HookType, useAllFiles: boolean, from?: string, to?: string) {
     this.gitToolkit = gitToolkit;
     this.root = gitToolkit.rootDir;
     this.hookType = hookType;
+
+    // Perform filtering based on a selected strategy
+    // @TODO: Enhance this part by adding multiple strategies, and rule to select them
+    if (from && to) {
+      debug(`Using strategy FromToFilterStrategy from ${from} to ${to}`);
+      this.strategy = new FromToFilterStrategy(this.gitToolkit, useAllFiles, from, to);
+    } else {
+      switch (this.hookType) {
+        case HookType.POST_COMMIT:
+          debug(`Using strategy PreviousCommitFilterStrategy`);
+          this.strategy = new PreviousCommitFilterStrategy(this.gitToolkit, useAllFiles);
+          break;
+        default:
+          debug(`Using strategy CurrentCommitFilterStrategy`);
+          this.strategy = new CurrentCommitFilterStrategy(this.gitToolkit, useAllFiles);
+          break;
+      }
+    }
   }
 
   /**
@@ -273,7 +293,7 @@ export class HooksResolver {
    * A wrapper for executing the packages-retrieval flow.
    * @returns the list of prepared packages to hook, filtered based on the VCS state and including interpolated shared steps.
    */
-  async getPreparedHooks(all: boolean): Promise<PackageHook[]> {
+  async getPreparedHooks(): Promise<PackageHook[]> {
     // Retrieve every hookable package
     const allPackages: string[] = this.extractPackagesPaths();
     debug(`Identified the following packages: ${allPackages}`);
@@ -293,23 +313,7 @@ export class HooksResolver {
     unprocessedHooks = this.interpolateSharedSteps(unprocessedHooks);
     debug(`Done loading ${unprocessedHooks.length} hooks`);
 
-    // Perform filtering based on a selected strategy
-    // @TODO: Enhance this part by adding multiple strategies, and rule to select them
-    let strategy: FilterStrategy;
-
-    switch (this.hookType) {
-      case HookType.POST_COMMIT:
-        debug(`Using strategy PreviousCommitFilterStrategy`);
-        strategy = new PreviousCommitFilterStrategy(this.gitToolkit, all);
-        break;
-      default:
-        debug(`Using strategy CurrentCommitFilterStrategy`);
-        strategy = new CurrentCommitFilterStrategy(this.gitToolkit, all);
-        break;
-    }
-
-    const hooks: PackageHook[] = await strategy.filter(unprocessedHooks);
-
+    const hooks: PackageHook[] = await this.strategy.filter(unprocessedHooks);
     return hooks;
   }
 }

@@ -22,13 +22,15 @@ export function addRun(program: commander.Command): void {
       'A valid git hook type ("pre-commit", "prepare-commit", "commit-msg", "post-commit")',
     )
     .option('-a, --all', 'Run hooks for all packages', '')
+    .option('--from <from>', 'Starting git reference used to evaluate hooks to run', '')
+    .option('--to <to>', 'Ending git reference used to evaluate hooks to run', '')
     .option('--args <args>', 'The arguments being passed to the hooks', '')
     .action(async (opts: RunOptions) => {
       debug('Running run command with options', opts);
       // Initialize the UI
       const ui = new MookmeUI(false);
       const git = new GitToolkit();
-      const resolver = new HooksResolver(git, opts.type);
+      const resolver = new HooksResolver(git, opts.type, opts.all, opts.from, opts.to);
 
       // Load the different config files
       const config = new Config(git.rootDir);

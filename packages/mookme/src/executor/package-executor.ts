@@ -6,10 +6,6 @@ import { ExecutionStatus } from '../types/status.types';
 
 export interface PackageExecutorOptions {
   /**
-   * The list of staged files in the current copy
-   */
-  stagedFiles: string[];
-  /**
    * The absolute path pointing towards the root directory
    */
   rootDir: string;
@@ -40,7 +36,6 @@ export class PackageExecutor {
           packagePath: pkg.cwd,
           type: pkg.type,
           venvActivate: pkg.venvActivate,
-          stagedFiles: options.stagedFiles,
           rootDir: options.rootDir,
         }),
     );

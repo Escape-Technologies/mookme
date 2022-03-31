@@ -10,12 +10,18 @@ const debug = Debug('mookme:filtering-strategy');
  */
 export abstract class FilterStrategy {
   gitToolkit: GitToolkit;
+  useAllFiles: boolean;
 
-  constructor(gitToolkit: GitToolkit) {
+  constructor(gitToolkit: GitToolkit, useAllFiles: boolean) {
     this.gitToolkit = gitToolkit;
+    this.useAllFiles = useAllFiles;
   }
 
-  abstract geFilesPathList(): string[];
+  abstract getFilesPathList(): string[];
+
+  getAllFilesPathList(): string[] {
+    return this.gitToolkit.getAllTrackedFiles();
+  }
 
   matchExactPath(filePath: string, to_match: string): boolean {
     const position = filePath.indexOf(to_match);
@@ -32,7 +38,9 @@ export abstract class FilterStrategy {
    * @returns the filtered list of {@link PackageHook} based on their consistency with the files staged in VCS.
    */
   async filter(hooks: UnprocessedPackageHook[]): Promise<PackageHook[]> {
-    const filesPathList = this.geFilesPathList();
+    debug(this.useAllFiles ? 'Using getAllFilesPathList' : 'Using getFilesPathList');
+    const filesPathList = this.useAllFiles ? this.getAllFilesPathList() : this.getFilesPathList();
+    debug(`Filtering will be performed with list ${filesPathList}`);
 
     const filtered: PackageHook[] = [];
 

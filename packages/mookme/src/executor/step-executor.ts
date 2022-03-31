@@ -27,10 +27,6 @@ export interface ExecuteStepOptions {
    * An optional path to a virtualenv to use (only used if type is {@link PackageType.PYTHON})
    */
   venvActivate?: string;
-  /**
-   * The list of files added to the VCS state
-   */
-  stagedFiles: string[];
 }
 
 /**
