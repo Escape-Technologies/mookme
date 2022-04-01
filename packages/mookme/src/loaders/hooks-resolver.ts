@@ -13,6 +13,13 @@ import { FromToFilterStrategy } from './filter-strategies/from-to.filter';
 
 const debug = Debug('mookme:hooks-resolver');
 
+export interface HooksResolverOptions {
+  useAllFiles?: boolean;
+  from?: string;
+  to?: string;
+  customStrategy?: FilterStrategy;
+}
+
 /**
  * A class defining several utilitaries used to load and prepare packages hooks to be executed
  */
@@ -27,14 +34,21 @@ export class HooksResolver {
    *
    * @param gitToolkit - the {@link GitToolkit} instance to use to manage the VCS state
    */
-  constructor(gitToolkit: GitToolkit, hookType: HookType, useAllFiles: boolean, from?: string, to?: string) {
+  constructor(gitToolkit: GitToolkit, hookType: HookType, opts: HooksResolverOptions = {}) {
     this.gitToolkit = gitToolkit;
     this.root = gitToolkit.rootDir;
     this.hookType = hookType;
 
+    const useAllFiles = opts.useAllFiles || false;
+    const from = opts.from || null;
+    const to = opts.to || null;
+    const customStrategy = opts.customStrategy || null;
+
     // Perform filtering based on a selected strategy
-    // @TODO: Enhance this part by adding multiple strategies, and rule to select them
-    if (from && to) {
+    if (customStrategy) {
+      debug(`Using a custom strategy`);
+      this.strategy = customStrategy;
+    } else if (from && to) {
       debug(`Using strategy FromToFilterStrategy from ${from} to ${to}`);
       this.strategy = new FromToFilterStrategy(this.gitToolkit, useAllFiles, from, to);
     } else {
