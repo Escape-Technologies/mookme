@@ -66,6 +66,7 @@ export class MookmeUI {
   stop(): void {
     debug('Stopping UI');
     this.started = false;
+    this.renderer.stop();
   }
 
   /**

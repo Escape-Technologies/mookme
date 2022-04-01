@@ -100,7 +100,7 @@ export class RunRunner {
     setTimeout(() => {
       processResults(packagesErrors);
       this.ui.stop();
-    }, 500);
+    }, 100);
 
     // Do not start modified files procedure, unless we are about to commit
     if (VCSSensitiveHook.includes(opts.type)) {
