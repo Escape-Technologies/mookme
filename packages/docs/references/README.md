@@ -65,6 +65,10 @@ Manually test wich packages are discovered and assess if your hooks are properly
 
 The type of hook to inspect, has to be one of `pre-commit`, `prepare-commit-msg`, `commit-msg`, `post-commit`.
 
+- `-f --files` (optional)
+
+A list of files paths to inspect. Paths must be relative from the repository root.
+
 ## Hook files
 
 ### General description
