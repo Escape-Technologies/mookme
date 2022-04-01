@@ -1,5 +1,4 @@
 import { HooksResolver } from '../loaders/hooks-resolver';
-import { UnprocessedPackageHook } from '../types/hook.types';
 import logger from '../utils/logger';
 
 /**
@@ -52,17 +51,18 @@ export class InspectRunner {
     logger.info(`Step 3: Build the list of available steps`);
     logger.info('');
 
-    // Step 3: Build the list of available steps, including local ones. Also load the package information
-    let hooks: UnprocessedPackageHook[] = this.resolver.loadPackages(packagesPathForHookType);
-
-    // Step 4: Interpolate step's content in case of shared steps
-    hooks = this.resolver.interpolateSharedSteps(hooks);
+    let hooks = await this.resolver.getPreparedHooks();
+    hooks = this.resolver.applyOnlyOn(hooks);
 
     for (const hook of hooks) {
       logger.info(`* ${hook.name}`);
       logger.log(`Path: ${hook.cwd}`);
       for (const step of hook.steps) {
-        logger.log(`- ${step.name} (${step.command})`);
+        logger.log(
+          step.matchedFiles.length === 0
+            ? `- [SKIPPED] ${step.name} (${step.command})`
+            : `- ${step.name} (${step.command})`,
+        );
       }
     }
   }
