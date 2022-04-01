@@ -43,6 +43,14 @@ The arguments that would be normally passed by git to the hook
 
 Skip the selection of hooks to run based on git-staged files, and run hooks of every package for this type
 
+- `--from` (optional)
+
+Starting git reference used to evaluate hooks to run. If set, `to` has to be set as well, otherwise this option is ignored.
+
+- `--to` (optional)
+
+Ending git reference used to evaluate hooks to run. If set, `from` has to be set as well, otherwise this option is ignored.
+
 ## `mookme inspect`
 
 Manually test wich packages are discovered and assess if your hooks are properly configured.

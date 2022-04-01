@@ -121,3 +121,14 @@ For instance, with the following configuration:
 ```
 
 You will run both setps when committing. The difference between these two files is that `package1/.hooks/pre-commit.local.json` is git-ignored by default through the command-line project initialization.
+
+## Use a range of commits
+
+Using the Mookme CLI, it is possible to invoke a set of hooks and steps selected using the files changed between two git references.
+
+````bash
+npx mookme run -t pre-commit --from HEAD~1 --to f9ff43
+npx mookme run -t pre-commit --from HEAD~25 --to d58688dd611ef01079f61ebae36df0ce8c380ddb
+````
+
+You can find more details about these options on the [mookme run reference](/references/#options-2)
