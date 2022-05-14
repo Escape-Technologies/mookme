@@ -125,15 +125,13 @@ export class GitToolkit {
       if (fs.existsSync(`${gitFolderPath}/hooks/${type}`)) {
         const hook = fs.readFileSync(`${gitFolderPath}/hooks/${type}`).toString();
         if (!hook.includes(mookmeCmd)) {
-          fs.appendFileSync(`${gitFolderPath}/hooks/${type}`, `\n${mookmeCmd}`, { flag: 'a+' });
-          execSync(`chmod +x ${gitFolderPath}/hooks/${type}`);
+          fs.appendFileSync(`${gitFolderPath}/hooks/${type}`, `\n${mookmeCmd}`, { flag: 'a+', mode: 0o0755 });
         } else {
           logger.log(`Hook ${type} is already declared, skipping...`);
         }
       } else {
         logger.warning(`Hook ${type} does not exist, creating file...`);
-        fs.appendFileSync(`${gitFolderPath}/hooks/${type}`, `#!/bin/bash\n${mookmeCmd}`, { flag: 'a+' });
-        execSync(`chmod +x ${gitFolderPath}/hooks/${type}`);
+        fs.appendFileSync(`${gitFolderPath}/hooks/${type}`, `#!/bin/bash\n${mookmeCmd}`, { flag: 'a+', mode: 0o0755 });
       }
     });
   }
