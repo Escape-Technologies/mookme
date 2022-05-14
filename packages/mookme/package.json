@@ -11,7 +11,7 @@
     "dist/**/*.js"
   ],
   "scripts": {
-    "prebuild": "rm -f ./.tmp/ts-build-infos.json && rm -rf dist",
+    "prebuild": "rimraf -f ./.tmp/ts-build-infos.json && rimraf -rf dist",
     "build": "tsc",
     "dev": "tsc -w",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -58,6 +58,7 @@
     "eslint-plugin-prettier": "3.4.0",
     "eslint-plugin-tsdoc": "^0.2.14",
     "prettier": "2.3.0",
+    "rimraf": "^3.0.2",
     "semantic-release": "^18.0.0",
     "typescript": "^4.2.4"
   },
