@@ -16,9 +16,9 @@
     "dev": "tsc -w",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prettier": "prettier -c src/**/*.ts",
-    "prettier:fix": "prettier --write 'src/**/*.ts'",
-    "eslint": "eslint 'src/**/*.ts'",
-    "eslint:fix": "eslint --fix 'src/**/*.ts'",
+    "prettier:fix": "prettier --write src/**/*.ts",
+    "eslint": "eslint src/**/*.ts",
+    "eslint:fix": "eslint --fix src/**/*.ts",
     "prepublishOnly": "npm run build"
   },
   "repository": {
