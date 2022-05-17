@@ -64,6 +64,10 @@ export class GitToolkit {
     return changedFiles;
   }
 
+  getCurrentBranchName(): string {
+    return execSync('git rev-parse --abbrev-ref HEAD').toString()
+  }
+
   getVCSState(): { staged: string[]; notStaged: string[] } {
     debug(`getVCSState called`);
     return {
