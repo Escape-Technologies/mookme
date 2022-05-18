@@ -23,8 +23,8 @@
   },
   "homepage": "https://github.com/Escape-Technologies/mookme",
   "devDependencies": {
-    "@commitlint/cli": "^12.1.1",
-    "@commitlint/config-angular": "^12.1.1",
+    "@commitlint/cli": "^17.0.0",
+    "@commitlint/config-angular": "^17.0.0",
     "@escape.tech/mookme": "file:packages/mookme"
   }
 }
