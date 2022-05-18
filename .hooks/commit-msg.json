@@ -1,6 +1,8 @@
 {
-    "steps": [{
-        "name": "commit lint",
-        "command": "cat {args} | ./node_modules/@commitlint/cli/cli.js"
-    }]
+  "steps": [
+    {
+      "name": "commit lint",
+      "command": "npx commitlint --edit"
+    }
+  ]
 }
