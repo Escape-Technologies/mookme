@@ -35,20 +35,14 @@ export class GitToolkit {
 
   getNotStagedFiles(): string[] {
     debug(`getNotStagedFiles called`);
-    const notStagedFiles = execSync('echo $(git diff --name-only)')
-      .toString()
-      .split(' ')
-      .map((pth) => pth.replace('\n', ''));
+    const notStagedFiles = execSync('git diff --name-only').toString().split('\n');
     debug(`Retrieved the following files not staged: ${notStagedFiles}`);
     return notStagedFiles;
   }
 
   getStagedFiles(): string[] {
     debug(`getStagedFiles called`);
-    const stagedFiles = execSync('echo $(git diff --cached --name-only)')
-      .toString()
-      .split(' ')
-      .map((pth) => pth.replace('\n', ''));
+    const stagedFiles = execSync('git diff --cached --name-only').toString().split('\n');
     debug(`Retrieved the following files staged: ${stagedFiles}`);
     return stagedFiles;
   }
@@ -64,10 +58,7 @@ export class GitToolkit {
 
   getFilesChangedBetweenRefs(from: string, to: string): string[] {
     debug(`getFilesChangedBetweenRefs(${from}, ${to}) called`);
-    const changedFiles = execSync(`echo $(git diff ${from} ${to} --name-only)`)
-      .toString()
-      .split(' ')
-      .map((pth) => pth.replace('\n', ''));
+    const changedFiles = execSync(`git diff ${from} ${to} --name-only`).toString().split('\n');
 
     debug(`Retrieved the following files commited: ${changedFiles}`);
     return changedFiles;
@@ -87,14 +78,9 @@ export class GitToolkit {
   }
 
   detectAndProcessModifiedFiles(initialNotStagedFiles: string[], behavior: ADDED_BEHAVIORS): void {
-    const notStagedFiles = execSync('echo $(git diff --name-only)')
-      .toString()
-      .split(' ')
-      .map((file) => file.replace('\n', ''));
-
+    const notStagedFiles = this.getNotStagedFiles();
     const changedFiles = notStagedFiles.filter((file) => !initialNotStagedFiles.includes(file));
     if (changedFiles.length > 0) {
-      console.log();
       switch (behavior) {
         case ADDED_BEHAVIORS.ADD_AND_COMMIT:
           logger.warning('Files were changed during hook execution !');
