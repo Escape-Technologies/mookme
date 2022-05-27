@@ -65,7 +65,7 @@ export class GitToolkit {
   }
 
   getCurrentBranchName(): string {
-    return execSync('git rev-parse --abbrev-ref HEAD').toString()
+    return execSync('git rev-parse --abbrev-ref HEAD').toString();
   }
 
   getVCSState(): { staged: string[]; notStaged: string[] } {
@@ -79,6 +79,13 @@ export class GitToolkit {
   getAllTrackedFiles(): string[] {
     debug(`getAllTrackedFiles called`);
     return execSync('git ls-tree -r HEAD --name-only', { cwd: this.rootDir }).toString().split('\n');
+  }
+
+  getFilesToPush(): string[] {
+    debug(`getFilesToPush called`);
+    const commits = execSync('git rev-list @{push}..', { cwd: this.rootDir }).toString().split('\n').filter(Boolean);
+    if (commits.length === 0) return [];
+    return this.getFilesChangedBetweenRefs(commits[commits.length - 1], commits[0]);
   }
 
   detectAndProcessModifiedFiles(initialNotStagedFiles: string[], behavior: ADDED_BEHAVIORS): void {
