@@ -78,6 +78,7 @@ export class RunRunner {
     // Load packages hooks to run
     let hooks = await this.hooksResolver.getPreparedHooks();
     hooks = this.hooksResolver.applyOnlyOn(hooks);
+
     hooks = this.hooksResolver.hydrateArguments(hooks, hookArguments);
 
     // Instanciate the package executors

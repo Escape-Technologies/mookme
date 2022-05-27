@@ -10,6 +10,7 @@ import { CurrentCommitFilterStrategy } from './filter-strategies/current-commit-
 import { PreviousCommitFilterStrategy } from './filter-strategies/previous-commit-filter';
 import wcmatch from 'wildcard-match';
 import { FromToFilterStrategy } from './filter-strategies/from-to.filter';
+import { NotPushedFilesFilterStrategy } from './filter-strategies/not-pushed-files-filter';
 
 const debug = Debug('mookme:hooks-resolver');
 
@@ -53,6 +54,10 @@ export class HooksResolver {
       this.strategy = new FromToFilterStrategy(this.gitToolkit, useAllFiles, from, to);
     } else {
       switch (this.hookType) {
+        case HookType.PRE_PUSH:
+          debug(`Using strategy NotPushedFilesFilter`);
+          this.strategy = new NotPushedFilesFilterStrategy(this.gitToolkit, useAllFiles);
+          break;
         case HookType.POST_COMMIT:
           debug(`Using strategy PreviousCommitFilterStrategy`);
           this.strategy = new PreviousCommitFilterStrategy(this.gitToolkit, useAllFiles);
