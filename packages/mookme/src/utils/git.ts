@@ -83,7 +83,13 @@ export class GitToolkit {
 
   getFilesToPush(): string[] {
     debug(`getFilesToPush called`);
-    const commits = execSync('git rev-list @{push}..', { cwd: this.rootDir }).toString().split('\n').filter(Boolean);
+    let commits: string[] = [];
+    try {
+      commits = execSync('git rev-list @{push}..', { cwd: this.rootDir }).toString().split('\n').filter(Boolean);
+    } catch (e) {
+      logger.warning('Failed to retrieve the list of commits to push.');
+      debug(e);
+    }
     if (commits.length === 0) return [];
     return this.getFilesChangedBetweenRefs(commits[commits.length - 1], commits[0]);
   }
