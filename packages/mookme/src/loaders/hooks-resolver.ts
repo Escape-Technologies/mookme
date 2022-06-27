@@ -29,16 +29,18 @@ export class HooksResolver {
   root: string;
   hookType: string;
   strategy: FilterStrategy;
+  maxDepth: number;
 
   /**
    * A class defining several utilitaries used to load and prepare packages hooks to be executed
    *
    * @param gitToolkit - the {@link GitToolkit} instance to use to manage the VCS state
    */
-  constructor(gitToolkit: GitToolkit, hookType: HookType, opts: HooksResolverOptions = {}) {
+  constructor(gitToolkit: GitToolkit, hookType: HookType, maxDepth: number, opts: HooksResolverOptions = {}) {
     this.gitToolkit = gitToolkit;
     this.root = gitToolkit.rootDir;
     this.hookType = hookType;
+    this.maxDepth = maxDepth;
 
     const useAllFiles = opts.useAllFiles || false;
     const from = opts.from || null;
@@ -73,10 +75,9 @@ export class HooksResolver {
   /**
    * Recursively retrieve the list of folders containing a hook specification with their absolute paths.
    * @param depth - the current depth of the folder exploration. Defaults to 0 for the initial call, should be increased across the recursive calls.
-   * @param maxDepth - the max value accepted for the depth parameter before stopping the future recursions
    * @returns a list of strings denoting the absolute paths of the detected pakcages
    */
-  extractPackagesPaths(depth = 0, maxDepth = 3, source?: string): string[] {
+  extractPackagesPaths(depth = 0, source?: string): string[] {
     const paths: string[] = [];
     const root = source || this.root;
 
@@ -95,8 +96,9 @@ export class HooksResolver {
       if (['node_modules', '.venv', '.git', '.hooks'].includes(folder.name)) {
         continue;
       }
-      if (depth < maxDepth) {
-        paths.push(...this.extractPackagesPaths(depth + 1, maxDepth, path.join(root, folder.name)));
+
+      if (depth < this.maxDepth) {
+        paths.push(...this.extractPackagesPaths(depth + 1, path.join(root, folder.name)));
       }
     }
 

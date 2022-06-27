@@ -30,10 +30,15 @@ export function addRun(program: commander.Command): void {
       // Initialize the UI
       const ui = new MookmeUI(false);
       const git = new GitToolkit();
-      const resolver = new HooksResolver(git, opts.type, { useAllFiles: opts.all, from: opts.from, to: opts.to });
 
       // Load the different config files
       const config = new Config(git.rootDir);
+
+      const resolver = new HooksResolver(git, opts.type, config.maxDepth, {
+        useAllFiles: opts.all,
+        from: opts.from,
+        to: opts.to,
+      });
 
       // Instanciate a runner instance for the run command, and start it against the provided options
       const runner = new RunRunner(ui, config, git, resolver);
