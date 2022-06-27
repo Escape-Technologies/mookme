@@ -1,7 +1,8 @@
 import chalk from 'chalk';
-import { ExecutionStatus } from '../types/status.types';
-import { UIPackageItem, UIStepItem } from './types';
-import { ConsoleCanvas } from './writer';
+import { Renderer } from './renderer';
+import { ExecutionStatus } from '../../types/status.types';
+import { UIPackageItem, UIStepItem } from '../types';
+import { ConsoleCanvas } from '../writer';
 
 const stepDisplayedStatuses = {
   [ExecutionStatus.CREATED]: '🗓 Created',
@@ -14,7 +15,7 @@ const stepDisplayedStatuses = {
 /**
  * A class designed for rendering the UI state object into console statements
  */
-export class Renderer {
+export class FancyRenderer implements Renderer {
   writer: ConsoleCanvas;
   dots = ['.. ', '. .', ' ..'];
   currentDotIndex = 0;
