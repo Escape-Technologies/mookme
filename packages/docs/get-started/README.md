@@ -38,6 +38,15 @@ This will only write your `.git/hooks` scripts.
 npx mookme init --only-hook
 ```
 
+### Extra configuration options
+
+These entries are options that can be specified by the `.mookme.json` file.
+
+| Option        | Description           | Accepted values and types | Default |
+| ------------- | --------------------- | ------------------------- | ------- |
+| `addedBehavior` | The behavior to respect when files are changed during the hooks | `addAndCommit` or `exit` | `exit` |
+| `maxDepth`      | The maximum depth of folders used to check for the existence of `.hooks` folders | number | `3` |
+
 ## Writing your hooks
 
 ### Global structure of your project hooks
