@@ -7,7 +7,8 @@ import { ADDED_BEHAVIORS } from './types';
  * This class holds the types and attributes retrieved from `.mookme.json`
  */
 export class Config {
-  addedBehavior: ADDED_BEHAVIORS;
+  addedBehavior: ADDED_BEHAVIORS = ADDED_BEHAVIORS.ADD_AND_COMMIT;
+  maxDepth = 3;
 
   /**
    * Instanciate a config object by loading the JSON config file, or defaults to a default configuration.
@@ -20,14 +21,13 @@ export class Config {
     // Test it's existence, and default to the default configuration if there is an issue
     if (!fs.existsSync(configFilePath)) {
       logger.warning(`No \`.mookme.json\` file found at path ${rootDir} proceeding with a default configuration`);
-      this.addedBehavior = ADDED_BEHAVIORS.ADD_AND_COMMIT;
     } else {
       // Load the file and add it's content to the correct attributes
       // @TODO: verify the content of the config file
       const configFromFile = JSON.parse(fs.readFileSync(configFilePath).toString());
-      this.addedBehavior = configFromFile.addedBehavior
-        ? (configFromFile.addedBehavior as ADDED_BEHAVIORS)
-        : ADDED_BEHAVIORS.ADD_AND_COMMIT;
+
+      if (configFromFile.addedBehavior) this.addedBehavior = configFromFile.addedBehavior as ADDED_BEHAVIORS;
+      if (configFromFile.maxDepth) this.maxDepth = configFromFile.maxDepth;
     }
   }
 }
