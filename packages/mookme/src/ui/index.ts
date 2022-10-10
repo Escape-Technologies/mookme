@@ -1,9 +1,10 @@
 import { bus, Events, EventType } from '../events';
 import { ExecutionStatus } from '../types/status.types';
-import { Renderer } from './renderer';
 import { UIPackageItem } from './types';
 
 import Debug from 'debug';
+import { FancyRenderer } from './renderers/fancy-renderer';
+import { Renderer } from './renderers/renderer';
 const debug = Debug('mookme:ui');
 
 /**
@@ -34,7 +35,7 @@ export class MookmeUI {
    * @param renderer - an instance of the {@link Renderer} class used to render the UI state
    */
   constructor(start = true, renderer?: Renderer) {
-    this.renderer = renderer || new Renderer();
+    this.renderer = renderer || new FancyRenderer();
     this.started = start;
 
     bus.on(EventType.PackageRegistered, [this.onPackageRegistered.bind(this), this.render.bind(this)]);
@@ -66,6 +67,7 @@ export class MookmeUI {
   stop(): void {
     debug('Stopping UI');
     this.started = false;
+    this.renderer.stop();
   }
 
   /**

@@ -1,11 +1,12 @@
 import chalk from 'chalk';
-import { ExecutionStatus } from '../types/status.types';
-import { UIPackageItem, UIStepItem } from './types';
-import { ConsoleCanvas } from './writer';
+import { Renderer } from './renderer';
+import { ExecutionStatus } from '../../types/status.types';
+import { UIPackageItem, UIStepItem } from '../types';
+import { ConsoleCanvas } from '../writer';
 
 const stepDisplayedStatuses = {
   [ExecutionStatus.CREATED]: '🗓 Created',
-  [ExecutionStatus.RUNNING]: '🦾 Running...',
+  [ExecutionStatus.RUNNING]: '🦾 Running',
   [ExecutionStatus.FAILURE]: '❌ Error.',
   [ExecutionStatus.SUCCESS]: '✅ Done.',
   [ExecutionStatus.SKIPPED]: '⏩ Skipped.',
@@ -14,8 +15,13 @@ const stepDisplayedStatuses = {
 /**
  * A class designed for rendering the UI state object into console statements
  */
-export class Renderer {
+export class FancyRenderer implements Renderer {
   writer: ConsoleCanvas;
+  dots = ['.. ', '. .', ' ..'];
+  currentDotIndex = 0;
+  interval: NodeJS.Timeout;
+
+  currentPackages?: UIPackageItem[];
 
   /**
    * Constructor for the renderer class
@@ -24,6 +30,14 @@ export class Renderer {
    */
   constructor(canvas?: ConsoleCanvas) {
     this.writer = canvas || new ConsoleCanvas();
+    this.interval = setInterval(() => {
+      this.currentDotIndex = (this.currentDotIndex + 1) % 3;
+      this.currentPackages && this.render(this.currentPackages);
+    }, 100);
+  }
+
+  stop(): void {
+    this.interval && clearInterval(this.interval);
   }
 
   /**
@@ -38,7 +52,7 @@ export class Renderer {
     }
     this.writer.write(`→ ${chalk.bold(step.name)} > ${displayedCommand} `);
     if (step.status === ExecutionStatus.RUNNING) {
-      this.writer.write(`${stepDisplayedStatuses[step.status]} `);
+      this.writer.write(`${stepDisplayedStatuses[step.status]}${this.dots[this.currentDotIndex]} `);
     } else {
       this.writer.write(`${stepDisplayedStatuses[step.status]} `);
     }
@@ -51,18 +65,23 @@ export class Renderer {
    */
   _renderPacakage(pkg: UIPackageItem): void {
     this.writer.write();
+    let message: string;
     switch (pkg.status) {
       case ExecutionStatus.CREATED:
-        this.writer.write(`${chalk.bold.inverse(` Hooks : ${pkg.name} `)}${chalk.bold.inverse(' Created... ')}`);
+        message = ` Created${this.dots[this.currentDotIndex]} `;
+        this.writer.write(`${chalk.bold.inverse(` Hooks : ${pkg.name} `)}${chalk.bold.inverse(message)}`);
         break;
       case ExecutionStatus.RUNNING:
-        this.writer.write(`${chalk.bold.inverse(` Hooks : ${pkg.name} `)}${chalk.bgBlueBright.bold(' Running... ')}`);
+        message = ` Running${this.dots[this.currentDotIndex]} `;
+        this.writer.write(`${chalk.bold.inverse(` Hooks : ${pkg.name} `)}${chalk.bgBlueBright.bold(message)}`);
         break;
       case ExecutionStatus.SUCCESS:
-        this.writer.write(`${chalk.bold.inverse(` Hooks : ${pkg.name} `)}${chalk.bgGreen.bold(' Done ✓ ')}`);
+        message = ' Done ✓ ';
+        this.writer.write(`${chalk.bold.inverse(` Hooks : ${pkg.name} `)}${chalk.bgGreen.bold(message)}`);
         break;
       case ExecutionStatus.FAILURE:
-        this.writer.write(`${chalk.bold.inverse(` Hooks : ${pkg.name} `)}${chalk.bgRed.bold(' Error × ')}`);
+        message = ' Error × ';
+        this.writer.write(`${chalk.bold.inverse(` Hooks : ${pkg.name} `)}${chalk.bgRed.bold(message)}`);
         break;
     }
     for (const step of pkg.steps) {
@@ -81,5 +100,7 @@ export class Renderer {
     for (const pkg of packages) {
       this._renderPacakage(pkg);
     }
+
+    this.currentPackages = packages;
   }
 }

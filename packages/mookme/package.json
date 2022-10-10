@@ -11,14 +11,14 @@
     "dist/**/*.js"
   ],
   "scripts": {
-    "prebuild": "rm -f ./.tmp/ts-build-infos.json && rm -rf dist",
+    "prebuild": "rimraf -f ./.tmp/ts-build-infos.json && rimraf -rf dist",
     "build": "tsc",
     "dev": "tsc -w",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prettier": "prettier -c src/**/*.ts",
-    "prettier:fix": "prettier --write 'src/**/*.ts'",
-    "eslint": "eslint 'src/**/*.ts'",
-    "eslint:fix": "eslint --fix 'src/**/*.ts'",
+    "prettier:fix": "prettier --write src/**/*.ts",
+    "eslint": "eslint src/**/*.ts",
+    "eslint:fix": "eslint --fix src/**/*.ts",
     "prepublishOnly": "npm run build"
   },
   "repository": {
@@ -49,6 +49,7 @@
     "@tsconfig/node10": "^1.0.7",
     "@types/debug": "^4.1.7",
     "@types/inquirer": "^7.3.1",
+    "@types/node": "^15.0.2",
     "@typescript-eslint/eslint-plugin": "4.22.1",
     "@typescript-eslint/parser": "4.22.1",
     "eslint": "^7.26.0",
@@ -57,11 +58,11 @@
     "eslint-plugin-prettier": "3.4.0",
     "eslint-plugin-tsdoc": "^0.2.14",
     "prettier": "2.3.0",
+    "rimraf": "^3.0.2",
     "semantic-release": "^18.0.0",
     "typescript": "^4.2.4"
   },
   "dependencies": {
-    "@types/node": "^15.0.2",
     "chalk": "^4.1.1",
     "commander": "^7.2.0",
     "debug": "^4.3.4",

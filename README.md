@@ -26,6 +26,10 @@ The Mookme project is architectured around this monorepo. Every packages are sto
 - `/packages/mookme`: The NodeJs project for the CLI of Mookme
 - `/packages/docs`: A vuepress website holding the code of the user's documentation
 
+## You are new and willing to contribute ?
+
+There are a [few small issues and improvements that you can look into](https://github.com/Escape-Technologies/mookme/labels/good%20first%20issue), that are designed and explained for first contributors.
+
 ## Release channels
 
 Mookme is released under a `main` channel and a `beta` channel. These both correspond to the `beta` and `main` branches of this repository.

@@ -6,6 +6,8 @@ import { MookmeUI } from '../ui';
 import { RunOptions, RunRunner } from '../runner/run';
 import { HooksResolver } from '../loaders/hooks-resolver';
 import Debug from 'debug';
+import { NoClearRenderer } from '../ui/renderers/noclear-renderer';
+import { FancyRenderer } from '../ui/renderers/fancy-renderer';
 
 const debug = Debug('mookme');
 
@@ -22,16 +24,19 @@ export function addRun(program: commander.Command): void {
       'A valid git hook type ("pre-commit", "prepare-commit", "commit-msg", "post-commit")',
     )
     .option('-a, --all', 'Run hooks for all packages', '')
+    .option('--from <from>', 'Starting git reference used to evaluate hooks to run', '')
+    .option('--to <to>', 'Ending git reference used to evaluate hooks to run', '')
     .option('--args <args>', 'The arguments being passed to the hooks', '')
     .action(async (opts: RunOptions) => {
       debug('Running run command with options', opts);
-      // Initialize the UI
-      const ui = new MookmeUI(false);
       const git = new GitToolkit();
-      const resolver = new HooksResolver(git, opts.type);
 
       // Load the different config files
       const config = new Config(git.rootDir);
+
+      // Initialize the UI
+      const ui = new MookmeUI(false, config.noClearRenderer ? new NoClearRenderer() : new FancyRenderer());
+      const resolver = new HooksResolver(git, opts.type, { useAllFiles: opts.all, from: opts.from, to: opts.to });
 
       // Instanciate a runner instance for the run command, and start it against the provided options
       const runner = new RunRunner(ui, config, git, resolver);

@@ -43,6 +43,14 @@ The arguments that would be normally passed by git to the hook
 
 Skip the selection of hooks to run based on git-staged files, and run hooks of every package for this type
 
+- `--from` (optional)
+
+Starting git reference used to evaluate hooks to run. If set, `to` has to be set as well, otherwise this option is ignored.
+
+- `--to` (optional)
+
+Ending git reference used to evaluate hooks to run. If set, `from` has to be set as well, otherwise this option is ignored.
+
 ## `mookme inspect`
 
 Manually test wich packages are discovered and assess if your hooks are properly configured.
@@ -56,6 +64,10 @@ Manually test wich packages are discovered and assess if your hooks are properly
 - `-t --type` (required)
 
 The type of hook to inspect, has to be one of `pre-commit`, `prepare-commit-msg`, `commit-msg`, `post-commit`.
+
+- `-f --files` (optional)
+
+A list of files paths to inspect. Paths must be relative from the repository root.
 
 ## Hook files
 
@@ -75,7 +87,7 @@ The list of steps (commands) being executed by this hook. In a step you can defi
 | ------------- | ------------- | ------|
 | `name`      | The name that will be given to this step | yes |
 | `cmd`      | The command invoked at this step |   yes |
-| `onlyOn` | A shell wildcard conditioning the execution of the step based on modified files      |    no |
+| `onlyOn` | A shell wildcard (or a list of wildcard) conditioning the execution of the step based on modified files      |    no |
 | `serial` | A boolean value describing if the package hook execution should await for the step to end |    no |
 | `from` | Extend a shared step |    no |
 

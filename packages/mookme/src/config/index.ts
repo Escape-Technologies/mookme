@@ -8,6 +8,7 @@ import { ADDED_BEHAVIORS } from './types';
  */
 export class Config {
   addedBehavior: ADDED_BEHAVIORS;
+  noClearRenderer = false;
 
   /**
    * Instanciate a config object by loading the JSON config file, or defaults to a default configuration.
@@ -28,6 +29,7 @@ export class Config {
       this.addedBehavior = configFromFile.addedBehavior
         ? (configFromFile.addedBehavior as ADDED_BEHAVIORS)
         : ADDED_BEHAVIORS.ADD_AND_COMMIT;
+      this.noClearRenderer = configFromFile.noClearRenderer || false;
     }
   }
 }
