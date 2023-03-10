@@ -107,6 +107,11 @@ A flag used mainly to tell `mookme` this is a python hook, and might need a virt
 
 A path to a `<venv>/bin/activate` script to execute before the command if the hook type is `python`
 
+- `condaEnv`
+
+A conda environment name to use for the execution of the command
+
+
 ### Available arguments
 
 A set of arguments is provided by Mookme, that can be directly used in the hooks command definitions using the following syntax in the step definition:
