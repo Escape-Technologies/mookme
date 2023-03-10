@@ -135,6 +135,7 @@ export class HooksResolver {
       cwd: packagePath,
       type: hooksDefinition.type,
       venvActivate: hooksDefinition.venvActivate,
+      condaEnv: hooksDefinition.condaEnv,
       steps: hooksDefinition.steps,
     };
 

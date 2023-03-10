@@ -36,6 +36,7 @@ export class PackageExecutor {
           packagePath: pkg.cwd,
           type: pkg.type,
           venvActivate: pkg.venvActivate,
+          condaEnv: pkg.condaEnv,
           rootDir: options.rootDir,
         }),
     );
