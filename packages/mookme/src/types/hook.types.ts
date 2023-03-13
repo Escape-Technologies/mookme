@@ -58,6 +58,10 @@ export interface UnprocessedPackageHook {
    * A boolean denoting whether a virtualenv is started of not for this hook (eg for Python)
    */
   venvActivate?: string;
+  /**
+   * The conda environment we want to use to start this hook. Optional
+   */
+  condaEnv?: string;
 }
 
 export interface PackageHook extends UnprocessedPackageHook {

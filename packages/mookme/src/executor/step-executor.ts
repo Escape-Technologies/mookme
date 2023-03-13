@@ -27,6 +27,10 @@ export interface ExecuteStepOptions {
    * An optional path to a virtualenv to use (only used if type is {@link PackageType.PYTHON})
    */
   venvActivate?: string;
+  /**
+   * An optional conda env to use
+   */
+  condaEnv?: string;
 }
 
 /**
@@ -89,9 +93,11 @@ export class StepExecutor {
    */
   computeExecutedCommand(): string {
     // Add eventual virtual env to activate before the command
-    const { type, venvActivate } = this.options;
+    const { type, venvActivate, condaEnv } = this.options;
     const { command } = this.step;
-    const execute = type === 'python' && venvActivate ? `source ${venvActivate} && ${command} && deactivate` : command;
+    const env_execute =
+      type === 'python' && venvActivate ? `source ${venvActivate} && ${command} && deactivate` : command;
+    const execute = condaEnv ? `conda run -n ${condaEnv} ""${env_execute}""` : env_execute;
 
     return execute;
   }
