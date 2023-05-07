@@ -31,6 +31,10 @@ export interface RunOptions {
    * A boolean parameter to detect if the whole hook suite should be ran, regardless of the VCS state
    */
   to: string;
+  /**
+   * The path of the folder where the mookme configuration file is stored
+   */
+  configRoot: string;
 }
 
 /**
