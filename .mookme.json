@@ -1,8 +1,4 @@
 {
-  "packagesPath": "./packages",
-  "packages": [
-    "docs",
-    "mookme"
-  ],
-  "addedBehavior": "exit"
+  "addedBehavior": "exit",
+  "noClearRenderer": true
 }

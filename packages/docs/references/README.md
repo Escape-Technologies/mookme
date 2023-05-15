@@ -51,6 +51,10 @@ Starting git reference used to evaluate hooks to run. If set, `to` has to be set
 
 Ending git reference used to evaluate hooks to run. If set, `from` has to be set as well, otherwise this option is ignored.
 
+- `--config-root` (optional)
+
+The path of the folder where the mookme configuration file (`.mookme.json`) is stored
+
 ## `mookme inspect`
 
 Manually test wich packages are discovered and assess if your hooks are properly configured.

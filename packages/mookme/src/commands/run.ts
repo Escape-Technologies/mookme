@@ -27,12 +27,13 @@ export function addRun(program: commander.Command): void {
     .option('--from <from>', 'Starting git reference used to evaluate hooks to run', '')
     .option('--to <to>', 'Ending git reference used to evaluate hooks to run', '')
     .option('--args <args>', 'The arguments being passed to the hooks', '')
+    .option('--config-root <configRoot>', 'The path of the folder where the mookme configuration file is stored', '')
     .action(async (opts: RunOptions) => {
       debug('Running run command with options', opts);
       const git = new GitToolkit();
 
       // Load the different config files
-      const config = new Config(git.rootDir);
+      const config = new Config(opts.configRoot || git.rootDir);
 
       // Initialize the UI
       const ui = new MookmeUI(false, config.noClearRenderer ? new NoClearRenderer() : new FancyRenderer());
