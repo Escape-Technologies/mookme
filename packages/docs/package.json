@@ -32,6 +32,5 @@
     "markdownlint-cli": "^0.27.1",
     "prettier": "2.3.0",
     "vuepress": "^1.8.2"
-  },
-  "dependencies": {}
+  }
 }
