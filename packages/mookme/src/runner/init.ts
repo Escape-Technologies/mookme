@@ -71,7 +71,7 @@ export class InitRunner {
     logger.log(JSON.stringify(mookMeConfig, null, 2));
 
     logger.info('');
-    logger.info('The follwowing git hooks will be created:');
+    logger.info('The following git hooks will be created:');
     hookTypes.forEach((t) => logger.log(`${root}/.git/hooks/${t}`));
 
     logger.info('');
