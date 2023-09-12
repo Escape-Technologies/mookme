@@ -85,7 +85,7 @@ export class GitToolkit {
     debug(`getFilesToPush called`);
     let commits: string[] = [];
     try {
-      commits = execSync('git rev-list @{push}..', { cwd: this.rootDir }).toString().split('\n').filter(Boolean);
+      commits = execSync('git rev-list @{push}^..', { cwd: this.rootDir }).toString().split('\n').filter(Boolean);
     } catch (e) {
       logger.warning('Failed to retrieve the list of commits to push.');
       debug(e);
