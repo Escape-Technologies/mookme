@@ -12,16 +12,23 @@ export const choiceQuestion = (name: string, message: string, choices: string[])
   pageSize: process.stdout.rows / 2,
 });
 
-export async function selectHookTypes(skip = false): Promise<HookType[]> {
+export async function selectHookTypes(skip = false, typeToHook?: HookType): Promise<HookType[]> {
   let typesToHook: HookType[];
+
   if (skip) {
+    // If skip is provided, skip everything and return the hook types
     typesToHook = hookTypes;
+  } else if (typeToHook) {
+    // If skip is not provided, but a type is provided, return the type
+    typesToHook = [typeToHook];
   } else {
+    // Prompt the user for the hook types
     const { types } = (await inquirer.prompt([
       choiceQuestion('types', 'Select git events to hook :\n', hookTypes),
     ])) as { types: HookType[] };
     typesToHook = types;
   }
+
   return typesToHook;
 }
 
