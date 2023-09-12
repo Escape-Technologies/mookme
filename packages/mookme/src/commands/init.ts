@@ -12,6 +12,7 @@ export function addInit(program: commander.Command): void {
     .option('--added-behaviour <added-behaviour>', 'Provide added behaviour and skip the associated prompter')
     .option('--skip-types-selection', 'Skip hook types selection')
     .option('--yes', 'Skip confirmation prompter')
+    .option('-t, --type <type>', 'A valid git hook type ("pre-commit", "prepare-commit", "commit-msg", "post-commit")')
     .action(async (opts: InitOptions) => {
       debug('Running init command with options', opts);
       const git = new GitToolkit();
