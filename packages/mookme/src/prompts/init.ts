@@ -12,15 +12,16 @@ export const choiceQuestion = (name: string, message: string, choices: string[])
   pageSize: process.stdout.rows / 2,
 });
 
-export async function selectHookTypes(skip = false, typeToHook?: HookType): Promise<HookType[]> {
+// @todo(lecanu.maxence@gmail.com): standardize arguments of this function as a unique argument being an array of types
+export async function selectHookTypes(skip = false, hookCollection?: HookType[]): Promise<HookType[]> {
   let typesToHook: HookType[];
 
   if (skip) {
     // If skip is provided, skip everything and return the hook types
     typesToHook = hookTypes;
-  } else if (typeToHook) {
-    // If skip is not provided, but a type is provided, return the type
-    typesToHook = [typeToHook];
+  } else if (hookCollection) {
+    // If skip is not provided, but types are provided, return the types
+    typesToHook = hookCollection;
   } else {
     // Prompt the user for the hook types
     const { types } = (await inquirer.prompt([

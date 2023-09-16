@@ -36,9 +36,9 @@ export interface InitOptions {
    */
   yes?: boolean;
   /**
-   * The hook type executed. See {@link HookType}
+   * The hook types executed. See {@link HookType}
    */
-  type?: HookType;
+  types?: HookType[];
 }
 
 export class InitRunner {
@@ -52,7 +52,7 @@ export class InitRunner {
     const root = this.gitToolkit.rootDir;
 
     if (opts.onlyHook) {
-      const hookTypes = await selectHookTypes(opts.skipTypesSelection, opts.type);
+      const hookTypes = await selectHookTypes(opts.skipTypesSelection, opts.types);
       this.gitToolkit.writeGitHooksFiles(hookTypes);
       process.exit(0);
     }
@@ -69,7 +69,7 @@ export class InitRunner {
       addedBehavior,
     };
 
-    const hookTypes = await selectHookTypes(opts.skipTypesSelection, opts.type);
+    const hookTypes = await selectHookTypes(opts.skipTypesSelection, opts.types);
 
     clear();
     logger.info(`The following configuration will be written into \`${root}/.mookme.json\`:`);
