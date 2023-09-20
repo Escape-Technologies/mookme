@@ -5,6 +5,7 @@ import { ADDED_BEHAVIORS } from '../config/types';
 import { addedBehaviorQuestion, selectHookTypes } from '../prompts/init';
 import { GitToolkit } from '../utils/git';
 import logger from '../utils/logger';
+import { HookType } from '../types/hook.types';
 
 const clear = () => process.stdout.write('\x1Bc');
 
@@ -34,6 +35,10 @@ export interface InitOptions {
    * Skip confirmation prompter
    */
   yes?: boolean;
+  /**
+   * The hook types executed. See {@link HookType}
+   */
+  types?: HookType[];
 }
 
 export class InitRunner {
@@ -47,7 +52,7 @@ export class InitRunner {
     const root = this.gitToolkit.rootDir;
 
     if (opts.onlyHook) {
-      const hookTypes = await selectHookTypes(opts.skipTypesSelection);
+      const hookTypes = await selectHookTypes(opts.skipTypesSelection, opts.types);
       this.gitToolkit.writeGitHooksFiles(hookTypes);
       process.exit(0);
     }
@@ -64,14 +69,14 @@ export class InitRunner {
       addedBehavior,
     };
 
-    const hookTypes = await selectHookTypes(opts.skipTypesSelection);
+    const hookTypes = await selectHookTypes(opts.skipTypesSelection, opts.types);
 
     clear();
     logger.info(`The following configuration will be written into \`${root}/.mookme.json\`:`);
     logger.log(JSON.stringify(mookMeConfig, null, 2));
 
     logger.info('');
-    logger.info('The follwowing git hooks will be created:');
+    logger.info('The following git hooks will be created:');
     hookTypes.forEach((t) => logger.log(`${root}/.git/hooks/${t}`));
 
     logger.info('');

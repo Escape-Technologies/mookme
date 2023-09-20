@@ -21,7 +21,7 @@ Hence it only requires a very minimal configuration, as most of this is defined 
 **Case 1 : You are the first to configure `Mookme` on your project**
 
 ```bash
-npx mookme init
+npx @escape.tech/mookme init
 ```
 
 This will display a prompter to let you define how you want the hooks to behave when a file is changed during commit hooks, write the corresponding documentation in your `package.json`, and write your `.git/hooks` scripts.
@@ -35,7 +35,7 @@ Every step of this process is clearly shown and nothing will be written without 
 This will only write your `.git/hooks` scripts.
 
 ```bash
-npx mookme init --only-hook
+npx @escape.tech/mookme init --only-hook
 ```
 
 ## Writing your hooks
@@ -61,7 +61,7 @@ Hooks are written in a folder `.hooks` located at the root of your project and a
 |- packages
 |  |- package A
 |  |  |- .hooks # will be executed if you commit changes on package A
-|  |  |  |- pre-commit.json 
+|  |  |  |- pre-commit.json
 |  |  |  |- post-commit.json
 |  |- package A
 |  |  |- .hooks # will be executed if you commit changes on package B
