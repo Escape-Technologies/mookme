@@ -103,7 +103,7 @@ export class GitToolkit {
           logger.warning('Files were changed during hook execution !');
           logger.info('Following the defined behavior : Add and continue.');
           for (const file of changedFiles) {
-            execSync(`git add ${this.rootDir}/${file}`);
+            execSync(`git add "${this.rootDir}/${file}"`);
           }
           break;
         case ADDED_BEHAVIORS.EXIT:
