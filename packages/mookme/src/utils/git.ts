@@ -1,5 +1,6 @@
 import fs from 'fs';
 import { execSync } from 'child_process';
+import path from 'path';
 import { HookType } from '../types/hook.types';
 import { ADDED_BEHAVIORS } from '../config/types';
 import logger from './logger';
@@ -31,6 +32,16 @@ export class GitToolkit {
       process.exit(0);
     }
     this.rootDir = rootDir;
+  }
+
+  getGitFolderPath(): string {
+    const gitFolderPath = execSync('git rev-parse --git-common-dir').toString().trim()
+
+    if (!path.isAbsolute(gitFolderPath)) {
+      return path.resolve(gitFolderPath);
+    }
+
+    return gitFolderPath;
   }
 
   getNotStagedFiles(): string[] {
@@ -115,7 +126,7 @@ export class GitToolkit {
   }
 
   writeGitHooksFiles(hookTypes: HookType[]): void {
-    const gitFolderPath = `${this.rootDir}/.git`;
+    const gitFolderPath = this.getGitFolderPath();
     if (!fs.existsSync(`${gitFolderPath}/hooks`)) {
       fs.mkdirSync(`${gitFolderPath}/hooks`);
     }
