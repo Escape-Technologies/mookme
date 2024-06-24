@@ -35,21 +35,21 @@ export class GitToolkit {
 
   getNotStagedFiles(): string[] {
     debug(`getNotStagedFiles called`);
-    const notStagedFiles = execSync('git diff --name-only').toString().split('\n');
+    const notStagedFiles = execSync('git diff --name-only --diff-filter=d').toString().split('\n');
     debug(`Retrieved the following files not staged: ${notStagedFiles}`);
     return notStagedFiles;
   }
 
   getStagedFiles(): string[] {
     debug(`getStagedFiles called`);
-    const stagedFiles = execSync('git diff --cached --name-only').toString().split('\n');
+    const stagedFiles = execSync('git diff --cached --name-only --diff-filter=d').toString().split('\n');
     debug(`Retrieved the following files staged: ${stagedFiles}`);
     return stagedFiles;
   }
 
   getPreviouslyCommitedFiles(nCommitsBeforeHead = 1): string[] {
     debug(`getPreviouslyCommitedFiles(${nCommitsBeforeHead}) called`);
-    const commitedFiles = execSync(`git diff-tree --no-commit-id --name-only -r HEAD~${nCommitsBeforeHead}`)
+    const commitedFiles = execSync(`git diff-tree --diff-filter=d --no-commit-id --name-only -r HEAD~${nCommitsBeforeHead}`)
       .toString()
       .split('\n');
     debug(`Retrieved the following files commited: ${commitedFiles}`);
@@ -58,7 +58,7 @@ export class GitToolkit {
 
   getFilesChangedBetweenRefs(from: string, to: string): string[] {
     debug(`getFilesChangedBetweenRefs(${from}, ${to}) called`);
-    const changedFiles = execSync(`git diff ${from} ${to} --name-only`).toString().split('\n');
+    const changedFiles = execSync(`git diff --diff-filter=d ${from} ${to} --name-only`).toString().split('\n');
 
     debug(`Retrieved the following files commited: ${changedFiles}`);
     return changedFiles;
