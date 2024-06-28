@@ -49,7 +49,7 @@ export class GitToolkit {
 
   getPreviouslyCommitedFiles(nCommitsBeforeHead = 1): string[] {
     debug(`getPreviouslyCommitedFiles(${nCommitsBeforeHead}) called`);
-    const commitedFiles = execSync(`git diff-tree --diff-filter=d --no-commit-id --name-only -r HEAD~${nCommitsBeforeHead}`)
+    const commitedFiles = execSync(`git diff-tree --no-commit-id --name-only -r HEAD~${nCommitsBeforeHead}`)
       .toString()
       .split('\n');
     debug(`Retrieved the following files commited: ${commitedFiles}`);
