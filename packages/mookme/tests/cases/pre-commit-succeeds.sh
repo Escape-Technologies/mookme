@@ -36,6 +36,7 @@ git add .
 node $ROOT_FOLDER/dist/index.js run -t pre-commit
 
 git commit -m "test: commit" --no-verify
-git rm package1/tobedeleted.txt
+rm package1/tobedeleted.txt
+git add .
 
 node $ROOT_FOLDER/dist/index.js run -t pre-commit
