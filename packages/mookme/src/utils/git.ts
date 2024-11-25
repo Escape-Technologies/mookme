@@ -124,7 +124,7 @@ export class GitToolkit {
 
     hookTypes.forEach((type) => {
       logger.info(`- ${gitFolderPath}/hooks/${type}`);
-      const mookmeCmd = `npx @escape.tech/mookme -- run --type ${type} --args "$1"`;
+      const mookmeCmd = `npx @escape.tech/mookme run --type ${type} --args "$1"`;
       if (fs.existsSync(`${gitFolderPath}/hooks/${type}`)) {
         const hook = fs.readFileSync(`${gitFolderPath}/hooks/${type}`).toString();
         if (!hook.includes(mookmeCmd)) {
