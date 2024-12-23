@@ -5,6 +5,10 @@
 - **[see the documentation](https://mookme.org)**
 - **[see the *beta* documentation](https://beta.mookme.org)**
 
+## Notice: Mookme is deprecated
+
+As of December 23rd 2024, Mookme has been officially discontinued in favor of [Gookme](https://github.com/LMaxence/gookme), a Golang CLI with a binary executable offering the same functionality. Mookme will no longer receive updates or support. Please refer to the [migration guide](MIGRATION.md) for more information.
+
 <img src="assets/banner.png" alt="demo" width="600"/>
 
 ## What you will find on this repository
