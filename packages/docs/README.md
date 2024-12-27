@@ -2,6 +2,14 @@
 
 *A simple and easy-to-use, yet powerful and language agnostic git hook for monorepos.*
 
+::: danger
+As of December 23rd 2024, Mookme has been officially discontinued in favor of [Gookme](https://github.com/LMaxence/gookme), a Golang CLI with a binary executable offering the same functionality. Mookme will no longer receive updates or support. Please refer to the [migration guide](https://github.com/Escape-Technologies/mookme/raw/refs/heads/beta/MIGRATION.md) for more information.
+
+The domain name mookme.org and the documentation website hosted on this domain will keep working until March 1st 2024.
+
+**After this date, the website will cease to exist and the repository as well as the npm package will be archived.**
+:::
+
 <img src="banner.png" alt="banner"/>
 
 ## What is Mookme ?
